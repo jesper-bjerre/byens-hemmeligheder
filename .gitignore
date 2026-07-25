@@ -1,2 +1,152 @@
-# Claude Code lokale indstillinger (kan indeholde maskinspecifikke stier og tokens)
+# =====================================================================
+# Byens Hemmeligheder
+#
+# ADVARSEL: Dette repository er PUBLIC på GitHub.
+# Se CLAUDE.md for politikken om hemmeligheder. Kort fortalt:
+# udvid denne fil FØR filen med hemmeligheden oprettes, og bekræft med
+#   git check-ignore -v <sti>
+# =====================================================================
+
+# ---------------------------------------------------------------------
+# Hemmeligheder — nøgler, certifikater og legitimationsoplysninger
+# ---------------------------------------------------------------------
+
+# Miljøfiler
+.env
+.env.*
+*.env
+
+# Private nøgler og certifikatpakker
+*.p8
+*.p12
+*.pfx
+*.pem
+*.key
+*.keystore
+*.jks
+*.asc
+*.gpg
+
+# Apple: signering, provisioning og App Store Connect
+AuthKey_*.p8
+*.mobileprovision
+*.provisionprofile
+**/fastlane/.env*
+**/fastlane/report.xml
+**/fastlane/Preview.html
+
+# SSH og netværkslegitimation
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*.ppk
+.netrc
+_netrc
+.npmrc
+.pypirc
+
+# Sky- og tjenestelegitimation
+.aws/
+azureauth.json
+gha-creds-*.json
+**/appsettings.*.local.json
+
+# Generiske hemmelighedsfiler
+secret.json
+secrets.json
+secrets.yml
+secrets.yaml
+credentials.json
+credentials.yml
+credentials.yaml
+*.secrets.json
+*-secrets.json
+*.credentials.json
+
+# Undtagelser: skabeloner med pladsholdere må gerne committes
+!.env.example
+!.env.sample
+!.env.template
+!*.example
+!*.sample
+!*.template
+
+# ---------------------------------------------------------------------
+# Claude Code
+# ---------------------------------------------------------------------
+
+# Lokale indstillinger (kan indeholde maskinspecifikke stier og tokens)
 .claude/settings.local.json
+.claude/worktrees/
+
+# ---------------------------------------------------------------------
+# Xcode og Swift
+# ---------------------------------------------------------------------
+
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+*.moved-aside
+
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.pbxuser
+*.perspectivev3
+
+.build/
+.swiftpm/
+Pods/
+Carthage/Build/
+
+# ---------------------------------------------------------------------
+# .NET / ASP.NET Core (backend, senere fase)
+# ---------------------------------------------------------------------
+
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.userprefs
+artifacts/
+
+# ---------------------------------------------------------------------
+# Node og web (senere fase)
+# ---------------------------------------------------------------------
+
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# ---------------------------------------------------------------------
+# Operativsystem og editorer
+# ---------------------------------------------------------------------
+
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.idea/
+.vscode/
+*.swp
+*~
+
+# ---------------------------------------------------------------------
+# Midlertidige filer
+# ---------------------------------------------------------------------
+
+*.log
+*.tmp
+tmp/
+.tmp/
