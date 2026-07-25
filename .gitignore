@@ -1,0 +1,2 @@
+# Claude Code lokale indstillinger (kan indeholde maskinspecifikke stier og tokens)
+.claude/settings.local.json
