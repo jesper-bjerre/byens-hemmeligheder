@@ -1,0 +1,67 @@
+{
+  "description": "Testvektorer for pointberegning. Skal give identiske resultater i Swift og i en fremtidig ASP.NET Core-implementering.",
+  "specification": "scoring.md",
+  "rounding": [
+    { "name": "3 % af 100", "base": 100, "percent": 3, "expected": 3 },
+    { "name": "4 % af 100", "base": 100, "percent": 4, "expected": 4 },
+    { "name": "5 % af 100", "base": 100, "percent": 5, "expected": 5 },
+    { "name": "0 % giver intet fradrag", "base": 100, "percent": 0, "expected": 0 },
+    { "name": "100 % fjerner alt", "base": 100, "percent": 100, "expected": 100 },
+    {
+      "name": "halv opad, ikke til lige tal — bankers rounding ville give 2",
+      "base": 50,
+      "percent": 5,
+      "expected": 3
+    },
+    {
+      "name": "halv opad ved 7,5",
+      "base": 150,
+      "percent": 5,
+      "expected": 8
+    },
+    {
+      "name": "afrunder ned under en halv",
+      "base": 80,
+      "percent": 3,
+      "expected": 2
+    },
+    {
+      "name": "afrunder op over en halv",
+      "base": 90,
+      "percent": 3,
+      "expected": 3
+    },
+    {
+      "name": "grundpoint uden for 100 regnes ens",
+      "base": 250,
+      "percent": 4,
+      "expected": 10
+    }
+  ],
+  "totals": [
+    {
+      "name": "ingen hints",
+      "base": 100,
+      "hintPercents": [],
+      "expectedTotal": 100
+    },
+    {
+      "name": "ét hint",
+      "base": 100,
+      "hintPercents": [3],
+      "expectedTotal": 97
+    },
+    {
+      "name": "to hints",
+      "base": 100,
+      "hintPercents": [3, 4],
+      "expectedTotal": 93
+    },
+    {
+      "name": "alle tre hints — SC-005",
+      "base": 100,
+      "hintPercents": [3, 4, 5],
+      "expectedTotal": 88
+    }
+  ]
+}

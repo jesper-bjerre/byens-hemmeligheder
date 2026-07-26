@@ -1,0 +1,133 @@
+{
+  "basePoints" : 100,
+  "completion" : {
+    "headline" : "Beskeden er åben",
+    "historyFact" : "De første to stod færdige i 2009.",
+    "message" : "Nu står alle fem bølger ved fjorden.",
+    "messageLabel" : "Den femte besked",
+    "subheadline" : "Du samlede den femte besked"
+  },
+  "difficulty" : 3,
+  "estimatedMinutes" : 10,
+  "fictionLabel" : "Fiktiv mission baseret på Bølgens byggehistorie.",
+  "hints" : [
+    {
+      "id" : "hint.boelgen.1",
+      "order" : 1,
+      "penaltyPercent" : 3,
+      "text" : "Tæl de store hvide toppe.",
+      "title" : "Hvor"
+    },
+    {
+      "id" : "hint.boelgen.2",
+      "order" : 2,
+      "penaltyPercent" : 4,
+      "text" : "Følg rækkefølgen.",
+      "title" : "Hvordan"
+    },
+    {
+      "id" : "hint.boelgen.3",
+      "order" : 3,
+      "penaltyPercent" : 5,
+      "text" : "Fem, ni og to.",
+      "title" : "Næsten"
+    }
+  ],
+  "id" : "mission.boelgen.den-femte-besked",
+  "locationId" : "loc.vejle-havn.boelgen",
+  "shortTitle" : "Den femte besked",
+  "slug" : "boelgen-den-femte-besked",
+  "sourceIds" : [
+    "source.visitvejle.boelgen"
+  ],
+  "status" : "fieldTestReady",
+  "steps" : [
+    {
+      "body" : "En glemt besked ved fjorden.",
+      "continueLabel" : "Jeg er klar",
+      "id" : "step.boelgen.intro",
+      "kind" : "narrative",
+      "order" : 1,
+      "title" : "Den femte besked"
+    },
+    {
+      "answerRule" : {
+        "acceptedAnswers" : [
+          "5"
+        ],
+        "canonicalAnswer" : "5",
+        "genericIncorrectFeedback" : "Tæl toppene igen.",
+        "kind" : "exact",
+        "nearMissResponses" : [
+
+        ]
+      },
+      "correctFeedback" : "Rigtigt.",
+      "eyebrow" : "SPOR 1 AF 3",
+      "hintIds" : [
+        "hint.boelgen.1"
+      ],
+      "id" : "step.boelgen.oejet",
+      "instruction" : "Tæl kun de store hvide toppe.",
+      "kind" : "singleChoice",
+      "options" : [
+        {
+          "id" : "opt.4",
+          "label" : "4"
+        },
+        {
+          "id" : "opt.5",
+          "label" : "5"
+        }
+      ],
+      "order" : 2,
+      "question" : "Hvor mange bølgetoppe kan du se?",
+      "title" : "Øjet"
+    },
+    {
+      "answerRule" : {
+        "acceptedAnswers" : [
+          "592",
+          "5 9 2",
+          "5-9-2"
+        ],
+        "canonicalAnswer" : "592",
+        "genericIncorrectFeedback" : "Find de tre delresultater hver for sig.",
+        "kind" : "digitsOnly",
+        "nearMissResponses" : [
+          {
+            "answer" : "529",
+            "feedback" : "Rækkefølgen er forkert."
+          }
+        ]
+      },
+      "evidenceCards" : [
+        {
+          "description" : "Fem hvide bølgeformede hoveddele.",
+          "displayValue" : "5",
+          "id" : "card.boelgen.oejet",
+          "label" : "Øjet",
+          "supportingText" : "Talt på stedet.",
+          "symbol" : "eye",
+          "title" : "Bølgetoppene"
+        }
+      ],
+      "eyebrow" : "SAML KODEN",
+      "hintIds" : [
+        "hint.boelgen.1"
+      ],
+      "id" : "step.boelgen.koden",
+      "instruction" : "Sæt tallene sammen.",
+      "kind" : "numericCode",
+      "length" : 3,
+      "order" : 5,
+      "title" : "Åbn beskeden"
+    }
+  ],
+  "tags" : [
+    "arkitektur",
+    "observation"
+  ],
+  "teaser" : "En glemt besked ved fjorden.",
+  "title" : "Bølgen – Den femte besked"
+}

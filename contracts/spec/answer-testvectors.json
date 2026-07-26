@@ -1,0 +1,224 @@
+{
+  "description": "Testvektorer for svarnormalisering og -bedømmelse. Sprogneutrale med vilje: de køres i dag af Swift Testing og skal senere køre uændret i xUnit mod ASP.NET Core-implementeringen.",
+  "specification": "answer-normalization.md",
+  "normalization": [
+    {
+      "name": "mellemrum fjernes i cifferkode",
+      "input": "5 9 2",
+      "profile": "digitsOnly",
+      "expected": "592"
+    },
+    {
+      "name": "bindestreger fjernes i cifferkode",
+      "input": "5-9-2",
+      "profile": "digitsOnly",
+      "expected": "592"
+    },
+    {
+      "name": "tankestreg behandles som bindestreg",
+      "input": "5–9–2",
+      "profile": "digitsOnly",
+      "expected": "592"
+    },
+    {
+      "name": "hard space fjernes",
+      "input": "5 9 2",
+      "profile": "digitsOnly",
+      "expected": "592"
+    },
+    {
+      "name": "nul-bredde-tegn fjernes",
+      "input": "5​9​2",
+      "profile": "digitsOnly",
+      "expected": "592"
+    },
+    {
+      "name": "fuldbredde-cifre bliver ASCII",
+      "input": "５９２",
+      "profile": "digitsOnly",
+      "expected": "592"
+    },
+    {
+      "name": "arabisk-indiske cifre bliver ASCII",
+      "input": "٥٩٢",
+      "profile": "digitsOnly",
+      "expected": "592"
+    },
+    {
+      "name": "foranstillet nul bevares",
+      "input": "007",
+      "profile": "digitsOnly",
+      "expected": "007"
+    },
+    {
+      "name": "foranstillet nul er ikke det samme som uden",
+      "input": "7",
+      "profile": "digitsOnly",
+      "expected": "7"
+    },
+    {
+      "name": "bogstaver kasseres i cifferprofilen",
+      "input": "kode 592",
+      "profile": "digitsOnly",
+      "expected": "592"
+    },
+    {
+      "name": "omgivende mellemrum trimmes",
+      "input": "   428   ",
+      "profile": "digitsOnly",
+      "expected": "428"
+    },
+    {
+      "name": "aa foldes fra bolle-å",
+      "input": "Blå",
+      "profile": "exact",
+      "expected": "blaa"
+    },
+    {
+      "name": "oe foldes fra ø",
+      "input": "Bølgen",
+      "profile": "exact",
+      "expected": "boelgen"
+    },
+    {
+      "name": "ae foldes fra æ",
+      "input": "Være",
+      "profile": "exact",
+      "expected": "vaere"
+    },
+    {
+      "name": "dekomponeret å samles af NFC før foldning",
+      "input": "Blå",
+      "profile": "exact",
+      "expected": "blaa"
+    },
+    {
+      "name": "versalt Å foldes som lille",
+      "input": "ÅBEN",
+      "profile": "exact",
+      "expected": "aaben"
+    },
+    {
+      "name": "krøllet apostrof bliver lige",
+      "input": "arkitekt’s",
+      "profile": "exact",
+      "expected": "arkitekt's"
+    },
+    {
+      "name": "mellemrum og punktum fjernes i tekstprofilen",
+      "input": "fem. ni. to",
+      "profile": "exact",
+      "expected": "femnito"
+    }
+  ],
+  "evaluation": [
+    {
+      "name": "Bølgen: kanonisk facit",
+      "rule": "boelgen.kode",
+      "input": "592",
+      "expected": "correct"
+    },
+    {
+      "name": "Bølgen: facit med mellemrum",
+      "rule": "boelgen.kode",
+      "input": "5 9 2",
+      "expected": "correct"
+    },
+    {
+      "name": "Bølgen: facit med bindestreger",
+      "rule": "boelgen.kode",
+      "input": "5-9-2",
+      "expected": "correct"
+    },
+    {
+      "name": "Bølgen: ombyttet rækkefølge er registreret fejlsvar",
+      "rule": "boelgen.kode",
+      "input": "529",
+      "expected": "nearMiss"
+    },
+    {
+      "name": "Bølgen: begyndt med etagerne",
+      "rule": "boelgen.kode",
+      "input": "952",
+      "expected": "nearMiss"
+    },
+    {
+      "name": "Bølgen: bølger efter pausen",
+      "rule": "boelgen.kode",
+      "input": "593",
+      "expected": "nearMiss"
+    },
+    {
+      "name": "Bølgen: årstallet brugt i stedet for antallet",
+      "rule": "boelgen.kode",
+      "input": "5918",
+      "expected": "nearMiss"
+    },
+    {
+      "name": "Bølgen: forkert første ciffer",
+      "rule": "boelgen.kode",
+      "input": "492",
+      "expected": "nearMiss"
+    },
+    {
+      "name": "Bølgen: to cifre er ufærdigt, ikke forkert",
+      "rule": "boelgen.kode",
+      "input": "59",
+      "expected": "malformed"
+    },
+    {
+      "name": "Bølgen: tomt svar er ufærdigt",
+      "rule": "boelgen.kode",
+      "input": "",
+      "expected": "malformed"
+    },
+    {
+      "name": "Bølgen: kun bogstaver er ufærdigt i cifferprofilen",
+      "rule": "boelgen.kode",
+      "input": "abc",
+      "expected": "malformed"
+    },
+    {
+      "name": "Bølgen: uregistreret forkert kode",
+      "rule": "boelgen.kode",
+      "input": "111",
+      "expected": "incorrect"
+    },
+    {
+      "name": "Fjordenhus: kanonisk facit",
+      "rule": "fjordenhus.kode",
+      "input": "428",
+      "expected": "correct"
+    },
+    {
+      "name": "Fjordenhus: facit med mellemrum",
+      "rule": "fjordenhus.kode",
+      "input": "4 2 8",
+      "expected": "correct"
+    },
+    {
+      "name": "Fjordenhus: ombyttet rækkefølge",
+      "rule": "fjordenhus.kode",
+      "input": "482",
+      "expected": "nearMiss"
+    },
+    {
+      "name": "Fjordenhus: hele højden brugt",
+      "rule": "fjordenhus.kode",
+      "input": "4228",
+      "expected": "nearMiss"
+    },
+    {
+      "name": "Fjordenhus: rummene talt som form",
+      "rule": "fjordenhus.kode",
+      "input": "2228",
+      "expected": "nearMiss"
+    },
+    {
+      "name": "Fjordenhus: uregistreret forkert kode",
+      "rule": "fjordenhus.kode",
+      "input": "999",
+      "expected": "incorrect"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "contentVersion" : "2026-07-25.1",
+  "id" : "0E7C0A2E-7C6E-4C9E-9E3F-1B2A3C4D5E6F",
+  "kind" : "answerSubmitted",
+  "occurredAt" : "2027-01-15T08:00:00.000Z",
+  "payload" : {
+    "answer" : "592",
+    "missionId" : "mission.boelgen.den-femte-besked",
+    "outcome" : "correct",
+    "stepId" : "step.boelgen.koden"
+  },
+  "sequence" : 7
+}

@@ -1,0 +1,420 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BH0000000000000000000017 /* BHContracts in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000011 /* BHContracts */; };
+		BH0000000000000000000018 /* BHGameCore in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000012 /* BHGameCore */; };
+		BH0000000000000000000019 /* BHContentKit in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000013 /* BHContentKit */; };
+		BH000000000000000000001A /* BHPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000014 /* BHPersistence */; };
+		BH000000000000000000001B /* BHLocationKit in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000015 /* BHLocationKit */; };
+		BH000000000000000000001C /* BHDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000016 /* BHDesignSystem */; };
+		BH000000000000000000001E /* content-pack.json in Resources */ = {isa = PBXBuildFile; fileRef = BH000000000000000000001D /* content-pack.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		BH0000000000000000000005 /* ByensHemmeligheder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ByensHemmeligheder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BH000000000000000000001D /* content-pack.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "content-pack.json"; path = "../contracts/content/da-DK/content-pack.json"; sourceTree = "<group>"; };
+		BH0000000000000000000021 /* ByensHemmelighederUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ByensHemmelighederUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BH000000000000000000001F /* Exceptions for "App" folder in "ByensHemmeligheder" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BH0000000000000000000004 /* ByensHemmeligheder */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		BH0000000000000000000009 /* App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BH000000000000000000001F /* Exceptions for "App" folder in "ByensHemmeligheder" target */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		BH0000000000000000000025 /* ByensHemmelighederUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ByensHemmelighederUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		BH000000000000000000002A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BH0000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BH0000000000000000000004;
+			remoteInfo = ByensHemmeligheder;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		BH0000000000000000000029 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BH0000000000000000000004 /* ByensHemmeligheder */;
+			targetProxy = BH000000000000000000002A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BH0000000000000000000007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BH0000000000000000000017 /* BHContracts in Frameworks */,
+				BH0000000000000000000018 /* BHGameCore in Frameworks */,
+				BH0000000000000000000019 /* BHContentKit in Frameworks */,
+				BH000000000000000000001A /* BHPersistence in Frameworks */,
+				BH000000000000000000001B /* BHLocationKit in Frameworks */,
+				BH000000000000000000001C /* BHDesignSystem in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BH0000000000000000000023 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BH0000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				BH0000000000000000000009 /* App */,
+				BH0000000000000000000025 /* ByensHemmelighederUITests */,
+				BH000000000000000000001D /* content-pack.json */,
+				BH0000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BH0000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BH0000000000000000000005 /* ByensHemmeligheder.app */,
+				BH0000000000000000000021 /* ByensHemmelighederUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BH0000000000000000000004 /* ByensHemmeligheder */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BH000000000000000000000B /* Build configuration list for PBXNativeTarget "ByensHemmeligheder" */;
+			buildPhases = (
+				BH0000000000000000000006 /* Sources */,
+				BH0000000000000000000007 /* Frameworks */,
+				BH0000000000000000000008 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BH0000000000000000000009 /* App */,
+			);
+			name = ByensHemmeligheder;
+			packageProductDependencies = (
+				BH0000000000000000000011 /* BHContracts */,
+				BH0000000000000000000012 /* BHGameCore */,
+				BH0000000000000000000013 /* BHContentKit */,
+				BH0000000000000000000014 /* BHPersistence */,
+				BH0000000000000000000015 /* BHLocationKit */,
+				BH0000000000000000000016 /* BHDesignSystem */,
+			);
+			productName = ByensHemmeligheder;
+			productReference = BH0000000000000000000005 /* ByensHemmeligheder.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BH0000000000000000000020 /* ByensHemmelighederUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BH0000000000000000000026 /* Build configuration list for PBXNativeTarget "ByensHemmelighederUITests" */;
+			buildPhases = (
+				BH0000000000000000000022 /* Sources */,
+				BH0000000000000000000023 /* Frameworks */,
+				BH0000000000000000000024 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BH0000000000000000000029 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				BH0000000000000000000025 /* ByensHemmelighederUITests */,
+			);
+			name = ByensHemmelighederUITests;
+			packageProductDependencies = (
+			);
+			productName = ByensHemmelighederUITests;
+			productReference = BH0000000000000000000021 /* ByensHemmelighederUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BH0000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					BH0000000000000000000004 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					BH0000000000000000000020 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = BH0000000000000000000004;
+					};
+				};
+			};
+			buildConfigurationList = BH000000000000000000000A /* Build configuration list for PBXProject "ByensHemmeligheder" */;
+			developmentRegion = da;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				da,
+				Base,
+			);
+			mainGroup = BH0000000000000000000002;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BH0000000000000000000010 /* XCLocalSwiftPackageReference "Packages/BHKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = BH0000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BH0000000000000000000004 /* ByensHemmeligheder */,
+				BH0000000000000000000020 /* ByensHemmelighederUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BH0000000000000000000008 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BH000000000000000000001E /* content-pack.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BH0000000000000000000024 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BH0000000000000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BH0000000000000000000022 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BH000000000000000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG BH_DEV_TOOLS";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		BH000000000000000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BH000000000000000000000E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Byens Hemmeligheder";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byenshemmeligheder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		BH000000000000000000000F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Byens Hemmeligheder";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byenshemmeligheder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		BH0000000000000000000027 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byenshemmeligheder.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG BH_DEV_TOOLS";
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = ByensHemmeligheder;
+			};
+			name = Debug;
+		};
+		BH0000000000000000000028 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byenshemmeligheder.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = ByensHemmeligheder;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BH000000000000000000000A /* Build configuration list for PBXProject "ByensHemmeligheder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BH000000000000000000000C /* Debug */,
+				BH000000000000000000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BH000000000000000000000B /* Build configuration list for PBXNativeTarget "ByensHemmeligheder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BH000000000000000000000E /* Debug */,
+				BH000000000000000000000F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BH0000000000000000000026 /* Build configuration list for PBXNativeTarget "ByensHemmelighederUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BH0000000000000000000027 /* Debug */,
+				BH0000000000000000000028 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		BH0000000000000000000010 /* XCLocalSwiftPackageReference "Packages/BHKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/BHKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BH0000000000000000000011 /* BHContracts */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BHContracts;
+		};
+		BH0000000000000000000012 /* BHGameCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BHGameCore;
+		};
+		BH0000000000000000000013 /* BHContentKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BHContentKit;
+		};
+		BH0000000000000000000014 /* BHPersistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BHPersistence;
+		};
+		BH0000000000000000000015 /* BHLocationKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BHLocationKit;
+		};
+		BH0000000000000000000016 /* BHDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BHDesignSystem;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = BH0000000000000000000001 /* Project object */;
+}

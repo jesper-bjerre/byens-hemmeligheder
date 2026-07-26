@@ -1,0 +1,112 @@
+import XCTest
+
+/// User Story 4: turen overlever afbrydelse og manglende netværk.
+final class ResumeAndOfflineTests: FlowTestCase {
+
+    private let missionId = "mission.boelgen.den-femte-besked"
+
+    /// SC-006. Dræb appen midt i opgaven og bekræft, at den genoptager samme sted.
+    func testProgressSurvivesTermination() {
+        var app = launchApp(
+            atLatitude: Vantage.boelgen.latitude,
+            longitude: Vantage.boelgen.longitude
+        )
+
+        tapMission(missionId, in: app)
+        startMission(in: app)
+        waitForPresence(in: app)
+        continueNarrative(in: app)
+
+        chooseOption("5", in: app)
+        chooseOption("9", in: app)
+
+        // Vi står nu på tredje spor. Dræb appen.
+        app.terminate()
+
+        // Start igen **uden** at nulstille progressionen.
+        app = launchApp(
+            atLatitude: Vantage.boelgen.latitude,
+            longitude: Vantage.boelgen.longitude,
+            resettingProgress: false
+        )
+
+        // Samme trin skal komme frem igen — ikke kortet, ikke forfra.
+        let pausen = app.buttons["option.2"]
+        XCTAssertTrue(
+            pausen.waitForExistence(timeout: Self.presenceTimeout),
+            "Appen genoptog ikke på det trin, spilleren stod på"
+        )
+
+        pausen.tap()
+        enterCode("592", in: app)
+        submitCode(in: app)
+        assertReward(points: 100, in: app)
+    }
+
+    /// SC-006, anden halvdel: et brugt hint skal stadig være brugt efter genstart.
+    func testHintStatusSurvivesTermination() {
+        var app = launchApp(
+            atLatitude: Vantage.boelgen.latitude,
+            longitude: Vantage.boelgen.longitude
+        )
+
+        tapMission(missionId, in: app)
+        startMission(in: app)
+        waitForPresence(in: app)
+        continueNarrative(in: app)
+
+        // Åbn hint 1 på observationstrinnet.
+        app.buttons["hints.open"].tap()
+        app.buttons["hint.reveal.1"].tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Vis hintet")).firstMatch.tap()
+        app.buttons["Luk"].tap()
+
+        app.terminate()
+        app = launchApp(
+            atLatitude: Vantage.boelgen.latitude,
+            longitude: Vantage.boelgen.longitude,
+            resettingProgress: false
+        )
+
+        // Hintet skal stå som åbnet — og genåbning må ikke koste igen (FR-019).
+        let hints = app.buttons["hints.open"]
+        XCTAssertTrue(hints.waitForExistence(timeout: Self.presenceTimeout))
+        hints.tap()
+        XCTAssertTrue(
+            app.staticTexts["Åbnet"].waitForExistence(timeout: Self.uiTimeout),
+            "Hintstatus overlevede ikke genstarten"
+        )
+    }
+
+    /// SC-003. Hele missionen skal kunne gennemføres uden netværk.
+    ///
+    /// Simulatoren deler værtens netværk og kan ikke sættes i flytilstand
+    /// programmatisk. Testen beviser derfor det, den kan bevise maskinelt:
+    /// gennemløbet foretager ingen netværkskald. Indholdet er bundlet, loggen er
+    /// lokal, og kortet er ikke-kritisk (R-008). Den fysiske flytilstandstest
+    /// står i quickstart.md lag 2.
+    func testFullFlowMakesNoNetworkRequests() {
+        let app = launchApp(
+            atLatitude: Vantage.boelgen.latitude,
+            longitude: Vantage.boelgen.longitude,
+            extraArguments: ["-BHFailOnNetworkAccess"]
+        )
+
+        tapMission(missionId, in: app)
+        startMission(in: app)
+        waitForPresence(in: app)
+        continueNarrative(in: app)
+
+        chooseOption("5", in: app)
+        chooseOption("9", in: app)
+        chooseOption("2", in: app)
+        enterCode("592", in: app)
+        submitCode(in: app)
+
+        assertReward(points: 100, in: app)
+
+        // Flaget får appen til at afbryde ved ethvert URLSession-kald.
+        // Når vi når hertil uden nedbrud, har intet i gennemløbet rørt netværket.
+        XCTAssertEqual(app.state, .runningForeground, "Appen døde undervejs — noget kaldte netværket")
+    }
+}

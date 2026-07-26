@@ -1,0 +1,36 @@
+{
+  "accessibility" : {
+    "distanceFromAccessMetres" : 35,
+    "incline" : "Fladt",
+    "notes" : "Endnu ikke opmålt i felten.",
+    "steps" : false,
+    "stroller" : "yes",
+    "surface" : "Fast belægning",
+    "wheelchair" : "partial"
+  },
+  "accuracyProfile" : "urbanCanyon",
+  "activationRadiusMetres" : 45,
+  "address" : "Havneøen, 7100 Vejle",
+  "areaId" : "area.vejle-havn",
+  "dwellSeconds" : 20,
+  "fieldVerified" : false,
+  "id" : "loc.vejle-havn.boelgen",
+  "latitude" : 55.7083,
+  "longitude" : 9.5497,
+  "maxAcceptableAccuracyMetres" : 40,
+  "name" : "Bølgen",
+  "publicAccess" : true,
+  "safety" : {
+    "flags" : [
+      "water",
+      "cyclePath"
+    ],
+    "notes" : "Åben vandkant og cyklister tæt på."
+  },
+  "vantagePoint" : {
+    "bearingDegrees" : 118,
+    "instruction" : "Stå på promenaden, så hele bygningen er synlig.",
+    "latitude" : 55.7089,
+    "longitude" : 9.5481
+  }
+}

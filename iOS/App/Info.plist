@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>da</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Byens Hemmeligheder</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>da</string>
+	</array>
+
+	<!-- Vises i OS-prompten, umiddelbart efter spillets egen primer (FR-030). -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Byens Hemmeligheder bruger din position til at se, at du står på det sted, opgaven handler om. Positionen forlader aldrig telefonen, og der gemmes hverken rute eller historik.</string>
+
+	<!-- Den oftest glemte nøgle i GPS-gatede apps. Uden den fejler
+	     requestTemporaryFullAccuracyAuthorization lydløst (research.md R-007). -->
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+		<key>MissionUnlock</key>
+		<string>Med præcis position kan appen se, at du står ved netop dette sted. Uden den kan opgaven ikke låses op.</string>
+	</dict>
+
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string></string>
+	</dict>
+
+	<!-- iPhone, portræt. Ingen iPad (plan.md, Target Platform). -->
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Spilleren står klods op ad facaden, hvor multipath er værst. Bruges til at afprøve accuracyInsufficient og soft override.
+
+  Xcode afspiller waypoints med ét sekund mellem hvert, så antallet af punkter
+  er også varigheden i sekunder. Brug via Debug > Simulate Location.
+-->
+<gpx version="1.1" creator="Byens Hemmeligheder" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>Bølgen — facade</name>
+    <trkseg>
+    <wpt lat="55.708300" lon="9.549700"><name>0</name></wpt>
+    <wpt lat="55.708325" lon="9.549717"><name>1</name></wpt>
+    <wpt lat="55.708339" lon="9.549727"><name>2</name></wpt>
+    <wpt lat="55.708336" lon="9.549725"><name>3</name></wpt>
+    <wpt lat="55.708318" lon="9.549713"><name>4</name></wpt>
+    <wpt lat="55.708292" lon="9.549695"><name>5</name></wpt>
+    <wpt lat="55.708270" lon="9.549679"><name>6</name></wpt>
+    <wpt lat="55.708260" lon="9.549672"><name>7</name></wpt>
+    <wpt lat="55.708267" lon="9.549677"><name>8</name></wpt>
+    <wpt lat="55.708289" lon="9.549692"><name>9</name></wpt>
+    <wpt lat="55.708315" lon="9.549710"><name>10</name></wpt>
+    <wpt lat="55.708335" lon="9.549724"><name>11</name></wpt>
+    <wpt lat="55.708340" lon="9.549728"><name>12</name></wpt>
+    <wpt lat="55.708328" lon="9.549719"><name>13</name></wpt>
+    <wpt lat="55.708304" lon="9.549703"><name>14</name></wpt>
+    <wpt lat="55.708278" lon="9.549685"><name>15</name></wpt>
+    <wpt lat="55.708262" lon="9.549674"><name>16</name></wpt>
+    <wpt lat="55.708262" lon="9.549674"><name>17</name></wpt>
+    <wpt lat="55.708279" lon="9.549685"><name>18</name></wpt>
+    <wpt lat="55.708304" lon="9.549703"><name>19</name></wpt>
+    <wpt lat="55.708328" lon="9.549719"><name>20</name></wpt>
+    <wpt lat="55.708340" lon="9.549728"><name>21</name></wpt>
+    <wpt lat="55.708335" lon="9.549724"><name>22</name></wpt>
+    <wpt lat="55.708315" lon="9.549710"><name>23</name></wpt>
+    <wpt lat="55.708288" lon="9.549692"><name>24</name></wpt>
+    <wpt lat="55.708267" lon="9.549677"><name>25</name></wpt>
+    <wpt lat="55.708260" lon="9.549672"><name>26</name></wpt>
+    <wpt lat="55.708270" lon="9.549679"><name>27</name></wpt>
+    <wpt lat="55.708293" lon="9.549695"><name>28</name></wpt>
+    <wpt lat="55.708319" lon="9.549713"><name>29</name></wpt>
+    <wpt lat="55.708337" lon="9.549726"><name>30</name></wpt>
+    <wpt lat="55.708339" lon="9.549727"><name>31</name></wpt>
+    <wpt lat="55.708324" lon="9.549717"><name>32</name></wpt>
+    <wpt lat="55.708300" lon="9.549700"><name>33</name></wpt>
+    <wpt lat="55.708275" lon="9.549682"><name>34</name></wpt>
+    <wpt lat="55.708261" lon="9.549673"><name>35</name></wpt>
+    <wpt lat="55.708264" lon="9.549675"><name>36</name></wpt>
+    <wpt lat="55.708282" lon="9.549687"><name>37</name></wpt>
+    <wpt lat="55.708308" lon="9.549706"><name>38</name></wpt>
+    <wpt lat="55.708331" lon="9.549721"><name>39</name></wpt>
+    <wpt lat="55.708340" lon="9.549728"><name>40</name></wpt>
+    <wpt lat="55.708332" lon="9.549723"><name>41</name></wpt>
+    <wpt lat="55.708311" lon="9.549708"><name>42</name></wpt>
+    <wpt lat="55.708285" lon="9.549689"><name>43</name></wpt>
+    <wpt lat="55.708265" lon="9.549676"><name>44</name></wpt>
+    <wpt lat="55.708260" lon="9.549672"><name>45</name></wpt>
+    <wpt lat="55.708273" lon="9.549681"><name>46</name></wpt>
+    <wpt lat="55.708297" lon="9.549698"><name>47</name></wpt>
+    <wpt lat="55.708322" lon="9.549715"><name>48</name></wpt>
+    <wpt lat="55.708338" lon="9.549727"><name>49</name></wpt>
+    <wpt lat="55.708338" lon="9.549726"><name>50</name></wpt>
+    <wpt lat="55.708321" lon="9.549715"><name>51</name></wpt>
+    <wpt lat="55.708296" lon="9.549697"><name>52</name></wpt>
+    <wpt lat="55.708272" lon="9.549680"><name>53</name></wpt>
+    <wpt lat="55.708260" lon="9.549672"><name>54</name></wpt>
+    <wpt lat="55.708266" lon="9.549676"><name>55</name></wpt>
+    <wpt lat="55.708286" lon="9.549690"><name>56</name></wpt>
+    <wpt lat="55.708312" lon="9.549708"><name>57</name></wpt>
+    <wpt lat="55.708333" lon="9.549723"><name>58</name></wpt>
+    <wpt lat="55.708340" lon="9.549728"><name>59</name></wpt>
+    </trkseg>
+  </trk>
+</gpx>

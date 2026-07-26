@@ -1,0 +1,8 @@
+{
+  "body" : "En glemt besked ved fjorden.",
+  "continueLabel" : "Jeg er klar",
+  "id" : "step.boelgen.intro",
+  "kind" : "narrative",
+  "order" : 1,
+  "title" : "Den femte besked"
+}

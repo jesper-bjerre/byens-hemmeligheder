@@ -1,0 +1,16 @@
+{
+  "acceptedAnswers" : [
+    "592",
+    "5 9 2",
+    "5-9-2"
+  ],
+  "canonicalAnswer" : "592",
+  "genericIncorrectFeedback" : "Find de tre delresultater hver for sig.",
+  "kind" : "digitsOnly",
+  "nearMissResponses" : [
+    {
+      "answer" : "529",
+      "feedback" : "Rækkefølgen er forkert."
+    }
+  ]
+}

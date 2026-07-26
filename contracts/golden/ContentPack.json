@@ -1,0 +1,206 @@
+{
+  "areas" : [
+    {
+      "id" : "area.vejle-havn",
+      "name" : "Vejle Havn",
+      "postalCode" : "7100"
+    }
+  ],
+  "contentVersion" : "2026-07-25.1",
+  "locale" : "da-DK",
+  "locations" : [
+    {
+      "accessibility" : {
+        "distanceFromAccessMetres" : 35,
+        "incline" : "Fladt",
+        "notes" : "Endnu ikke opmålt i felten.",
+        "steps" : false,
+        "stroller" : "yes",
+        "surface" : "Fast belægning",
+        "wheelchair" : "partial"
+      },
+      "accuracyProfile" : "urbanCanyon",
+      "activationRadiusMetres" : 45,
+      "address" : "Havneøen, 7100 Vejle",
+      "areaId" : "area.vejle-havn",
+      "dwellSeconds" : 20,
+      "fieldVerified" : false,
+      "id" : "loc.vejle-havn.boelgen",
+      "latitude" : 55.7083,
+      "longitude" : 9.5497,
+      "maxAcceptableAccuracyMetres" : 40,
+      "name" : "Bølgen",
+      "publicAccess" : true,
+      "safety" : {
+        "flags" : [
+          "water",
+          "cyclePath"
+        ],
+        "notes" : "Åben vandkant og cyklister tæt på."
+      },
+      "vantagePoint" : {
+        "bearingDegrees" : 118,
+        "instruction" : "Stå på promenaden, så hele bygningen er synlig.",
+        "latitude" : 55.7089,
+        "longitude" : 9.5481
+      }
+    }
+  ],
+  "media" : [
+    {
+      "altText" : "Fem hvide bølgeformede tage set fra promenaden.",
+      "credit" : "Foto: Fotografens Navn",
+      "filename" : "boelgen-hero.jpg",
+      "id" : "media.boelgen.hero",
+      "kind" : "contemporary",
+      "licence" : "CC BY 4.0",
+      "owner" : "Fotografens Navn",
+      "restrictions" : "Må ikke beskæres."
+    }
+  ],
+  "missions" : [
+    {
+      "basePoints" : 100,
+      "completion" : {
+        "headline" : "Beskeden er åben",
+        "historyFact" : "De første to stod færdige i 2009.",
+        "message" : "Nu står alle fem bølger ved fjorden.",
+        "messageLabel" : "Den femte besked",
+        "subheadline" : "Du samlede den femte besked"
+      },
+      "difficulty" : 3,
+      "estimatedMinutes" : 10,
+      "fictionLabel" : "Fiktiv mission baseret på Bølgens byggehistorie.",
+      "hints" : [
+        {
+          "id" : "hint.boelgen.1",
+          "order" : 1,
+          "penaltyPercent" : 3,
+          "text" : "Tæl de store hvide toppe.",
+          "title" : "Hvor"
+        },
+        {
+          "id" : "hint.boelgen.2",
+          "order" : 2,
+          "penaltyPercent" : 4,
+          "text" : "Følg rækkefølgen.",
+          "title" : "Hvordan"
+        },
+        {
+          "id" : "hint.boelgen.3",
+          "order" : 3,
+          "penaltyPercent" : 5,
+          "text" : "Fem, ni og to.",
+          "title" : "Næsten"
+        }
+      ],
+      "id" : "mission.boelgen.den-femte-besked",
+      "locationId" : "loc.vejle-havn.boelgen",
+      "shortTitle" : "Den femte besked",
+      "slug" : "boelgen-den-femte-besked",
+      "sourceIds" : [
+        "source.visitvejle.boelgen"
+      ],
+      "status" : "fieldTestReady",
+      "steps" : [
+        {
+          "body" : "En glemt besked ved fjorden.",
+          "continueLabel" : "Jeg er klar",
+          "id" : "step.boelgen.intro",
+          "kind" : "narrative",
+          "order" : 1,
+          "title" : "Den femte besked"
+        },
+        {
+          "answerRule" : {
+            "acceptedAnswers" : [
+              "5"
+            ],
+            "canonicalAnswer" : "5",
+            "genericIncorrectFeedback" : "Tæl toppene igen.",
+            "kind" : "exact",
+            "nearMissResponses" : [
+
+            ]
+          },
+          "correctFeedback" : "Rigtigt.",
+          "eyebrow" : "SPOR 1 AF 3",
+          "hintIds" : [
+            "hint.boelgen.1"
+          ],
+          "id" : "step.boelgen.oejet",
+          "instruction" : "Tæl kun de store hvide toppe.",
+          "kind" : "singleChoice",
+          "options" : [
+            {
+              "id" : "opt.4",
+              "label" : "4"
+            },
+            {
+              "id" : "opt.5",
+              "label" : "5"
+            }
+          ],
+          "order" : 2,
+          "question" : "Hvor mange bølgetoppe kan du se?",
+          "title" : "Øjet"
+        },
+        {
+          "answerRule" : {
+            "acceptedAnswers" : [
+              "592",
+              "5 9 2",
+              "5-9-2"
+            ],
+            "canonicalAnswer" : "592",
+            "genericIncorrectFeedback" : "Find de tre delresultater hver for sig.",
+            "kind" : "digitsOnly",
+            "nearMissResponses" : [
+              {
+                "answer" : "529",
+                "feedback" : "Rækkefølgen er forkert."
+              }
+            ]
+          },
+          "evidenceCards" : [
+            {
+              "description" : "Fem hvide bølgeformede hoveddele.",
+              "displayValue" : "5",
+              "id" : "card.boelgen.oejet",
+              "label" : "Øjet",
+              "supportingText" : "Talt på stedet.",
+              "symbol" : "eye",
+              "title" : "Bølgetoppene"
+            }
+          ],
+          "eyebrow" : "SAML KODEN",
+          "hintIds" : [
+            "hint.boelgen.1"
+          ],
+          "id" : "step.boelgen.koden",
+          "instruction" : "Sæt tallene sammen.",
+          "kind" : "numericCode",
+          "length" : 3,
+          "order" : 5,
+          "title" : "Åbn beskeden"
+        }
+      ],
+      "tags" : [
+        "arkitektur",
+        "observation"
+      ],
+      "teaser" : "En glemt besked ved fjorden.",
+      "title" : "Bølgen – Den femte besked"
+    }
+  ],
+  "schemaVersion" : "1.0",
+  "sources" : [
+    {
+      "id" : "source.visitvejle.boelgen",
+      "kind" : "officialTourism",
+      "publisher" : "VisitVejle",
+      "title" : "Bølgen",
+      "url" : "https://www.visitvejle.dk/vejle/planlaeg-ferien/boelgen-gdk724987"
+    }
+  ]
+}
