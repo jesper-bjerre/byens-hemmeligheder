@@ -27,11 +27,11 @@ public struct BHPrimaryButtonStyle: ButtonStyle {
             .frame(minHeight: BHMetrics.primaryButtonHeight)
             .padding(.horizontal, BHSpacing.regular)
             .background(
-                RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous)
+                Capsule(style: .continuous)
                     .fill(isDestructive ? BHColor.danger : BHColor.accent)
             )
             .opacity(configuration.isPressed ? 0.82 : 1)
-            .contentShape(RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous))
+            .contentShape(Capsule(style: .continuous))
     }
 }
 
@@ -50,11 +50,11 @@ public struct BHSecondaryButtonStyle: ButtonStyle {
             .frame(minHeight: BHMetrics.primaryButtonHeight)
             .padding(.horizontal, BHSpacing.regular)
             .background(
-                RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous)
-                    .strokeBorder(BHColor.accent, lineWidth: 2)
+                Capsule(style: .continuous)
+                    .strokeBorder(BHColor.accent, lineWidth: 1.5)
             )
             .opacity(configuration.isPressed ? 0.7 : 1)
-            .contentShape(RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous))
+            .contentShape(Capsule(style: .continuous))
     }
 }
 
@@ -83,5 +83,47 @@ public struct BHCard<Content: View>: View {
                 RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous)
                     .fill(BHColor.surface)
             )
+            .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
     }
+}
+
+
+/// Etiket med ikonet **efter** teksten — designforslagets pil på primærknappen.
+///
+/// Titlen får lov at bryde over flere linjer. En bar `HStack` giver teksten et
+/// fast slot ved siden af ikonet, og så klippes den ved de store
+/// tilgængelighedsstørrelser — tilgængelighedsauditten afviser det (FR-037).
+public struct TrailingIconLabelStyle: LabelStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: BHSpacing.tight) {
+            configuration.title
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            configuration.icon
+        }
+    }
+}
+
+/// Etiket med ikonet før teksten. Samme hensyn som ovenfor.
+public struct LeadingIconLabelStyle: LabelStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: BHSpacing.tight) {
+            configuration.icon
+            configuration.title
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+extension LabelStyle where Self == TrailingIconLabelStyle {
+    public static var bhTrailingIcon: TrailingIconLabelStyle { TrailingIconLabelStyle() }
+}
+
+extension LabelStyle where Self == LeadingIconLabelStyle {
+    public static var bhLeadingIcon: LeadingIconLabelStyle { LeadingIconLabelStyle() }
 }

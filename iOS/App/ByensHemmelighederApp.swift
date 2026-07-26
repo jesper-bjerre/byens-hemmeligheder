@@ -1,6 +1,7 @@
 import BHContentKit
 import BHContracts
 import BHDesignSystem
+import BHGameCore
 import BHLocationKit
 import BHPersistence
 import SwiftUI
@@ -41,7 +42,16 @@ struct ByensHemmelighederApp: App {
             return scripted
         }
         #if targetEnvironment(simulator)
-        return ScriptedLocationProvider()
+        // Start ved Bølgens standpunkt, så et gennemløb kan afprøves med det
+        // samme uden at gå først. Opgaven **startes** ikke af sig selv — kun
+        // opgavekortet popper op, og trykket er stadig spillerens eget.
+        //
+        // Værdien spejler `loc.vejle-havn.boelgen` i indholdspakken. Den er
+        // dev-kode og læses derfor ikke fra pakken; ændres standpunktet efter
+        // feltbesøget, må den rettes her.
+        return ScriptedLocationProvider(
+            start: GeoPoint(latitude: 55.7089, longitude: 9.5481)
+        )
         #endif
         #endif
         return CoreLocationProvider()

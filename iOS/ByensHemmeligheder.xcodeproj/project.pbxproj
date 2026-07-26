@@ -16,10 +16,21 @@
 		BH000000000000000000001E /* content-pack.json in Resources */ = {isa = PBXBuildFile; fileRef = BH000000000000000000001D /* content-pack.json */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		BH000000000000000000002A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BH0000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BH0000000000000000000004;
+			remoteInfo = ByensHemmeligheder;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		BH0000000000000000000005 /* ByensHemmeligheder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ByensHemmeligheder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BH000000000000000000001D /* content-pack.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "content-pack.json"; path = "../contracts/content/da-DK/content-pack.json"; sourceTree = "<group>"; };
 		BH0000000000000000000021 /* ByensHemmelighederUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ByensHemmelighederUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BH000000000000000000002B /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Shared.xcconfig; path = Config/Shared.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -47,24 +58,6 @@
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
-
-/* Begin PBXContainerItemProxy section */
-		BH000000000000000000002A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BH0000000000000000000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BH0000000000000000000004;
-			remoteInfo = ByensHemmeligheder;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXTargetDependency section */
-		BH0000000000000000000029 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BH0000000000000000000004 /* ByensHemmeligheder */;
-			targetProxy = BH000000000000000000002A /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		BH0000000000000000000007 /* Frameworks */ = {
@@ -95,6 +88,7 @@
 			children = (
 				BH0000000000000000000009 /* App */,
 				BH0000000000000000000025 /* ByensHemmelighederUITests */,
+				BH000000000000000000002B /* Shared.xcconfig */,
 				BH000000000000000000001D /* content-pack.json */,
 				BH0000000000000000000003 /* Products */,
 			);
@@ -240,6 +234,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		BH0000000000000000000029 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BH0000000000000000000004 /* ByensHemmeligheder */;
+			targetProxy = BH000000000000000000002A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		BH000000000000000000000C /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -279,14 +281,16 @@
 		};
 		BH000000000000000000000E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BH000000000000000000002B /* Shared.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QHL89A7A8J;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Byens Hemmeligheder";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -301,14 +305,16 @@
 		};
 		BH000000000000000000000F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BH000000000000000000002B /* Shared.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QHL89A7A8J;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Byens Hemmeligheder";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

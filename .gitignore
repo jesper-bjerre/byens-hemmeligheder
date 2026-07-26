@@ -81,6 +81,15 @@ credentials.yaml
 .claude/worktrees/
 
 # ---------------------------------------------------------------------
+# Lokal signering
+# ---------------------------------------------------------------------
+
+# Udviklerteam og signeringsindstillinger hører til den enkelte maskine.
+# Team-id er ikke en nøgle, men det knytter dette public repo til en konkret
+# Apple-udviklerkonto. Skabelonen ved siden af er committet.
+iOS/Config/Local.xcconfig
+
+# ---------------------------------------------------------------------
 # Xcode og Swift
 # ---------------------------------------------------------------------
 

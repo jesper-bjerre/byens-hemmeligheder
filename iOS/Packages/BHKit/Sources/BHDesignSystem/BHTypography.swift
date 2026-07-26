@@ -35,7 +35,7 @@ public enum BHSpacing {
 }
 
 public enum BHRadius {
-    public static let card: CGFloat = 16
+    public static let card: CGFloat = 20
     public static let control: CGFloat = 12
 }
 

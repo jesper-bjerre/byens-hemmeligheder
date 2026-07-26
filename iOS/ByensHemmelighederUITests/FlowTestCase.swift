@@ -47,20 +47,54 @@ class FlowTestCase: XCTestCase {
 
     // MARK: - Skridt i gennemløbet
 
+    /// Trykker på opgavens markør på kortet og åbner den fra popuppen.
+    ///
+    /// Forsiden er kortet — der findes ingen liste. Markøren er en knap med sit
+    /// eget id, netop så den kan findes her uden at gå gennem MapKits
+    /// markeringsbinding.
     func tapMission(_ missionId: String, in app: XCUIApplication) {
-        let row = app.buttons["mission.\(missionId)"]
-        XCTAssertTrue(row.waitForExistence(timeout: Self.uiTimeout), "Opgaven '\(missionId)' står ikke på forsiden")
-        row.tap()
+        tapMissionPin(missionId, in: app)
+
+        let open = app.buttons["preview.open"]
+        XCTAssertTrue(
+            open.waitForExistence(timeout: Self.uiTimeout),
+            "Popuppen med opgavebeskrivelsen kom ikke frem"
+        )
+        open.tap()
     }
 
-    func startMission(in app: XCUIApplication) {
-        let start = app.buttons["Tag afsted"]
-        XCTAssertTrue(start.waitForExistence(timeout: Self.uiTimeout), "Knappen 'Tag afsted' mangler")
-        start.tap()
+    /// Åbner kun popuppen, uden at gå videre til detaljen.
+    func tapMissionPin(_ missionId: String, in app: XCUIApplication) {
+        let pin = app.buttons["mission.\(missionId)"]
+        XCTAssertTrue(
+            pin.waitForExistence(timeout: Self.uiTimeout),
+            "Opgavens markør '\(missionId)' står ikke på kortet"
+        )
 
-        // Sikkerhedsskærmen vises før sessionens første mission (FR-008).
+        // Vent på, at markøren står stille. Dukker den op, mens kortet stadig
+        // centrerer, flytter den sig under fingeren.
+        var previous = pin.frame
+        for _ in 0..<10 {
+            Thread.sleep(forTimeInterval: 0.2)
+            let current = pin.frame
+            if current == previous { break }
+            previous = current
+        }
+
+        pin.tap()
+        if !app.buttons["preview.open"].waitForExistence(timeout: 3) {
+            pin.tap()
+        }
+    }
+
+    /// Kvitterer for sikkerhedsskærmen, hvis den vises.
+    ///
+    /// "Start opgave" på opgavekortet går nu direkte i gang — der er ikke
+    /// længere et missionsark imellem. Tilbage er kun sikkerhedsskærmen, som
+    /// vises én gang pr. session (FR-008).
+    func startMission(in app: XCUIApplication) {
         let safety = app.buttons["safety.continue"]
-        if safety.waitForExistence(timeout: 3) {
+        if safety.waitForExistence(timeout: 5) {
             safety.tap()
         }
     }
@@ -105,29 +139,19 @@ class FlowTestCase: XCTestCase {
         field.typeText(code)
     }
 
-    /// Tømmer kodefeltet og **bekræfter**, at det blev tomt.
+    /// Tømmer kodefeltet via appens egen ryd-knap.
     ///
-    /// Feltets `accessibilityValue` er læsevenlig ("5 9 2", ikke "592"), fordi
-    /// VoiceOver skal læse cifrene enkeltvis. Den værdi kan derfor ikke bruges
-    /// til at tælle sletninger med — feltet tømmes i stedet, indtil det melder
-    /// sig tomt.
+    /// Tidligere sendte testen sletteanslag ind i feltet. Det var upålideligt:
+    /// feltets rapporterede værdi nåede at være forældet mellem anslagene, og
+    /// testen efterlod rester, der først viste sig som et forkert svar flere
+    /// skridt senere. En knap i appen er både mere robust at teste og bedre for
+    /// en spiller med handsker på.
     func clearCode(in app: XCUIApplication) {
+        let clear = app.buttons["code.clear"]
+        guard clear.waitForExistence(timeout: Self.uiTimeout) else { return }
+        clear.tap()
+
         let field = app.textFields["code.field"]
-        guard field.exists else { return }
-
-        // Tastaturet skal være oppe, før sletninger lander. Uden ventetiden
-        // sender testen tasteanslag ud i ingenting, og fejlen viser sig først
-        // som et mystisk restindhold i feltet flere skridt senere.
-        field.tap()
-        XCTAssertTrue(
-            app.keyboards.element.waitForExistence(timeout: Self.uiTimeout),
-            "Tastaturet kom ikke op til kodefeltet"
-        )
-
-        for _ in 0..<12 {
-            if (field.value as? String) == "Tomt" { return }
-            field.typeText(XCUIKeyboardKey.delete.rawValue)
-        }
         XCTAssertEqual(field.value as? String, "Tomt", "Kodefeltet kunne ikke tømmes")
     }
 

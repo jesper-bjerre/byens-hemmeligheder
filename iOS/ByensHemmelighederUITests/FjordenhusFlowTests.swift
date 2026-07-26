@@ -43,10 +43,10 @@ final class FjordenhusFlowTests: FlowTestCase {
             longitude: Vantage.fjordenhus.longitude
         )
 
-        // Bølgen er urørt og skal stadig stå som uløst.
+        // Bølgen er urørt og skal stadig stå som uløst på kortet.
         XCTAssertTrue(
             app.buttons["mission.mission.boelgen.den-femte-besked"].waitForExistence(timeout: Self.uiTimeout),
-            "Bølgen forsvandt fra forsiden"
+            "Bølgen forsvandt fra kortet"
         )
 
         tapMission(missionId, in: app)

@@ -1,0 +1,17 @@
+// Skabelon. Kopiér til `Local.xcconfig` og udfyld:
+//
+//     cp iOS/Config/Local.xcconfig.example iOS/Config/Local.xcconfig
+//
+// `Local.xcconfig` er gitignoreret og må aldrig committes.
+
+// Dit Apple-udviklerteam. Nødvendigt for at bygge til en fysisk enhed.
+//
+// Find det med:
+//
+//     security find-identity -v -p codesigning
+//     security find-certificate -c "<navnet fra listen>" -p \
+//       | openssl x509 -noout -subject
+//
+// Team-id'et er `OU`-feltet i certifikatets subject — ti tegn, fx `A1B2C3D4E5`.
+// Det kan også ses under Xcode ▸ Settings ▸ Accounts.
+DEVELOPMENT_TEAM = <indsæt lokalt, commit aldrig>

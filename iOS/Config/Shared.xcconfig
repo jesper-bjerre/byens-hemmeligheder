@@ -1,0 +1,16 @@
+// Fælles byggeindstillinger for app-targetet.
+//
+// Denne fil er committet. Alt maskinspecifikt hører hjemme i `Local.xcconfig`,
+// som er gitignoreret — se `Local.xcconfig.example`.
+
+// Signering
+//
+// `DEVELOPMENT_TEAM` sættes i Local.xcconfig og står derfor ikke her. Uden den
+// kan der bygges til simulator, men ikke til en fysisk enhed. Det er den
+// rigtige byttehandel for et public repo: en frisk klon kan køre og teste med
+// det samme, og ingen udvikleridentitet følger med i historikken.
+CODE_SIGN_STYLE = Automatic
+
+// Inkluderingen er **valgfri** (`?`). Mangler filen — på en frisk klon eller i
+// CI — fejler bygningen ikke; den kan bare ikke signere til en enhed.
+#include? "Local.xcconfig"

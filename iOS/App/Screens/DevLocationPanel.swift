@@ -172,6 +172,18 @@ struct DevLocationPanel: View {
                 provider?.stop()
             }
             .buttonStyle(.bhSecondary)
+
+            // Dwell-tiden er 20 sekunder og komprimeres ikke — `PresenceGate`
+            // ville kassere sine egne fixes som forældede, hvis uret løj. Under
+            // udvikling er ventetiden sjældent det, der skal afprøves, så her er
+            // en eksplicit genvej. Den bruger den samme selvbekræftelse, en
+            // spiller får tilbudt ved dårligt signal (FR-027), og stemples som
+            // sådan i hændelsesloggen — den forfalsker ikke en GPS-verifikation.
+            Button("Spring ventetiden over") {
+                Task { await engine.acceptSoftOverride() }
+            }
+            .buttonStyle(.bhSecondary)
+            .accessibilityHint("Bekræfter tilstedeværelse uden at vente på dwell")
         }
     }
 }

@@ -215,6 +215,17 @@ struct ChallengeView: View {
             .buttonStyle(.bhPrimary)
             .disabled(typedCode.isEmpty)
             .accessibilityIdentifier("code.submit")
+
+            // Et forkert tastet ciffer skal kunne fortrydes uden at slette
+            // bagfra ét ad gangen — særligt med handsker på ved en havnekant.
+            if !typedCode.isEmpty {
+                Button("Ryd") {
+                    typedCode = ""
+                }
+                .buttonStyle(.bhSecondary)
+                .accessibilityIdentifier("code.clear")
+                .accessibilityHint("Tømmer kodefeltet")
+            }
         }
     }
 

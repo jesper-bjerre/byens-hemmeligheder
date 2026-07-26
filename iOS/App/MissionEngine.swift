@@ -203,6 +203,14 @@ final class MissionEngine {
         return GeoMath.distanceMetres(from: here, to: configuration.centre)
     }
 
+    /// Om "Start opgave" må trykkes fra dér, hvor spilleren står (princip I).
+    func startability(for mission: Mission) -> MissionStartability {
+        MissionStartRule.evaluate(
+            distanceMetres: distanceMetres(to: mission),
+            activationRadiusMetres: location(for: mission)?.activationRadiusMetres
+        )
+    }
+
     /// Standpunktet for en mission, hvis indholdet kender det.
     func vantagePoint(for mission: Mission) -> GeoPoint? {
         guard let location = location(for: mission),
@@ -282,12 +290,33 @@ final class MissionEngine {
 
     // MARK: - Hints
 
+    /// De hints, **trinnet** tilbyder. Afgør, om hint-knappen overhovedet vises.
     func hints(for step: Step, in mission: Mission) -> [Hint] {
         step.hintIds.compactMap { mission.hint(id: $0) }.sorted { $0.order < $1.order }
     }
 
+    /// De hints, **arket** viser: hele missionens stige.
+    ///
+    /// Ikke kun trinnets egne. Rækkefølgen er en missionsregel — hint 2 kræver
+    /// hint 1 — og et trin, der kun tilbyder hint 2, ville ellers være en
+    /// blindgyde: spilleren kunne se det låste hint uden at kunne åbne det, der
+    /// spærrer.
+    func missionHints(in mission: Mission) -> [Hint] {
+        mission.orderedHints
+    }
+
     func isRevealed(_ hint: Hint) -> Bool {
         revealedHintIds.contains(hint.id)
+    }
+
+    /// Om hintet må åbnes nu (hint 2 kræver hint 1).
+    func isUnlocked(_ hint: Hint, in mission: Mission) -> Bool {
+        HintRule.isUnlocked(hint, in: mission.orderedHints, revealed: revealedHintIds)
+    }
+
+    /// Hvilket hint der spærrer — til beskeden på skærmen.
+    func blockingHint(for hint: Hint, in mission: Mission) -> Hint? {
+        HintRule.blocking(hint, in: mission.orderedHints, revealed: revealedHintIds)
     }
 
     /// Fradraget, spilleren får at vide **før** hintet åbnes (FR-018).
@@ -296,6 +325,11 @@ final class MissionEngine {
     }
 
     func reveal(_ hint: Hint, in mission: Mission, now: Date = Date()) async {
+        // Rækkefølgen håndhæves her og ikke kun i knappens `disabled`.
+        // En regel, der kun findes i et view, holder kun så længe alle veje
+        // til handlingen går gennem netop dét view.
+        guard isUnlocked(hint, in: mission) else { return }
+
         // Genåbning koster ikke igen (FR-019).
         guard revealedHintIds.insert(hint.id).inserted else { return }
         await record(.hintUsed, missionId: mission.id, hintId: hint.id, now: now)

@@ -17,8 +17,20 @@ final class AccessibilityAuditTests: FlowTestCase {
     /// derfor falsk — kontrasten er kontrolleret i BHDesignSystem.
     private let ignored: XCUIAccessibilityAuditType = [.contrast]
 
-    private func audit(_ app: XCUIApplication, screen: String) throws {
-        try app.performAccessibilityAudit(for: .all.subtracting(ignored)) { issue in
+    /// Kortskærmen og opgavekortet fravælger desuden `.hitRegion`.
+    ///
+    /// Apples egen "Juridiske oplysninger"-attribution er 10 pt høj, og den er
+    /// MapKits — ikke vores. R-008 forbyder udtrykkeligt at dække den, så den
+    /// kan hverken forstørres eller flyttes. Alle vores egne trykflader på
+    /// skærmen er mindst 44 pt.
+    private let ignoredOnMap: XCUIAccessibilityAuditType = [.contrast, .hitRegion]
+
+    private func audit(
+        _ app: XCUIApplication,
+        screen: String,
+        excluding: XCUIAccessibilityAuditType? = nil
+    ) throws {
+        try app.performAccessibilityAudit(for: .all.subtracting(excluding ?? ignored)) { issue in
             // Uden elementets identitet er en auditfejl umulig at rette —
             // beskeden alene siger kun *hvad*, ikke *hvor*. Værdierne trækkes
             // ud som strenge her, fordi `issue` ikke er `Sendable`.
@@ -35,17 +47,29 @@ final class AccessibilityAuditTests: FlowTestCase {
             longitude: Vantage.boelgen.longitude
         )
         XCTAssertTrue(app.buttons["mission.\(missionId)"].waitForExistence(timeout: Self.uiTimeout))
-        try audit(app, screen: "Kort")
+        try audit(app, screen: "Kort", excluding: ignoredOnMap)
     }
 
-    func testMissionSheetIsAccessible() throws {
+    func testMissionPreviewPopupIsAccessible() throws {
+        let app = launchApp(
+            atLatitude: Vantage.boelgen.latitude,
+            longitude: Vantage.boelgen.longitude
+        )
+        tapMissionPin(missionId, in: app)
+        XCTAssertTrue(app.buttons["preview.open"].waitForExistence(timeout: Self.uiTimeout))
+        // Kortet ligger synligt bag overlayet, så Apples attribution tælles med.
+        try audit(app, screen: "Opgavepopup", excluding: ignoredOnMap)
+    }
+
+    /// Sikkerhedsskærmen ligger nu direkte mellem kortet og opgaven.
+    func testSafetyInterstitialIsAccessible() throws {
         let app = launchApp(
             atLatitude: Vantage.boelgen.latitude,
             longitude: Vantage.boelgen.longitude
         )
         tapMission(missionId, in: app)
-        XCTAssertTrue(app.buttons["Tag afsted"].waitForExistence(timeout: Self.uiTimeout))
-        try audit(app, screen: "Missionsark")
+        XCTAssertTrue(app.buttons["safety.continue"].waitForExistence(timeout: Self.uiTimeout))
+        try audit(app, screen: "Sikkerhed")
     }
 
     func testChallengeScreensAreAccessible() throws {

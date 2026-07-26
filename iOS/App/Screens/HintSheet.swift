@@ -20,12 +20,12 @@ struct HintSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BHSpacing.snug) {
-                    Text("Hvert hint koster point. Du kan altid læse et hint igen uden at betale mere.")
+                    Text("Hints åbnes i rækkefølge. Hvert koster point, men du kan altid læse et igen uden at betale mere.")
                         .font(BHFont.body)
                         .foregroundStyle(BHColor.inkMuted)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    ForEach(engine.hints(for: step, in: mission)) { hint in
+                    ForEach(engine.missionHints(in: mission)) { hint in
                         hintCard(hint)
                     }
 
@@ -88,6 +88,12 @@ struct HintSheet: View {
                             .font(BHFont.eyebrow)
                             .foregroundStyle(BHColor.inkMuted)
                             .labelStyle(.titleAndIcon)
+                    } else if !engine.isUnlocked(hint, in: mission) {
+                        // Status bæres af både tekst og symbol (FR-039).
+                        Label("Låst", systemImage: "lock.fill")
+                            .font(BHFont.eyebrow)
+                            .foregroundStyle(BHColor.inkMuted)
+                            .labelStyle(.titleAndIcon)
                     }
                 }
 
@@ -96,6 +102,17 @@ struct HintSheet: View {
                         .font(BHFont.body)
                         .foregroundStyle(BHColor.ink)
                         .fixedSize(horizontal: false, vertical: true)
+                } else if let blocking = engine.blockingHint(for: hint, in: mission) {
+                    // Låst. Stigen går hvor → hvordan → næsten løsningen, og
+                    // fradragene stiger med den. Kunne spilleren springe til
+                    // det sidste, ville hen betale 5 % for noget, et vink på
+                    // 3 % måske havde klaret.
+                    Text("Åbn hint \(blocking.order) først")
+                        .font(BHFont.body)
+                        .foregroundStyle(BHColor.inkMuted)
+                        .frame(maxWidth: .infinity, minHeight: BHMetrics.minimumTapTarget, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("hint.locked.\(hint.order)")
                 } else {
                     // Fradraget står på selve knappen — ikke i en note nedenunder.
                     Button("Vis hint — \(engine.penalty(for: hint, in: mission)) point") {
