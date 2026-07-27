@@ -61,15 +61,19 @@ final class AccessibilityAuditTests: FlowTestCase {
         try audit(app, screen: "Opgavepopup", excluding: ignoredOnMap)
     }
 
-    /// Sikkerhedsskærmen ligger nu direkte mellem kortet og opgaven.
-    func testSafetyInterstitialIsAccessible() throws {
+    /// Approach-skærmen ligger nu direkte mellem kortet og opgaven.
+    func testApproachScreenIsAccessible() throws {
         let app = launchApp(
             atLatitude: Vantage.boelgen.latitude,
             longitude: Vantage.boelgen.longitude
         )
         tapMission(missionId, in: app)
-        XCTAssertTrue(app.buttons["safety.continue"].waitForExistence(timeout: Self.uiTimeout))
-        try audit(app, screen: "Sikkerhed")
+        // Skærmen viser positionsstatus, indtil gaten åbner.
+        XCTAssertTrue(
+            app.staticTexts["Find stedet"].waitForExistence(timeout: Self.uiTimeout),
+            "Approach-skærmen kom ikke frem"
+        )
+        try audit(app, screen: "Find stedet")
     }
 
     func testChallengeScreensAreAccessible() throws {

@@ -26,7 +26,7 @@ struct ContentConsistencyTests {
     func requiredFieldsArePresent() throws {
         #expect(pack.schemaVersion == "1.0")
         #expect(pack.locale == "da-DK")
-        #expect(pack.missions.count == 2)
+        #expect(pack.missions.count >= 2, "Pakken skal bære mindst Bølgen og Fjordenhus")
 
         for mission in pack.missions {
             #expect(!mission.fictionLabel.isEmpty, "\(mission.id) mangler fiktionsmarkering")
@@ -130,8 +130,17 @@ struct ContentConsistencyTests {
         }
     }
 
-    @Test("En spiller med alle tre hints beholder 88 point")
-    func allHintsLeaveEightyEight() {
+    /// SC-005 lover 88 % tilbage efter alle tre hints. Det holder for
+    /// grundpoint, hvor afrundingen går op — men afrundingen sker **pr.
+    /// transaktion**, ikke på summen, og det er reglen der gælder.
+    ///
+    /// Ved 100 point: −3 −4 −5 = 88, altså præcis 88 %.
+    /// Ved 50 point: −2 −2 −3 = 43, altså 86 %. Halve point findes ikke.
+    ///
+    /// Testen hævder derfor **reglen**, ikke tallet. Ville den have hævdet 88 %
+    /// for alle, ville den tvinge alle opgaver op på samme grundpoint.
+    @Test("Alle tre hints trækker præcis det, afrundingsreglen siger")
+    func allHintsFollowTheRoundingRule() {
         let ledger = ScoreLedger()
         for mission in pack.missions {
             let used = mission.orderedHints.map {
@@ -145,7 +154,32 @@ struct ContentConsistencyTests {
                     completionEventId: "c"
                 )
             )
-            #expect(total == 88, "\(mission.id) giver \(total)")
+            let expected = mission.basePoints - mission.orderedHints.reduce(0) {
+                $0 + ScoreLedger.penalty(base: mission.basePoints, percent: $1.penaltyPercent)
+            }
+            #expect(total == expected, "\(mission.id) gav \(total), reglen siger \(expected)")
+            #expect(total < mission.basePoints, "\(mission.id): hints skal koste noget")
+        }
+    }
+
+    /// Bølgen og Fjordenhus bærer stadig løftet om præcis 88 point (SC-005).
+    @Test("De to oprindelige opgaver giver præcis 88 point med alle hints")
+    func theOriginalTwoStillLeaveEightyEight() throws {
+        let ledger = ScoreLedger()
+        for id in ["mission.boelgen.den-femte-besked", "mission.fjordenhus.vandets-tromler"] {
+            let mission = try #require(pack.mission(id: id))
+            let used = mission.orderedHints.map {
+                ScoreLedger.UsedHint(hint: $0, eventId: "e-\($0.id)")
+            }
+            let total = ledger.total(
+                of: ledger.transactions(
+                    missionId: mission.id,
+                    basePoints: mission.basePoints,
+                    usedHints: used,
+                    completionEventId: "c"
+                )
+            )
+            #expect(total == 88, "\(id) gav \(total)")
         }
     }
 

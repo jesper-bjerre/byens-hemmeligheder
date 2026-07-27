@@ -1,12 +1,17 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "2026-07-25.1",
+  "contentVersion": "2026-07-27.1",
   "locale": "da-DK",
   "areas": [
     {
       "id": "area.vejle-havn",
       "name": "Vejle Havn",
       "postalCode": "7100"
+    },
+    {
+      "id": "area.vejle-oest",
+      "name": "Vejle Øst",
+      "postalCode": "7120"
     }
   ],
   "locations": [
@@ -29,7 +34,11 @@
       },
       "publicAccess": true,
       "safety": {
-        "flags": ["water", "cyclePath", "darkness"],
+        "flags": [
+          "water",
+          "cyclePath",
+          "darkness"
+        ],
         "notes": "Der er åben vandkant langs promenaden, og cyklister kommer hurtigt. Stå med ryggen til vandet, hold jer samlet væk fra kanten, og gå aldrig ud på cykelstien for at få et bedre kig. Kig op fra telefonen, når I flytter jer."
       },
       "accessibility": {
@@ -63,7 +72,10 @@
       },
       "publicAccess": true,
       "safety": {
-        "flags": ["water", "crowding"],
+        "flags": [
+          "water",
+          "crowding"
+        ],
         "notes": "Opgaven løses fra kajen, hvor der er åbent vand tæt på. Hold god afstand til kanten, bloker ikke broen eller indgangen, og rør ikke bygningen eller kunstværkerne."
       },
       "accessibility": {
@@ -74,6 +86,42 @@
         "stroller": "unknown",
         "distanceFromAccessMetres": null,
         "notes": "Standpunktet er endnu ikke opmålt i felten. Underlag, kanter og kørestolsadgang skal registreres ved feltbesøget, før opgaven kan erklæres publiceringsklar."
+      },
+      "fieldVerified": false,
+      "lastPhysicallyVerified": null
+    },
+    {
+      "id": "loc.vejle-oest.frydenlund98",
+      "areaId": "area.vejle-oest",
+      "name": "Frydenlund 98",
+      "address": "Frydenlund 98, 7120 Vejle",
+      "latitude": 55.734897,
+      "longitude": 9.62027,
+      "activationRadiusMetres": 45,
+      "maxAcceptableAccuracyMetres": 40,
+      "dwellSeconds": 20,
+      "accuracyProfile": "standard",
+      "vantagePoint": {
+        "latitude": 55.734897,
+        "longitude": 9.62027,
+        "bearingDegrees": 0,
+        "instruction": "Bliv på det offentligt tilgængelige standpunkt. Gå ikke ind på grunden, åbn ikke buret, og forsøg ikke at fodre eller kalde på kaninen."
+      },
+      "publicAccess": false,
+      "safety": {
+        "flags": [
+          "privateProperty"
+        ],
+        "notes": "Privat adresse. Testopgave — ikke til offentlig brug."
+      },
+      "accessibility": {
+        "surface": "Indendørs gulv",
+        "incline": "Fladt",
+        "steps": false,
+        "wheelchair": "unknown",
+        "stroller": "unknown",
+        "distanceFromAccessMetres": null,
+        "notes": "Testopgave på privat adresse. Tilgængelighed er ikke registreret."
       },
       "fieldVerified": false,
       "lastPhysicallyVerified": null
@@ -91,10 +139,18 @@
       "difficulty": 3,
       "estimatedMinutes": 10,
       "basePoints": 100,
-      "tags": ["arkitektur", "observation", "havn", "familie"],
+      "tags": [
+        "arkitektur",
+        "observation",
+        "havn",
+        "familie"
+      ],
       "fictionLabel": "Fiktiv mission baseret på Bølgens dokumenterede bygge- og arkitekturhistorie.",
       "heroMediaId": null,
-      "sourceIds": ["source.visitvejle.boelgen", "source.henninglarsen.boelgen"],
+      "sourceIds": [
+        "source.visitvejle.boelgen",
+        "source.henninglarsen.boelgen"
+      ],
       "steps": [
         {
           "id": "step.boelgen.intro",
@@ -113,15 +169,29 @@
           "question": "Hvor mange store, hvide bølgetoppe kan du se?",
           "instruction": "Se på hele byggeriet på én gang. Tæl kun de store bølgetoppe – ikke vinduer, altaner, boliger, master eller refleksioner i vandet.",
           "options": [
-            { "id": "opt.boelgen.oejet.3", "label": "3" },
-            { "id": "opt.boelgen.oejet.4", "label": "4" },
-            { "id": "opt.boelgen.oejet.5", "label": "5" },
-            { "id": "opt.boelgen.oejet.6", "label": "6" }
+            {
+              "id": "opt.boelgen.oejet.3",
+              "label": "3"
+            },
+            {
+              "id": "opt.boelgen.oejet.4",
+              "label": "4"
+            },
+            {
+              "id": "opt.boelgen.oejet.5",
+              "label": "5"
+            },
+            {
+              "id": "opt.boelgen.oejet.6",
+              "label": "6"
+            }
           ],
           "answerRule": {
             "kind": "exact",
             "canonicalAnswer": "5",
-            "acceptedAnswers": ["5"],
+            "acceptedAnswers": [
+              "5"
+            ],
             "nearMissResponses": [
               {
                 "answer": "4",
@@ -135,7 +205,9 @@
             "genericIncorrectFeedback": "Tæl de store, hvide bølgetoppe på hele byggeriet. Vinduer, altaner og master tæller ikke med."
           },
           "correctFeedback": "Rigtigt. Fem bølgeformede hoveddele rejser sig ved fjorden.",
-          "hintIds": ["hint.boelgen.1"]
+          "hintIds": [
+            "hint.boelgen.1"
+          ]
         },
         {
           "id": "step.boelgen.etagerne",
@@ -146,15 +218,29 @@
           "question": "Hvor mange etager har hver bølge?",
           "instruction": "Du skal ikke tælle etagerne på bygningen. Oplysningen står her: hver bølge består af ni etager.",
           "options": [
-            { "id": "opt.boelgen.etagerne.5", "label": "5" },
-            { "id": "opt.boelgen.etagerne.7", "label": "7" },
-            { "id": "opt.boelgen.etagerne.9", "label": "9" },
-            { "id": "opt.boelgen.etagerne.11", "label": "11" }
+            {
+              "id": "opt.boelgen.etagerne.5",
+              "label": "5"
+            },
+            {
+              "id": "opt.boelgen.etagerne.7",
+              "label": "7"
+            },
+            {
+              "id": "opt.boelgen.etagerne.9",
+              "label": "9"
+            },
+            {
+              "id": "opt.boelgen.etagerne.11",
+              "label": "11"
+            }
           ],
           "answerRule": {
             "kind": "exact",
             "canonicalAnswer": "9",
-            "acceptedAnswers": ["9"],
+            "acceptedAnswers": [
+              "9"
+            ],
             "nearMissResponses": [
               {
                 "answer": "5",
@@ -164,7 +250,9 @@
             "genericIncorrectFeedback": "Svaret står i teksten ovenfor. Hver bølge består af ni etager."
           },
           "correctFeedback": "Rigtigt. Hver bølge har ni etager.",
-          "hintIds": ["hint.boelgen.2"]
+          "hintIds": [
+            "hint.boelgen.2"
+          ]
         },
         {
           "id": "step.boelgen.pausen",
@@ -175,15 +263,29 @@
           "question": "Hvor mange bølger stod færdige før byggepausen?",
           "instruction": "De første bølger stod færdige i 2009. Derefter gik byggeriet i stå, før de sidste blev opført. Hele Bølgen stod færdig i 2018. Spørgsmålet handler om antallet af bølger – ikke om årstallet.",
           "options": [
-            { "id": "opt.boelgen.pausen.1", "label": "1" },
-            { "id": "opt.boelgen.pausen.2", "label": "2" },
-            { "id": "opt.boelgen.pausen.3", "label": "3" },
-            { "id": "opt.boelgen.pausen.5", "label": "5" }
+            {
+              "id": "opt.boelgen.pausen.1",
+              "label": "1"
+            },
+            {
+              "id": "opt.boelgen.pausen.2",
+              "label": "2"
+            },
+            {
+              "id": "opt.boelgen.pausen.3",
+              "label": "3"
+            },
+            {
+              "id": "opt.boelgen.pausen.5",
+              "label": "5"
+            }
           ],
           "answerRule": {
             "kind": "exact",
             "canonicalAnswer": "2",
-            "acceptedAnswers": ["2"],
+            "acceptedAnswers": [
+              "2"
+            ],
             "nearMissResponses": [
               {
                 "answer": "3",
@@ -193,7 +295,9 @@
             "genericIncorrectFeedback": "To bølger stod færdige, før byggeriet gik i stå. Læs teksten ovenfor igen."
           },
           "correctFeedback": "Rigtigt. To bølger stod færdige, før byggeriet gik i stå.",
-          "hintIds": ["hint.boelgen.2"]
+          "hintIds": [
+            "hint.boelgen.2"
+          ]
         },
         {
           "id": "step.boelgen.koden",
@@ -235,7 +339,11 @@
           "answerRule": {
             "kind": "digitsOnly",
             "canonicalAnswer": "592",
-            "acceptedAnswers": ["592", "5 9 2", "5-9-2"],
+            "acceptedAnswers": [
+              "592",
+              "5 9 2",
+              "5-9-2"
+            ],
             "nearMissResponses": [
               {
                 "answer": "529",
@@ -260,7 +368,11 @@
             ],
             "genericIncorrectFeedback": "Find først de tre delresultater hver for sig. Saml dem først bagefter i rækkefølgen Øjet → Etagerne → Pausen."
           },
-          "hintIds": ["hint.boelgen.1", "hint.boelgen.2", "hint.boelgen.3"]
+          "hintIds": [
+            "hint.boelgen.1",
+            "hint.boelgen.2",
+            "hint.boelgen.3"
+          ]
         }
       ],
       "hints": [
@@ -308,10 +420,18 @@
       "difficulty": 3,
       "estimatedMinutes": 7,
       "basePoints": 100,
-      "tags": ["arkitektur", "observation", "havn", "familie"],
+      "tags": [
+        "arkitektur",
+        "observation",
+        "havn",
+        "familie"
+      ],
       "fictionLabel": "Fiktiv mission baseret på Fjordenhus' dokumenterede arkitektur.",
       "heroMediaId": null,
-      "sourceIds": ["source.fjordenhus.officiel", "source.visitvejle.fjordenhus"],
+      "sourceIds": [
+        "source.fjordenhus.officiel",
+        "source.visitvejle.fjordenhus"
+      ],
       "steps": [
         {
           "id": "step.fjordenhus.intro",
@@ -330,15 +450,29 @@
           "question": "Hvor mange store, sammenhængende cylindriske hoveddele består huset af?",
           "instruction": "Se på bygningen som en samlet form. Ignorér vinduer, åbninger, buer, glasfelter og gangbro.",
           "options": [
-            { "id": "opt.fjordenhus.form.2", "label": "2" },
-            { "id": "opt.fjordenhus.form.3", "label": "3" },
-            { "id": "opt.fjordenhus.form.4", "label": "4" },
-            { "id": "opt.fjordenhus.form.6", "label": "6" }
+            {
+              "id": "opt.fjordenhus.form.2",
+              "label": "2"
+            },
+            {
+              "id": "opt.fjordenhus.form.3",
+              "label": "3"
+            },
+            {
+              "id": "opt.fjordenhus.form.4",
+              "label": "4"
+            },
+            {
+              "id": "opt.fjordenhus.form.6",
+              "label": "6"
+            }
           ],
           "answerRule": {
             "kind": "exact",
             "canonicalAnswer": "4",
-            "acceptedAnswers": ["4"],
+            "acceptedAnswers": [
+              "4"
+            ],
             "nearMissResponses": [
               {
                 "answer": "6",
@@ -352,7 +486,9 @@
             "genericIncorrectFeedback": "Se huset som én samlet form, og tæl de store runde hoveddele. Detaljerne tæller ikke med."
           },
           "correctFeedback": "Rigtigt. Huset er bygget af fire sammenhængende cylindre.",
-          "hintIds": ["hint.fjordenhus.1"]
+          "hintIds": [
+            "hint.fjordenhus.1"
+          ]
         },
         {
           "id": "step.fjordenhus.vand",
@@ -363,15 +499,29 @@
           "question": "Hvor mange rum gennemstrømmes af vand?",
           "instruction": "Du skal ikke kunne se rummene fra kajen. Oplysningen står her: i stueetagen løber fjordens vand gennem to af husets rum.",
           "options": [
-            { "id": "opt.fjordenhus.vand.1", "label": "1" },
-            { "id": "opt.fjordenhus.vand.2", "label": "2" },
-            { "id": "opt.fjordenhus.vand.3", "label": "3" },
-            { "id": "opt.fjordenhus.vand.4", "label": "4" }
+            {
+              "id": "opt.fjordenhus.vand.1",
+              "label": "1"
+            },
+            {
+              "id": "opt.fjordenhus.vand.2",
+              "label": "2"
+            },
+            {
+              "id": "opt.fjordenhus.vand.3",
+              "label": "3"
+            },
+            {
+              "id": "opt.fjordenhus.vand.4",
+              "label": "4"
+            }
           ],
           "answerRule": {
             "kind": "exact",
             "canonicalAnswer": "2",
-            "acceptedAnswers": ["2"],
+            "acceptedAnswers": [
+              "2"
+            ],
             "nearMissResponses": [
               {
                 "answer": "4",
@@ -381,7 +531,9 @@
             "genericIncorrectFeedback": "Svaret står i teksten ovenfor. Fjordens vand løber gennem to rum i stueetagen."
           },
           "correctFeedback": "Rigtigt. Fjorden løber gennem to af husets rum.",
-          "hintIds": ["hint.fjordenhus.2"]
+          "hintIds": [
+            "hint.fjordenhus.2"
+          ]
         },
         {
           "id": "step.fjordenhus.hoejde",
@@ -392,15 +544,29 @@
           "question": "Fjordenhus er 28 meter højt. Hvilket ciffer skal du bruge?",
           "instruction": "Arkitektnoten siger: brug det sidste ciffer i husets højde.",
           "options": [
-            { "id": "opt.fjordenhus.hoejde.2", "label": "2" },
-            { "id": "opt.fjordenhus.hoejde.8", "label": "8" },
-            { "id": "opt.fjordenhus.hoejde.28", "label": "28" },
-            { "id": "opt.fjordenhus.hoejde.10", "label": "10" }
+            {
+              "id": "opt.fjordenhus.hoejde.2",
+              "label": "2"
+            },
+            {
+              "id": "opt.fjordenhus.hoejde.8",
+              "label": "8"
+            },
+            {
+              "id": "opt.fjordenhus.hoejde.28",
+              "label": "28"
+            },
+            {
+              "id": "opt.fjordenhus.hoejde.10",
+              "label": "10"
+            }
           ],
           "answerRule": {
             "kind": "exact",
             "canonicalAnswer": "8",
-            "acceptedAnswers": ["8"],
+            "acceptedAnswers": [
+              "8"
+            ],
             "nearMissResponses": [
               {
                 "answer": "28",
@@ -414,7 +580,9 @@
             "genericIncorrectFeedback": "Huset er 28 meter højt, og du skal bruge det sidste ciffer i højden."
           },
           "correctFeedback": "Rigtigt. Det sidste ciffer i 28 er 8.",
-          "hintIds": ["hint.fjordenhus.2"]
+          "hintIds": [
+            "hint.fjordenhus.2"
+          ]
         },
         {
           "id": "step.fjordenhus.koden",
@@ -456,7 +624,11 @@
           "answerRule": {
             "kind": "digitsOnly",
             "canonicalAnswer": "428",
-            "acceptedAnswers": ["428", "4 2 8", "4-2-8"],
+            "acceptedAnswers": [
+              "428",
+              "4 2 8",
+              "4-2-8"
+            ],
             "nearMissResponses": [
               {
                 "answer": "482",
@@ -481,7 +653,11 @@
             ],
             "genericIncorrectFeedback": "Find først de tre delresultater hver for sig. Saml dem først bagefter i rækkefølgen form → vand → højde."
           },
-          "hintIds": ["hint.fjordenhus.1", "hint.fjordenhus.2", "hint.fjordenhus.3"]
+          "hintIds": [
+            "hint.fjordenhus.1",
+            "hint.fjordenhus.2",
+            "hint.fjordenhus.3"
+          ]
         }
       ],
       "hints": [
@@ -517,9 +693,237 @@
       "storyId": null,
       "chapterId": null,
       "nextChapterId": null
+    },
+    {
+      "id": "mission.frydenlund98.den-groenne-transmission",
+      "slug": "frydenlund98-den-groenne-transmission",
+      "locationId": "loc.vejle-oest.frydenlund98",
+      "title": "Den grønne transmission",
+      "shortTitle": "Den grønne transmission",
+      "teaser": "Et fjernsyn står stadig tændt i det forladte værelse. Kun et fastfrosset øjeblik fra et cykelløb er tilbage.",
+      "status": "fieldTestReady",
+      "difficulty": 2,
+      "estimatedMinutes": 6,
+      "basePoints": 75,
+      "tags": [
+        "test",
+        "billedobservation",
+        "sport"
+      ],
+      "fictionLabel": "Fiktiv detektivsag. Sportsbegivenheden på fjernsynet er dokumenteret.",
+      "heroMediaId": "media.frydenlund98.stue",
+      "sourceIds": [
+        "source.letour.foix-2026"
+      ],
+      "steps": [
+        {
+          "id": "step.frydenlund98.intro",
+          "order": 1,
+          "kind": "narrative",
+          "title": "Sag 07 – Den grønne transmission",
+          "body": "Et fjernsyn står stadig tændt i det forladte værelse.\n\nDen ukendte person har ikke efterladt et brev, et navn eller en dato. Kun et fastfrosset øjeblik fra et cykelløb.\n\nEfterforskeren nåede at skrive én sætning:\n\n“Find året, hvor den danske rytter for første gang bar grønt i Touren.”\n\nKoden består af fire cifre.",
+          "continueLabel": "Undersøg værelset"
+        },
+        {
+          "id": "step.frydenlund98.koden",
+          "order": 2,
+          "kind": "numericCode",
+          "eyebrow": "SAGENS KODE",
+          "title": "Find året",
+          "instruction": "På fjernsynet ses Tour de France og Lidl-Trek. Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje. Indtast årstallet som en kode på fire cifre.",
+          "length": 4,
+          "evidenceCards": [
+            {
+              "id": "card.frydenlund98.sportsarkiv",
+              "symbol": "archive",
+              "label": "Sportsarkiv",
+              "title": "4. etape til Foix",
+              "description": "Mads Pedersen vandt etapen og overtog Tourens grønne førertrøje for første gang.",
+              "supportingText": "Arkivets mappe er mærket med løbsåret, men de fire cifre er blevet fjernet.",
+              "displayValue": "????"
+            }
+          ],
+          "answerRule": {
+            "kind": "digitsOnly",
+            "canonicalAnswer": "2026",
+            "acceptedAnswers": [
+              "2026",
+              "2 0 2 6",
+              "20-26"
+            ],
+            "nearMissResponses": [
+              {
+                "answer": "2025",
+                "feedback": "Du er tæt på nutiden, men dette var ikke året for Mads Pedersens første grønne førertrøje i Touren. Undersøg sportsarkivet igen."
+              },
+              {
+                "answer": "2024",
+                "feedback": "Det viste spor hører til et senere Tour de France. Find året for etapen til Foix, hvor han overtog grønt."
+              },
+              {
+                "answer": "2022",
+                "feedback": "Mads Pedersen vandt også en Tour-etape i 2022, men spørgsmålet handler om første gang, han bar den grønne førertrøje."
+              }
+            ],
+            "genericIncorrectFeedback": "Du har fundet kodeformatet, men ikke den rigtige begivenhed. Fokusér på Mads Pedersen, Lidl-Trek og den grønne trøje."
+          },
+          "hintIds": [
+            "hint.frydenlund98.1",
+            "hint.frydenlund98.2",
+            "hint.frydenlund98.3"
+          ]
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint.frydenlund98.1",
+          "order": 1,
+          "penaltyPercent": 3,
+          "title": "Hvor",
+          "text": "Det vigtigste spor findes på fjernsynet. Undersøg cykelløbet og holdet."
+        },
+        {
+          "id": "hint.frydenlund98.2",
+          "order": 2,
+          "penaltyPercent": 4,
+          "title": "Hvordan",
+          "text": "Den danske rytter er Mads Pedersen. Find året, hvor han for første gang overtog den grønne førertrøje i Tour de France."
+        },
+        {
+          "id": "hint.frydenlund98.3",
+          "order": 3,
+          "penaltyPercent": 5,
+          "title": "Næsten løsningen",
+          "text": "Det skete på 4. etape til Foix i Tour de France 2026. Brug løbsåret som den firecifrede kode."
+        }
+      ],
+      "completion": {
+        "headline": "Koden er korrekt",
+        "subheadline": "Sag 07 er lukket",
+        "messageLabel": "Den grønne transmission",
+        "message": "Den fastfrosne transmission var ikke tilfældig. Efterforskeren havde set præcis det øjeblik, sagen hang på.",
+        "historyFact": "I Tour de France 2026 vandt Mads Pedersen 4. etape til Foix og overtog den grønne førertrøje. Det var første gang, han bar grønt som leder af Tourens pointkonkurrence."
+      },
+      "storyId": null,
+      "chapterId": null,
+      "nextChapterId": null
+    },
+    {
+      "id": "mission.frydenlund98.veras-hemmelige-snack",
+      "slug": "frydenlund98-veras-hemmelige-snack",
+      "locationId": "loc.vejle-oest.frydenlund98",
+      "title": "Veras hemmelige snack",
+      "shortTitle": "Veras snack",
+      "teaser": "Kaninen Vera har gravet efter noget særligt. Det er sprødt, orange og gemmer sig normalt under jorden.",
+      "status": "fieldTestReady",
+      "difficulty": 1,
+      "estimatedMinutes": 3,
+      "basePoints": 50,
+      "tags": [
+        "test",
+        "gåde",
+        "børn",
+        "dyr"
+      ],
+      "fictionLabel": "Fiktiv gåde. Kaninen Vera er virkelig.",
+      "heroMediaId": null,
+      "sourceIds": [
+        "source.frydenlund98.vera"
+      ],
+      "steps": [
+        {
+          "id": "step.vera.intro",
+          "order": 1,
+          "kind": "narrative",
+          "title": "Vera og den skjulte snack",
+          "body": "Kaninen Vera hygger sig i sit bur. Hun hopper rundt, snuser til græsset og graver små huller i jorden.\n\nI dag har hun gravet efter noget særligt. Det er sprødt, orange og gemmer sig normalt under jorden.\n\nKan du løse Veras gåde og finde navnet på hendes hemmelige snack?",
+          "continueLabel": "Hør gåden"
+        },
+        {
+          "id": "step.vera.gaaden",
+          "order": 2,
+          "kind": "freeText",
+          "eyebrow": "VERAS GÅDE",
+          "title": "Hvad er jeg?",
+          "question": "Jeg gemmer mig under jorden, men mit grønne hår kan ses. Jeg er lang og orange, og kaniner siges at holde af mig.",
+          "instruction": "Skriv svaret som ét ord.",
+          "placeholder": "Skriv dit svar",
+          "answerRule": {
+            "kind": "exact",
+            "canonicalAnswer": "gulerod",
+            "acceptedAnswers": [
+              "gulerod",
+              "Gulerod",
+              "en gulerod",
+              "gulerødder"
+            ],
+            "nearMissResponses": [
+              {
+                "answer": "kartoffel",
+                "feedback": "Den vokser rigtignok under jorden, men Veras snack er lang og orange."
+              },
+              {
+                "answer": "græs",
+                "feedback": "Vera snuser til græsset, men hun har gravet efter noget andet — noget der gemmer sig nede i jorden."
+              }
+            ],
+            "genericIncorrectFeedback": "Det er ikke det, Vera leder efter. Tænk på noget orange, som vokser under jorden og ofte forbindes med kaniner."
+          },
+          "hintIds": [
+            "hint.vera.1",
+            "hint.vera.2",
+            "hint.vera.3"
+          ]
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint.vera.1",
+          "order": 1,
+          "penaltyPercent": 3,
+          "title": "Hvor vokser den?",
+          "text": "Veras snack vokser nede i jorden, mens noget grønt stikker op over jorden."
+        },
+        {
+          "id": "hint.vera.2",
+          "order": 2,
+          "penaltyPercent": 4,
+          "title": "Hvordan ser den ud?",
+          "text": "Den er normalt lang, sprød og orange."
+        },
+        {
+          "id": "hint.vera.3",
+          "order": 3,
+          "penaltyPercent": 5,
+          "title": "Næsten svaret",
+          "text": "Det er en grøntsag, som begynder med g og ofte forbindes med kaniner."
+        }
+      ],
+      "completion": {
+        "headline": "Du fandt Veras hemmelige snack!",
+        "subheadline": "Svaret er gulerod",
+        "messageLabel": "Veras gåde",
+        "message": "Vera hopper videre gennem buret. Måske leder hun allerede efter det næste skjulte spor.",
+        "historyFact": "Gulerødder gemmer sig under jorden, mens det grønne løv stikker op. Det er roden, kaniner — og mennesker — spiser."
+      },
+      "storyId": null,
+      "chapterId": null,
+      "nextChapterId": null
     }
   ],
-  "media": [],
+  "media": [
+    {
+      "id": "media.frydenlund98.stue",
+      "filename": "frydenlund98-stue.png",
+      "altText": "En mørk stue med et fjernsyn, der viser et professionelt cykelløb. På et bord foran fjernsynet ligger en lup, tomme papirer og en notesbog.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Testmateriale, Byens Gåder",
+      "kind": "aiGenerated",
+      "restrictions": "MÅ IKKE UDGIVES. Tv-billedet kan gengive ophavsretligt beskyttet transmission, grafik og holdlogoer. Se opgavedokumentets afsnit 20.",
+      "expiresAt": null
+    }
+  ],
   "sources": [
     {
       "id": "source.visitvejle.boelgen",
@@ -548,6 +952,20 @@
       "publisher": "VisitVejle",
       "url": "https://www.visitvejle.dk/vejle/planlaeg-ferien/fjordenhus-gdk1101859",
       "kind": "officialTourism"
+    },
+    {
+      "id": "source.letour.foix-2026",
+      "title": "Pedersen and Traeen: northern power rules Foix",
+      "publisher": "Tour de France",
+      "url": "https://www.letour.fr/en/news/2026/pedersen-and-traeen-northern-power-rules-foix/1337325",
+      "kind": "press"
+    },
+    {
+      "id": "source.frydenlund98.vera",
+      "title": "Kaninen Vera på Frydenlund 98",
+      "publisher": "Byens Gåder",
+      "url": "https://byensgaader.dk/kilder/frydenlund98-vera",
+      "kind": "other"
     }
   ]
 }

@@ -80,23 +80,43 @@ struct EngineIsContentDrivenTests {
             """)
     }
 
-    /// Begge opgaver skal have samme form, så den ene ikke er et særtilfælde.
-    @Test("Begge missioner har samme struktur")
-    func bothMissionsShareTheSameShape() throws {
+    /// Alle opgaver skal opfylde de samme strukturelle krav.
+    ///
+    /// Testen hævdede tidligere, at opgaverne havde **samme trinstruktur**.
+    /// Det holdt, mens der kun fandtes to arkitekturgåder, men det var den
+    /// forkerte påstand: pointen er, at motoren ikke behandler nogen opgave
+    /// særligt — ikke at alle opgaver ligner hinanden. En billedopgave og en
+    /// børnegåde *skal* have forskellig form, og kontrakten skal bære dem begge.
+    @Test("Alle opgaver opfylder de samme strukturelle krav")
+    func everyMissionMeetsTheSameStructuralContract() throws {
         let pack = try ContractFixtures.contentPack()
-        #expect(pack.missions.count == 2)
-
-        let shapes = pack.missions.map { mission in
-            mission.orderedSteps.map(\.kind).joined(separator: ",")
-        }
-        #expect(
-            Set(shapes).count == 1,
-            "Opgaverne har forskellig trinstruktur: \(shapes). Så er den ene ikke bevis for den anden"
-        )
+        #expect(pack.missions.count >= 2)
 
         for mission in pack.missions {
-            #expect(mission.hints.count == 3)
-            #expect(mission.basePoints == 100)
+            #expect(mission.hints.count == 3, "\(mission.id) har ikke tre hints")
+            #expect(mission.basePoints > 0, "\(mission.id) har ingen grundpoint")
+            #expect(
+                mission.orderedSteps.first?.kind == "narrative",
+                "\(mission.id) begynder ikke med en fortælling"
+            )
+            #expect(
+                mission.orderedSteps.contains { $0.answerRule != nil },
+                "\(mission.id) har intet trin, der kan bedømmes"
+            )
+            #expect(
+                mission.orderedSteps.allSatisfy { $0.kind != "unknown" },
+                "\(mission.id) bruger en trintype, appen ikke kender"
+            )
         }
+    }
+
+    /// De trintyper, indholdet faktisk bruger, skal alle kunne afkodes.
+    @Test("Ingen trintype i pakken degraderer til unknown")
+    func everyStepKindIsUnderstood() throws {
+        let pack = try ContractFixtures.contentPack()
+        let kinds = Set(pack.missions.flatMap { $0.orderedSteps.map(\.kind) })
+
+        #expect(!kinds.contains("unknown"))
+        #expect(kinds.contains("narrative"))
     }
 }

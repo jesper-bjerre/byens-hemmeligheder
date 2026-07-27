@@ -19,8 +19,10 @@ struct ChallengeView: View {
     @Environment(Router.self) private var router
 
     @State private var typedCode = ""
+    @State private var typedText = ""
     @State private var selectedOptionId: String?
     @FocusState private var codeFieldFocused: Bool
+    @FocusState private var textFieldFocused: Bool
 
     var body: some View {
         ScrollView {
@@ -30,6 +32,8 @@ struct ChallengeView: View {
                     singleChoice(choice)
                 case .numericCode(let code):
                     numericCode(code)
+                case .freeText(let text):
+                    freeText(text)
                 case .narrative, .unknown:
                     EmptyView()
                 }
@@ -133,6 +137,12 @@ struct ChallengeView: View {
         }
         .accessibilityElement(children: .combine)
 
+        // For en billedopgave *er* billedet gåden. Det skal kunne studeres,
+        // mens koden tastes — ikke kun på introen.
+        if let heroMediaId = mission.heroMediaId {
+            MissionHeroImage(mediaId: heroMediaId)
+        }
+
         // FR-010: deltallene vises igen, så ingen skal huske dem hjem fra
         // trin 2 — heller ikke den yngste i familien, der taster koden.
         VStack(spacing: BHSpacing.snug) {
@@ -229,6 +239,69 @@ struct ChallengeView: View {
         }
     }
 
+    // MARK: - Fritekst
+
+    @ViewBuilder
+    private func freeText(_ step: FreeTextStep) -> some View {
+        VStack(alignment: .leading, spacing: BHSpacing.snug) {
+            if let eyebrow = step.eyebrow {
+                Text(eyebrow)
+                    .font(BHFont.eyebrow)
+                    .foregroundStyle(BHColor.accent)
+                    .accessibilityLabel(eyebrow.lowercased())
+            }
+            Text(step.title)
+                .font(BHFont.title)
+                .foregroundStyle(BHColor.ink)
+            if let question = step.question {
+                Text(question)
+                    .font(BHFont.heading)
+                    .foregroundStyle(BHColor.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(step.instruction)
+                .font(BHFont.body)
+                .foregroundStyle(BHColor.inkMuted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .combine)
+
+        if let heroMediaId = mission.heroMediaId {
+            MissionHeroImage(mediaId: heroMediaId)
+        }
+
+        VStack(alignment: .leading, spacing: BHSpacing.snug) {
+            TextField(step.placeholder ?? "", text: $typedText)
+                .font(BHFont.heading)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .focused($textFieldFocused)
+                .padding(BHSpacing.regular)
+                .frame(minHeight: BHMetrics.primaryButtonHeight)
+                .background(
+                    RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous)
+                        .fill(BHColor.surface)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous)
+                        .strokeBorder(BHColor.separator, lineWidth: 1)
+                )
+                // Autokorrektur er slået fra med vilje. Den ville rette
+                // spillerens gæt til noget andet, før svaret blev bedømt — og
+                // `DanishTextNormalizer` klarer i forvejen store bogstaver,
+                // mellemrum og danske tegn.
+                .accessibilityLabel(step.question ?? step.title)
+                .accessibilityIdentifier("text.field")
+
+            Button("Svar") {
+                Task { await answer(typedText) }
+            }
+            .buttonStyle(.bhPrimary)
+            .disabled(typedText.trimmingCharacters(in: .whitespaces).isEmpty)
+            .accessibilityIdentifier("text.submit")
+        }
+    }
+
     // MARK: - Feedback
 
     @ViewBuilder
@@ -289,6 +362,7 @@ struct ChallengeView: View {
         guard outcome.isCorrect else { return }
 
         codeFieldFocused = false
+        textFieldFocused = false
         guard let next = engine.nextStep(after: step, in: mission) else {
             await engine.complete(mission)
             router.replaceTop(with: .reward(missionId: mission.id))

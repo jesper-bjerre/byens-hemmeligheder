@@ -15,16 +15,7 @@ final class BoelgenFlowTests: FlowTestCase {
             longitude: Vantage.boelgen.longitude
         )
 
-        // Sikkerhedsnoterne står på opgavekortet, før turen begynder (FR-006).
-        tapMissionPin(missionId, in: app)
-        XCTAssertTrue(
-            app.descendants(matching: .any)
-                .containing(NSPredicate(format: "label CONTAINS[c] %@", "vandkant")).firstMatch.exists,
-            "Sikkerhedsnoterne mangler på opgavekortet"
-        )
-        app.buttons["preview.open"].tap()
-
-        startMission(in: app)
+        tapMission(missionId, in: app)
         waitForPresence(in: app)
 
         // Fiktionsmarkeringen står på den narrative intro (FR-007).

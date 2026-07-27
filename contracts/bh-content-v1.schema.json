@@ -188,6 +188,21 @@
           }
         },
         {
+          "if": { "properties": { "kind": { "const": "freeText" } }, "required": ["kind"] },
+          "then": {
+            "required": ["title", "instruction", "answerRule", "hintIds"],
+            "properties": {
+              "eyebrow": { "type": "string" },
+              "title": { "type": "string", "minLength": 1 },
+              "question": { "type": "string", "minLength": 1 },
+              "instruction": { "type": "string", "minLength": 1 },
+              "placeholder": { "type": "string" },
+              "answerRule": { "$ref": "#/$defs/answerRule" },
+              "hintIds": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+            }
+          }
+        },
+        {
           "if": { "properties": { "kind": { "const": "numericCode" } }, "required": ["kind"] },
           "then": {
             "required": ["title", "instruction", "length", "evidenceCards", "answerRule", "hintIds"],

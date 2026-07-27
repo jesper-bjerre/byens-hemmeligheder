@@ -134,6 +134,26 @@ enum GoldenSamples {
         hintIds: ["hint.boelgen.1"]
     )
 
+    static let freeTextStep = FreeTextStep(
+        id: "step.vera.gaaden",
+        order: 2,
+        eyebrow: "VERAS GÅDE",
+        title: "Hvad er jeg?",
+        question: "Jeg gemmer mig under jorden, men mit grønne hår kan ses.",
+        instruction: "Skriv svaret som ét ord.",
+        placeholder: "Skriv dit svar",
+        answerRule: AnswerRule(
+            kind: .known(.exact),
+            canonicalAnswer: "gulerod",
+            acceptedAnswers: ["gulerod", "en gulerod"],
+            nearMissResponses: [
+                NearMissResponse(answer: "kartoffel", feedback: "Den er ikke orange.")
+            ],
+            genericIncorrectFeedback: "Tænk på noget orange under jorden."
+        ),
+        hintIds: ["hint.vera.1"]
+    )
+
     static let completion = Completion(
         headline: "Beskeden er åben",
         subheadline: "Du samlede den femte besked",

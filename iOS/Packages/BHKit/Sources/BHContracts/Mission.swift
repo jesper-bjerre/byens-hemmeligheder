@@ -101,6 +101,7 @@ public enum Step: Hashable, Sendable, Identifiable {
     case narrative(NarrativeStep)
     case singleChoice(SingleChoiceStep)
     case numericCode(NumericCodeStep)
+    case freeText(FreeTextStep)
     case unknown(UnknownStep)
 
     public var id: String {
@@ -108,6 +109,7 @@ public enum Step: Hashable, Sendable, Identifiable {
         case .narrative(let step): step.id
         case .singleChoice(let step): step.id
         case .numericCode(let step): step.id
+        case .freeText(let step): step.id
         case .unknown(let step): step.id
         }
     }
@@ -117,6 +119,7 @@ public enum Step: Hashable, Sendable, Identifiable {
         case .narrative(let step): step.order
         case .singleChoice(let step): step.order
         case .numericCode(let step): step.order
+        case .freeText(let step): step.order
         case .unknown(let step): step.order
         }
     }
@@ -126,6 +129,7 @@ public enum Step: Hashable, Sendable, Identifiable {
         case .narrative: NarrativeStep.kind
         case .singleChoice: SingleChoiceStep.kind
         case .numericCode: NumericCodeStep.kind
+        case .freeText: FreeTextStep.kind
         case .unknown(let step): step.kind
         }
     }
@@ -135,6 +139,7 @@ public enum Step: Hashable, Sendable, Identifiable {
         switch self {
         case .singleChoice(let step): step.answerRule
         case .numericCode(let step): step.answerRule
+        case .freeText(let step): step.answerRule
         case .narrative, .unknown: nil
         }
     }
@@ -144,6 +149,7 @@ public enum Step: Hashable, Sendable, Identifiable {
         switch self {
         case .singleChoice(let step): step.hintIds
         case .numericCode(let step): step.hintIds
+        case .freeText(let step): step.hintIds
         case .narrative, .unknown: []
         }
     }
@@ -165,6 +171,8 @@ extension Step: Codable {
             self = .singleChoice(try SingleChoiceStep(from: decoder))
         case NumericCodeStep.kind:
             self = .numericCode(try NumericCodeStep(from: decoder))
+        case FreeTextStep.kind:
+            self = .freeText(try FreeTextStep(from: decoder))
         default:
             self = .unknown(
                 UnknownStep(
@@ -181,6 +189,7 @@ extension Step: Codable {
         case .narrative(let step): try step.encode(to: encoder)
         case .singleChoice(let step): try step.encode(to: encoder)
         case .numericCode(let step): try step.encode(to: encoder)
+        case .freeText(let step): try step.encode(to: encoder)
         case .unknown(let step): try step.encode(to: encoder)
         }
     }
@@ -376,6 +385,86 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         try container.encode(instruction, forKey: .instruction)
         try container.encode(length, forKey: .length)
         try container.encode(evidenceCards, forKey: .evidenceCards)
+        try container.encode(answerRule, forKey: .answerRule)
+        try container.encode(hintIds, forKey: .hintIds)
+    }
+}
+
+/// Et fritekstsvar — ét ord eller en kort frase.
+///
+/// Tilføjet efter `numericCode` og er derfor en **additiv** kontraktændring:
+/// en ældre app afkoder trinnet til ``Step/unknown(_:)`` og springer det over
+/// frem for at mure hele indholdspakken (FR-003, research.md R-003).
+///
+/// Adskiller sig fra ``SingleChoiceStep`` ved ikke at have svarmuligheder.
+/// Spilleren skriver selv, og ``AnswerRuleKind/exact`` afgør resten — hvilket
+/// er dét, der gør `gulerod`, `Gulerod` og `en gulerod` til samme svar uden at
+/// opgaven behøver kende de tre former hver for sig.
+public struct FreeTextStep: Codable, Hashable, Sendable, Identifiable {
+    public static let kind = "freeText"
+
+    public let id: String
+    public let order: Int
+    public let eyebrow: String?
+    public let title: String
+    public let question: String?
+    /// Afgrænsningen: hvad spilleren skal svare på (FR-009).
+    public let instruction: String
+    /// Vist i det tomme felt. Må aldrig røbe svaret.
+    public let placeholder: String?
+    public let answerRule: AnswerRule
+    public let hintIds: [String]
+
+    public init(
+        id: String,
+        order: Int,
+        eyebrow: String? = nil,
+        title: String,
+        question: String? = nil,
+        instruction: String,
+        placeholder: String? = nil,
+        answerRule: AnswerRule,
+        hintIds: [String]
+    ) {
+        self.id = id
+        self.order = order
+        self.eyebrow = eyebrow
+        self.title = title
+        self.question = question
+        self.instruction = instruction
+        self.placeholder = placeholder
+        self.answerRule = answerRule
+        self.hintIds = hintIds
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, order, kind, eyebrow, title, question, instruction
+        case placeholder, answerRule, hintIds
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        order = try container.decode(Int.self, forKey: .order)
+        eyebrow = try container.decodeIfPresent(String.self, forKey: .eyebrow)
+        title = try container.decode(String.self, forKey: .title)
+        question = try container.decodeIfPresent(String.self, forKey: .question)
+        instruction = try container.decode(String.self, forKey: .instruction)
+        placeholder = try container.decodeIfPresent(String.self, forKey: .placeholder)
+        answerRule = try container.decode(AnswerRule.self, forKey: .answerRule)
+        hintIds = try container.decode([String].self, forKey: .hintIds)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(order, forKey: .order)
+        try container.encode(Self.kind, forKey: .kind)
+        try container.encodeIfPresent(eyebrow, forKey: .eyebrow)
+        try container.encode(title, forKey: .title)
+        try container.encodeIfPresent(question, forKey: .question)
+        try container.encode(instruction, forKey: .instruction)
+        try container.encodeIfPresent(placeholder, forKey: .placeholder)
         try container.encode(answerRule, forKey: .answerRule)
         try container.encode(hintIds, forKey: .hintIds)
     }

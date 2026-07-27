@@ -14,6 +14,7 @@
 		BH000000000000000000001B /* BHLocationKit in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000015 /* BHLocationKit */; };
 		BH000000000000000000001C /* BHDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000016 /* BHDesignSystem */; };
 		BH000000000000000000001E /* content-pack.json in Resources */ = {isa = PBXBuildFile; fileRef = BH000000000000000000001D /* content-pack.json */; };
+		BH000000000000000000002D /* media in Resources */ = {isa = PBXBuildFile; fileRef = BH000000000000000000002C /* media */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +32,7 @@
 		BH000000000000000000001D /* content-pack.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "content-pack.json"; path = "../contracts/content/da-DK/content-pack.json"; sourceTree = "<group>"; };
 		BH0000000000000000000021 /* ByensHemmelighederUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ByensHemmelighederUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BH000000000000000000002B /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Shared.xcconfig; path = Config/Shared.xcconfig; sourceTree = "<group>"; };
+		BH000000000000000000002C /* media */ = {isa = PBXFileReference; lastKnownFileType = folder; name = media; path = "../contracts/content/da-DK/media"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -90,6 +92,7 @@
 				BH0000000000000000000025 /* ByensHemmelighederUITests */,
 				BH000000000000000000002B /* Shared.xcconfig */,
 				BH000000000000000000001D /* content-pack.json */,
+				BH000000000000000000002C /* media */,
 				BH0000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -205,6 +208,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BH000000000000000000001E /* content-pack.json in Resources */,
+				BH000000000000000000002D /* media in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,18 +289,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = QHL89A7A8J;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Byens Hemmeligheder";
+				INFOPLIST_KEY_CFBundleDisplayName = "Byens Gåder";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byenshemmeligheder;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byensgaader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -309,18 +312,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = QHL89A7A8J;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Byens Hemmeligheder";
+				INFOPLIST_KEY_CFBundleDisplayName = "Byens Gåder";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byenshemmeligheder;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byensgaader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -329,12 +331,13 @@
 		};
 		BH0000000000000000000027 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BH000000000000000000002B /* Shared.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byenshemmeligheder.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byensgaader.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG BH_DEV_TOOLS";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -344,12 +347,13 @@
 		};
 		BH0000000000000000000028 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BH000000000000000000002B /* Shared.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byenshemmeligheder.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byensgaader.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = ByensHemmeligheder;

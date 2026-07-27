@@ -2,12 +2,21 @@ import BHContracts
 import BHDesignSystem
 import SwiftUI
 
-/// Vises før sessionens første mission (FR-008).
+/// **Uden for flowet.** Vises ikke i dag.
 ///
-/// Ikke en formalitet. Begge lokationer i feature 001 ligger ved åbent vand med
-/// cykeltrafik tæt på, og målgruppen er 10–15-årige med en telefon i hånden.
-/// Skærmen skal læses, ikke klikkes væk — derfor står lokationens egne
-/// sikkerhedsnoter her, ikke en generisk ansvarsfraskrivelse.
+/// Skærmen lå tidligere før sessionens første mission (FR-008). Den er taget
+/// ud efter redaktionel beslutning: en advarsel foran hver tur passer ikke til
+/// dansk friluftsnorm, og ansvaret for ikke at gå i vandet er spillerens eget.
+///
+/// Filen står tilbage som grundlag for den generelle sikkerhedsside, appen
+/// senere får et menupunkt til — og for den godkendelse, spilleren eventuelt
+/// skal give ved første start. `MissionEngine.hasSeenSafetyInterstitial` er
+/// bevaret til netop det.
+///
+/// Bemærk, at forfatningens princip IV er upåvirket: den kræver
+/// sikkerhedsreview ved feltbesøg og at opgaverne ikke *kræver* farlig færdsel
+/// — ikke at advarslen står i brugerfladen. Sikkerhedsdata bliver derfor i
+/// indholdspakken.
 struct SafetyInterstitialView: View {
     let mission: Mission
 

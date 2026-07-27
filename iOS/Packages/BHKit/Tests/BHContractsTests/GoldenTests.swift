@@ -151,6 +151,10 @@ struct GoldenTests {
         try assertGolden(Step.numericCode(GoldenSamples.numericCodeStep), named: "Step.numericCode")
     }
 
+    @Test("Step: freeText") func freeTextStep() throws {
+        try assertGolden(Step.freeText(GoldenSamples.freeTextStep), named: "Step.freeText")
+    }
+
     // MARK: - Kørselsmodellen
 
     @Test("GameEvent") func gameEvent() throws {

@@ -24,6 +24,10 @@ struct NarrativeStepView: View {
                     .foregroundStyle(BHColor.ink)
                     .fixedSize(horizontal: false, vertical: true)
 
+                if let heroMediaId = mission.heroMediaId {
+                    MissionHeroImage(mediaId: heroMediaId)
+                }
+
                 Text(step.body)
                     .font(BHFont.narrative)
                     .foregroundStyle(BHColor.ink)

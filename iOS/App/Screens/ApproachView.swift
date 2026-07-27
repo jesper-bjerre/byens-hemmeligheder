@@ -25,9 +25,6 @@ struct ApproachView: View {
                 if let vantage = location?.vantagePoint {
                     vantageCard(vantage)
                 }
-                if let location {
-                    safetyReminder(location)
-                }
                 actions
             }
             .padding(BHSpacing.regular)
@@ -123,21 +120,6 @@ struct ApproachView: View {
             }
         }
         .accessibilityElement(children: .combine)
-    }
-
-    private func safetyReminder(_ location: Location) -> some View {
-        Label(location.safety.notes, systemImage: "exclamationmark.triangle.fill")
-            .font(BHFont.caption)
-            .foregroundStyle(BHColor.caution)
-            .labelStyle(.titleAndIcon)
-            .padding(BHSpacing.snug)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous)
-                    .fill(BHColor.caution.opacity(0.12))
-            )
-            .fixedSize(horizontal: false, vertical: true)
-            .accessibilityLabel("Sikkerhed. \(location.safety.notes)")
     }
 
     // MARK: - Handlinger

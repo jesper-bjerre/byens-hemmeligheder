@@ -42,15 +42,16 @@ struct ByensHemmelighederApp: App {
             return scripted
         }
         #if targetEnvironment(simulator)
-        // Start ved Bølgens standpunkt, så et gennemløb kan afprøves med det
-        // samme uden at gå først. Opgaven **startes** ikke af sig selv — kun
-        // opgavekortet popper op, og trykket er stadig spillerens eget.
+        // Start ved Frydenlund 98, hvor testopgaverne ligger, så et gennemløb
+        // kan afprøves med det samme uden at gå først. Opgaven **startes** ikke
+        // af sig selv — kun opgavekortet popper op, og trykket er stadig
+        // spillerens eget.
         //
-        // Værdien spejler `loc.vejle-havn.boelgen` i indholdspakken. Den er
-        // dev-kode og læses derfor ikke fra pakken; ændres standpunktet efter
-        // feltbesøget, må den rettes her.
+        // Værdien spejler `loc.vejle-oest.frydenlund98` i indholdspakken. Den er
+        // dev-kode og læses derfor ikke fra pakken; flyttes standpunktet, må den
+        // rettes her.
         return ScriptedLocationProvider(
-            start: GeoPoint(latitude: 55.7089, longitude: 9.5481)
+            start: GeoPoint(latitude: 55.734897, longitude: 9.620270)
         )
         #endif
         #endif
@@ -131,7 +132,7 @@ struct RootView: View {
             switch step {
             case .narrative(let narrative):
                 NarrativeStepView(mission: mission, step: narrative)
-            case .singleChoice, .numericCode:
+            case .singleChoice, .numericCode, .freeText:
                 ChallengeView(mission: mission, step: step)
             case .unknown:
                 // Et trin fra en nyere kontrakt. Spring det over frem for at

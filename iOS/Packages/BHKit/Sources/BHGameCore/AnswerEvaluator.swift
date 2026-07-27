@@ -67,6 +67,8 @@ public struct AnswerEvaluator: Sendable {
             evaluate(input, rule: step.answerRule, expectedLength: step.length)
         case .singleChoice(let step):
             evaluate(input, rule: step.answerRule, expectedLength: nil)
+        case .freeText(let step):
+            evaluate(input, rule: step.answerRule, expectedLength: nil)
         case .narrative, .unknown:
             .malformed(reason: .empty)
         }

@@ -133,7 +133,7 @@ struct ExploreMapView: View {
                 }
 
                 ForEach(mappableMissions) { mission in
-                    if let point = engine.vantagePoint(for: mission) {
+                    if let point = displayPoint(for: mission) {
                         Annotation(mission.shortTitle, coordinate: point.coordinate) {
                             missionPin(mission)
                         }
@@ -197,7 +197,7 @@ struct ExploreMapView: View {
 
         let hit = mappableMissions
             .compactMap { mission -> (Mission, CGFloat)? in
-                guard let point = engine.vantagePoint(for: mission),
+                guard let point = displayPoint(for: mission),
                       let pinPoint = proxy.convert(point.coordinate, to: .named(Self.mapSpace))
                 else { return nil }
                 let dx = pinPoint.x - screenPoint.x
@@ -298,13 +298,7 @@ struct ExploreMapView: View {
         selectedMission = nil
         Task {
             await engine.startSession(for: mission)
-            if engine.hasSeenSafetyInterstitial {
-                router.push(.approach(missionId: mission.id))
-            } else {
-                // Sikkerhedsskærmen vises én gang pr. session (FR-008) og
-                // fører selv videre til stedet.
-                router.presentedSheet = .safety(missionId: mission.id)
-            }
+            router.push(.approach(missionId: mission.id))
         }
     }
 
@@ -319,6 +313,50 @@ struct ExploreMapView: View {
                 .overlay(Circle().strokeBorder(.white, lineWidth: 3))
         }
         .accessibilityLabel("Din position")
+    }
+
+    /// Hvor markøren **tegnes**.
+    ///
+    /// Flere opgaver kan dele samme adresse — Frydenlund 98 har allerede to —
+    /// og så lander de oven på hinanden, hvor kun den øverste kan trykkes.
+    /// Deler flere opgaver koordinat, spredes de derfor på en lille cirkel
+    /// omkring det.
+    ///
+    /// Hit-testen bruger **samme** funktion, så det, fingeren rammer, er det,
+    /// øjet ser. Bruges der to forskellige punkter, opstår præcis den slags
+    /// fejl, der er umulig at få øje på i koden.
+    private func displayPoint(for mission: Mission) -> GeoPoint? {
+        guard let anchor = engine.vantagePoint(for: mission) else { return nil }
+
+        let sharing = mappableMissions.filter { other in
+            guard let point = engine.vantagePoint(for: other) else { return false }
+            return Self.isSameSpot(point, anchor)
+        }
+        guard sharing.count > 1,
+              let index = sharing.firstIndex(where: { $0.id == mission.id })
+        else { return anchor }
+
+        let angle = 2 * Double.pi * Double(index) / Double(sharing.count)
+        let metresNorth = Self.fanRadiusMetres * cos(angle)
+        let metresEast = Self.fanRadiusMetres * sin(angle)
+
+        // 1 breddegrad ≈ 111 320 m. Længdegrader smalner mod polerne.
+        let latitude = anchor.latitude + metresNorth / 111_320
+        let longitude = anchor.longitude
+            + metresEast / (111_320 * cos(anchor.latitude * .pi / 180))
+        return GeoPoint(latitude: latitude, longitude: longitude)
+    }
+
+    /// Hvor langt markører spredes, når de deler adresse.
+    ///
+    /// 25 m er nok til at adskille dem på almindeligt zoomniveau og lidt nok
+    /// til, at markøren stadig peger på det rigtige sted.
+    private static let fanRadiusMetres = 25.0
+
+    /// To standpunkter regnes som samme sted inden for cirka en meter.
+    private static func isSameSpot(_ first: GeoPoint, _ second: GeoPoint) -> Bool {
+        abs(first.latitude - second.latitude) < 0.00001
+            && abs(first.longitude - second.longitude) < 0.00001
     }
 
     /// Uløste først, så en løst opgave aldrig dækker en, spilleren mangler.
@@ -415,8 +453,6 @@ struct MissionPreviewCard: View {
                 closeButton
             }
 
-            safetyNote
-
             // Princip I: stedet er spillet. Knappen er lukket hjemmefra.
             Button("Start opgave", action: onOpen)
                 .buttonStyle(.bhPrimary)
@@ -440,24 +476,6 @@ struct MissionPreviewCard: View {
                 .fill(BHColor.canvas)
                 .shadow(color: .black.opacity(0.18), radius: 16, y: -2)
         )
-    }
-
-    /// Sikkerhedsnoten står her, ikke bag en knap.
-    ///
-    /// Opgavekortet er nu det eneste, spilleren ser før turen, og forfatningens
-    /// princip IV kræver, at risikoen er kendt inden da. Begge lokationer ligger
-    /// ved åbent vand med cykeltrafik tæt på (FR-006).
-    @ViewBuilder
-    private var safetyNote: some View {
-        if let notes = engine.location(for: mission)?.safety.notes {
-            Label(notes, systemImage: "exclamationmark.triangle.fill")
-                .font(BHFont.caption)
-                .foregroundStyle(BHColor.caution)
-                .labelStyle(.bhLeadingIcon)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityLabel("Sikkerhed. \(notes)")
-        }
     }
 
     private var closeButton: some View {

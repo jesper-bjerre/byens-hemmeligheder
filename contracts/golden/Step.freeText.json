@@ -1,0 +1,28 @@
+{
+  "answerRule" : {
+    "acceptedAnswers" : [
+      "gulerod",
+      "en gulerod"
+    ],
+    "canonicalAnswer" : "gulerod",
+    "genericIncorrectFeedback" : "Tænk på noget orange under jorden.",
+    "kind" : "exact",
+    "nearMissResponses" : [
+      {
+        "answer" : "kartoffel",
+        "feedback" : "Den er ikke orange."
+      }
+    ]
+  },
+  "eyebrow" : "VERAS GÅDE",
+  "hintIds" : [
+    "hint.vera.1"
+  ],
+  "id" : "step.vera.gaaden",
+  "instruction" : "Skriv svaret som ét ord.",
+  "kind" : "freeText",
+  "order" : 2,
+  "placeholder" : "Skriv dit svar",
+  "question" : "Jeg gemmer mig under jorden, men mit grønne hår kan ses.",
+  "title" : "Hvad er jeg?"
+}

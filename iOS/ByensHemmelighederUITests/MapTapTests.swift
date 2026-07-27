@@ -160,12 +160,13 @@ final class MapTapTests: FlowTestCase {
         XCTAssertTrue(note.label.contains("Bølgen"), "Forklaringen nævner ikke stedet: '\(note.label)'")
     }
 
-    /// Sikkerhedsnoterne skal stå på selve opgavekortet.
+    /// Ingen advarsler i opgaveflowet.
     ///
-    /// Knappen "Se vej og sikkerhed" er fjernet, og missionsarket indgår ikke
-    /// længere i flowet. Så er opgavekortet det eneste, spilleren ser før turen
-    /// — og forfatningens princip IV kræver, at risikoen er kendt inden da.
-    func testSafetyNotesAppearOnThePreviewCard() {
+    /// Sikkerhedsteksterne er taget ud efter redaktionel beslutning: de passer
+    /// ikke til dansk friluftsnorm, og ansvaret er spillerens eget. Data bliver
+    /// i indholdspakken til en senere generel side — men de må ikke snige sig
+    /// tilbage i turen.
+    func testNoSafetyWarningsInTheMissionFlow() {
         let app = launchApp(
             atLatitude: Vantage.boelgen.latitude,
             longitude: Vantage.boelgen.longitude
@@ -173,11 +174,16 @@ final class MapTapTests: FlowTestCase {
         tapMissionPin("mission.boelgen.den-femte-besked", in: app)
         XCTAssertTrue(app.buttons["preview.open"].waitForExistence(timeout: Self.uiTimeout))
 
-        XCTAssertFalse(app.buttons["preview.directions"].exists, "Den forvirrende knap er tilbage")
-        XCTAssertTrue(
+        XCTAssertFalse(
             app.descendants(matching: .any)
                 .containing(NSPredicate(format: "label CONTAINS[c] %@", "vandkant")).firstMatch.exists,
-            "Sikkerhedsnoterne mangler på opgavekortet (FR-006)"
+            "Sikkerhedsadvarslen er tilbage på opgavekortet"
+        )
+
+        app.buttons["preview.open"].tap()
+        XCTAssertFalse(
+            app.buttons["safety.continue"].waitForExistence(timeout: 3),
+            "\"Inden I går\"-skærmen bliver stadig vist"
         )
     }
 

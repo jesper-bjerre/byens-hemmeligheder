@@ -12,13 +12,13 @@ public struct BHWordmark: View {
         VStack(alignment: .leading, spacing: -2) {
             Text("Byens")
                 .foregroundStyle(BHColor.onBrandPrimary)
-            Text("Hemmeligheder")
+            Text("Gåder")
                 .foregroundStyle(BHColor.onBrand)
         }
         .font(.system(.title, design: .serif, weight: .regular))
         .fixedSize(horizontal: false, vertical: true)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Byens Hemmeligheder")
+        .accessibilityLabel("Byens Gåder")
         .accessibilityAddTraits(.isHeader)
     }
 }

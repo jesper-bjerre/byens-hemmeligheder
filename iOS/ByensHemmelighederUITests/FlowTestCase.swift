@@ -87,17 +87,12 @@ class FlowTestCase: XCTestCase {
         }
     }
 
-    /// Kvitterer for sikkerhedsskærmen, hvis den vises.
+    /// Ikke længere noget skridt mellem opgavekortet og stedet.
     ///
-    /// "Start opgave" på opgavekortet går nu direkte i gang — der er ikke
-    /// længere et missionsark imellem. Tilbage er kun sikkerhedsskærmen, som
-    /// vises én gang pr. session (FR-008).
-    func startMission(in app: XCUIApplication) {
-        let safety = app.buttons["safety.continue"]
-        if safety.waitForExistence(timeout: 5) {
-            safety.tap()
-        }
-    }
+    /// "Start opgave" går direkte til approach-skærmen. Sikkerhedsskærmen er
+    /// taget ud af flowet efter redaktionel beslutning. Metoden bevares, så
+    /// gennemløbstestene læser som rejsen gør.
+    func startMission(in app: XCUIApplication) {}
 
     /// Venter på, at gaten verificerer og det første trin åbner.
     func waitForPresence(in app: XCUIApplication) {
