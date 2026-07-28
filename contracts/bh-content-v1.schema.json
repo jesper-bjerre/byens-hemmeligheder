@@ -4,338 +4,963 @@
   "title": "Byens Hemmeligheder — indholdspakke v1",
   "description": "Kontrakten mellem indhold og klient. Byte-identisk med det fremtidige API-svar. Kun additive ændringer er tilladt.",
   "type": "object",
-  "required": ["schemaVersion", "contentVersion", "locale", "areas", "locations", "missions", "media", "sources"],
+  "required": [
+    "schemaVersion",
+    "contentVersion",
+    "locale",
+    "areas",
+    "locations",
+    "missions",
+    "media",
+    "sources"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schemaVersion": { "const": "1.0" },
-    "contentVersion": { "type": "string", "minLength": 1 },
-    "locale": { "type": "string", "const": "da-DK" },
-    "areas": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/area" } },
-    "locations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/location" } },
-    "missions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/mission" } },
-    "media": { "type": "array", "items": { "$ref": "#/$defs/mediaAsset" } },
-    "sources": { "type": "array", "items": { "$ref": "#/$defs/source" } }
-  },
-
-  "$defs": {
-    "id": { "type": "string", "pattern": "^[a-z0-9]+([._-][a-z0-9]+)*$", "minLength": 2 },
-
-    "area": {
-      "type": "object",
-      "required": ["id", "name", "postalCode"],
-      "additionalProperties": false,
-      "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "name": { "type": "string", "minLength": 1 },
-        "postalCode": { "type": "string", "pattern": "^[0-9]{4}$" }
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "contentVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "locale": {
+      "type": "string",
+      "const": "da-DK"
+    },
+    "areas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/area"
       }
     },
-
-    "location": {
+    "locations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/location"
+      }
+    },
+    "missions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/mission"
+      }
+    },
+    "media": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/mediaAsset"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([._-][a-z0-9]+)*$",
+      "minLength": 2
+    },
+    "area": {
       "type": "object",
       "required": [
-        "id", "areaId", "name", "address",
-        "latitude", "longitude", "activationRadiusMetres", "maxAcceptableAccuracyMetres",
-        "dwellSeconds", "accuracyProfile", "vantagePoint",
-        "publicAccess", "safety", "accessibility", "fieldVerified", "lastPhysicallyVerified"
+        "id",
+        "name",
+        "postalCode"
       ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "areaId": { "$ref": "#/$defs/id" },
-        "name": { "type": "string", "minLength": 1 },
-        "address": { "type": "string", "minLength": 1 },
-        "latitude": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
-        "longitude": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
-        "activationRadiusMetres": { "type": ["number", "null"], "minimum": 5, "maximum": 200 },
-        "maxAcceptableAccuracyMetres": { "type": ["number", "null"], "minimum": 5, "maximum": 200 },
-        "dwellSeconds": { "type": "number", "minimum": 0, "maximum": 120 },
-        "accuracyProfile": { "enum": ["standard", "urbanCanyon"] },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "postalCode": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "required": [
+        "id",
+        "areaId",
+        "name",
+        "address",
+        "latitude",
+        "longitude",
+        "activationRadiusMetres",
+        "maxAcceptableAccuracyMetres",
+        "dwellSeconds",
+        "accuracyProfile",
+        "vantagePoint",
+        "publicAccess",
+        "safety",
+        "accessibility",
+        "fieldVerified",
+        "lastPhysicallyVerified"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "areaId": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "address": {
+          "type": "string",
+          "minLength": 1
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -180,
+          "maximum": 180
+        },
+        "activationRadiusMetres": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 5,
+          "maximum": 200
+        },
+        "maxAcceptableAccuracyMetres": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 5,
+          "maximum": 200
+        },
+        "dwellSeconds": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "accuracyProfile": {
+          "enum": [
+            "standard",
+            "urbanCanyon"
+          ]
+        },
         "vantagePoint": {
           "oneOf": [
-            { "type": "null" },
+            {
+              "type": "null"
+            },
             {
               "type": "object",
-              "required": ["latitude", "longitude", "bearingDegrees", "instruction"],
+              "required": [
+                "latitude",
+                "longitude",
+                "bearingDegrees",
+                "instruction"
+              ],
               "additionalProperties": false,
               "properties": {
-                "latitude": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
-                "longitude": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
-                "bearingDegrees": { "type": ["number", "null"], "minimum": 0, "exclusiveMaximum": 360 },
-                "instruction": { "type": "string", "minLength": 1 }
+                "latitude": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "bearingDegrees": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "exclusiveMaximum": 360
+                },
+                "instruction": {
+                  "type": "string",
+                  "minLength": 1
+                }
               }
             }
           ]
         },
-        "publicAccess": { "type": "boolean" },
+        "publicAccess": {
+          "type": "boolean"
+        },
         "safety": {
           "type": "object",
-          "required": ["flags", "notes"],
+          "required": [
+            "flags",
+            "notes"
+          ],
           "additionalProperties": false,
           "properties": {
             "flags": {
               "type": "array",
               "items": {
-                "enum": ["traffic", "water", "steepSlope", "darkness", "privateProperty", "cyclePath", "construction", "crowding"]
+                "enum": [
+                  "traffic",
+                  "water",
+                  "steepSlope",
+                  "darkness",
+                  "privateProperty",
+                  "cyclePath",
+                  "construction",
+                  "crowding"
+                ]
               }
             },
-            "notes": { "type": "string", "minLength": 1 }
+            "notes": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
         "accessibility": {
           "type": "object",
-          "required": ["surface", "incline", "steps", "wheelchair", "stroller", "notes"],
+          "required": [
+            "surface",
+            "incline",
+            "steps",
+            "wheelchair",
+            "stroller",
+            "notes"
+          ],
           "additionalProperties": false,
           "properties": {
-            "surface": { "type": "string", "minLength": 1 },
-            "incline": { "type": "string", "minLength": 1 },
-            "steps": { "type": "boolean" },
-            "wheelchair": { "enum": ["yes", "partial", "no", "unknown"] },
-            "stroller": { "enum": ["yes", "partial", "no", "unknown"] },
-            "distanceFromAccessMetres": { "type": ["number", "null"], "minimum": 0 },
-            "notes": { "type": "string", "minLength": 1 }
+            "surface": {
+              "type": "string",
+              "minLength": 1
+            },
+            "incline": {
+              "type": "string",
+              "minLength": 1
+            },
+            "steps": {
+              "type": "boolean"
+            },
+            "wheelchair": {
+              "enum": [
+                "yes",
+                "partial",
+                "no",
+                "unknown"
+              ]
+            },
+            "stroller": {
+              "enum": [
+                "yes",
+                "partial",
+                "no",
+                "unknown"
+              ]
+            },
+            "distanceFromAccessMetres": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
-        "fieldVerified": { "type": "boolean" },
-        "lastPhysicallyVerified": { "type": ["string", "null"], "format": "date" }
+        "fieldVerified": {
+          "type": "boolean"
+        },
+        "lastPhysicallyVerified": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        }
       }
     },
-
     "mission": {
       "type": "object",
       "required": [
-        "id", "slug", "locationId", "title", "shortTitle", "teaser", "status",
-        "difficulty", "estimatedMinutes", "basePoints", "tags", "fictionLabel",
-        "heroMediaId", "sourceIds", "steps", "hints", "completion",
-        "storyId", "chapterId", "nextChapterId"
+        "id",
+        "slug",
+        "locationId",
+        "title",
+        "shortTitle",
+        "teaser",
+        "status",
+        "difficulty",
+        "estimatedMinutes",
+        "basePoints",
+        "tags",
+        "fictionLabel",
+        "heroMediaId",
+        "sourceIds",
+        "steps",
+        "hints",
+        "completion",
+        "storyId",
+        "chapterId",
+        "nextChapterId"
       ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "slug": { "$ref": "#/$defs/id" },
-        "locationId": { "$ref": "#/$defs/id" },
-        "title": { "type": "string", "minLength": 1 },
-        "shortTitle": { "type": "string", "minLength": 1 },
-        "teaser": { "type": "string", "minLength": 1 },
-        "status": { "enum": ["draft", "researchReady", "fieldTestReady", "publishReady", "paused"] },
-        "difficulty": { "type": "integer", "minimum": 1, "maximum": 5 },
-        "estimatedMinutes": { "type": "integer", "minimum": 1 },
-        "basePoints": { "type": "integer", "minimum": 1 },
-        "tags": { "type": "array", "items": { "type": "string" } },
-        "fictionLabel": { "type": "string", "minLength": 1 },
-        "heroMediaId": { "type": ["string", "null"] },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "slug": {
+          "$ref": "#/$defs/id"
+        },
+        "locationId": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shortTitle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "teaser": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "researchReady",
+            "fieldTestReady",
+            "publishReady",
+            "paused"
+          ]
+        },
+        "difficulty": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "estimatedMinutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "basePoints": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fictionLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "heroMediaId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "placeMediaId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Realistisk foto: hvor spilleren fysisk skal stå. Må aldrig være AI-genereret."
+        },
+        "moodMediaId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "AI-genereret stemningsbillede. Må aldrig bære information, opgaven skal løses med."
+        },
         "narrationMediaId": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Indtalt introduktion. Stemning og uddybning — aldrig indhold."
         },
-        "sourceIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
-        "steps": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/step" } },
+        "sourceIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        },
         "hints": {
           "type": "array",
           "minItems": 3,
           "maxItems": 3,
-          "items": { "$ref": "#/$defs/hint" }
+          "items": {
+            "$ref": "#/$defs/hint"
+          }
         },
-        "completion": { "$ref": "#/$defs/completion" },
-        "storyId": { "type": "null", "description": "Reserveret. Ingen adfærd i fase 1." },
-        "chapterId": { "type": "null", "description": "Reserveret. Ingen adfærd i fase 1." },
-        "nextChapterId": { "type": "null", "description": "Reserveret. Ingen adfærd i fase 1." }
+        "completion": {
+          "$ref": "#/$defs/completion"
+        },
+        "storyId": {
+          "type": "null",
+          "description": "Reserveret. Ingen adfærd i fase 1."
+        },
+        "chapterId": {
+          "type": "null",
+          "description": "Reserveret. Ingen adfærd i fase 1."
+        },
+        "nextChapterId": {
+          "type": "null",
+          "description": "Reserveret. Ingen adfærd i fase 1."
+        }
       }
     },
-
     "step": {
       "type": "object",
-      "required": ["id", "order", "kind"],
+      "required": [
+        "id",
+        "order",
+        "kind"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "order": { "type": "integer", "minimum": 1 },
-        "kind": { "type": "string" }
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "type": "string"
+        }
       },
       "allOf": [
         {
-          "if": { "properties": { "kind": { "const": "narrative" } }, "required": ["kind"] },
-          "then": {
-            "required": ["title", "body", "continueLabel"],
+          "if": {
             "properties": {
-              "title": { "type": "string", "minLength": 1 },
-              "body": { "type": "string", "minLength": 1 },
-              "continueLabel": { "type": "string", "minLength": 1 }
+              "kind": {
+                "const": "narrative"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "title",
+              "body",
+              "continueLabel"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1
+              },
+              "continueLabel": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
         },
         {
-          "if": { "properties": { "kind": { "const": "singleChoice" } }, "required": ["kind"] },
-          "then": {
-            "required": ["title", "question", "instruction", "options", "answerRule", "correctFeedback", "hintIds"],
+          "if": {
             "properties": {
-              "eyebrow": { "type": "string" },
-              "title": { "type": "string", "minLength": 1 },
-              "question": { "type": "string", "minLength": 1 },
-              "instruction": { "type": "string", "minLength": 1 },
+              "kind": {
+                "const": "singleChoice"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "title",
+              "question",
+              "instruction",
+              "options",
+              "answerRule",
+              "correctFeedback",
+              "hintIds"
+            ],
+            "properties": {
+              "eyebrow": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "question": {
+                "type": "string",
+                "minLength": 1
+              },
+              "instruction": {
+                "type": "string",
+                "minLength": 1
+              },
               "options": {
                 "type": "array",
                 "minItems": 2,
                 "items": {
                   "type": "object",
-                  "required": ["id", "label"],
+                  "required": [
+                    "id",
+                    "label"
+                  ],
                   "additionalProperties": false,
                   "properties": {
-                    "id": { "type": "string", "minLength": 1 },
-                    "label": { "type": "string", "minLength": 1 }
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    }
                   }
                 }
               },
-              "answerRule": { "$ref": "#/$defs/answerRule" },
-              "correctFeedback": { "type": "string", "minLength": 1 },
-              "hintIds": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+              "answerRule": {
+                "$ref": "#/$defs/answerRule"
+              },
+              "correctFeedback": {
+                "type": "string",
+                "minLength": 1
+              },
+              "hintIds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/id"
+                }
+              }
             }
           }
         },
         {
-          "if": { "properties": { "kind": { "const": "freeText" } }, "required": ["kind"] },
-          "then": {
-            "required": ["title", "instruction", "answerRule", "hintIds"],
+          "if": {
             "properties": {
-              "eyebrow": { "type": "string" },
-              "title": { "type": "string", "minLength": 1 },
-              "question": { "type": "string", "minLength": 1 },
-              "instruction": { "type": "string", "minLength": 1 },
-              "placeholder": { "type": "string" },
-              "answerRule": { "$ref": "#/$defs/answerRule" },
-              "hintIds": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+              "kind": {
+                "const": "freeText"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "title",
+              "instruction",
+              "answerRule",
+              "hintIds"
+            ],
+            "properties": {
+              "eyebrow": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "question": {
+                "type": "string",
+                "minLength": 1
+              },
+              "instruction": {
+                "type": "string",
+                "minLength": 1
+              },
+              "placeholder": {
+                "type": "string"
+              },
+              "answerRule": {
+                "$ref": "#/$defs/answerRule"
+              },
+              "hintIds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/id"
+                }
+              }
             }
           }
         },
         {
-          "if": { "properties": { "kind": { "const": "numericCode" } }, "required": ["kind"] },
-          "then": {
-            "required": ["title", "instruction", "length", "evidenceCards", "answerRule", "hintIds"],
+          "if": {
             "properties": {
-              "eyebrow": { "type": "string" },
-              "title": { "type": "string", "minLength": 1 },
-              "instruction": { "type": "string", "minLength": 1 },
-              "length": { "type": "integer", "minimum": 1, "maximum": 12 },
+              "kind": {
+                "const": "numericCode"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "title",
+              "instruction",
+              "length",
+              "evidenceCards",
+              "answerRule",
+              "hintIds"
+            ],
+            "properties": {
+              "eyebrow": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "instruction": {
+                "type": "string",
+                "minLength": 1
+              },
+              "length": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
               "evidenceCards": {
                 "type": "array",
                 "items": {
                   "type": "object",
-                  "required": ["id", "label", "title", "description", "supportingText", "displayValue"],
+                  "required": [
+                    "id",
+                    "label",
+                    "title",
+                    "description",
+                    "supportingText",
+                    "displayValue"
+                  ],
                   "additionalProperties": false,
                   "properties": {
-                    "id": { "$ref": "#/$defs/id" },
-                    "symbol": { "type": "string" },
-                    "label": { "type": "string", "minLength": 1 },
-                    "title": { "type": "string", "minLength": 1 },
-                    "description": { "type": "string", "minLength": 1 },
-                    "supportingText": { "type": "string", "minLength": 1 },
-                    "displayValue": { "type": "string" }
+                    "id": {
+                      "$ref": "#/$defs/id"
+                    },
+                    "symbol": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "supportingText": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "displayValue": {
+                      "type": "string"
+                    }
                   }
                 }
               },
-              "answerRule": { "$ref": "#/$defs/answerRule" },
-              "hintIds": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+              "answerRule": {
+                "$ref": "#/$defs/answerRule"
+              },
+              "hintIds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/id"
+                }
+              }
             }
           }
         }
       ]
     },
-
     "answerRule": {
       "type": "object",
-      "required": ["kind", "canonicalAnswer", "acceptedAnswers", "nearMissResponses", "genericIncorrectFeedback"],
+      "required": [
+        "kind",
+        "canonicalAnswer",
+        "acceptedAnswers",
+        "nearMissResponses",
+        "genericIncorrectFeedback"
+      ],
       "additionalProperties": false,
       "properties": {
-        "kind": { "enum": ["exact", "digitsOnly"] },
+        "kind": {
+          "enum": [
+            "exact",
+            "digitsOnly"
+          ]
+        },
         "canonicalAnswer": {
           "type": "string",
           "minLength": 1,
           "description": "Altid string. Foranstillede nuller er betydende og må ikke tabes til en talkonvertering."
         },
-        "acceptedAnswers": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "acceptedAnswers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "nearMissResponses": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["answer", "feedback"],
+            "required": [
+              "answer",
+              "feedback"
+            ],
             "additionalProperties": false,
             "properties": {
-              "answer": { "type": "string", "minLength": 1 },
-              "feedback": { "type": "string", "minLength": 1 }
+              "answer": {
+                "type": "string",
+                "minLength": 1
+              },
+              "feedback": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
         },
-        "genericIncorrectFeedback": { "type": "string", "minLength": 1 }
+        "genericIncorrectFeedback": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
-
     "hint": {
       "type": "object",
-      "required": ["id", "order", "penaltyPercent", "title", "text"],
+      "required": [
+        "id",
+        "order",
+        "penaltyPercent",
+        "title",
+        "text"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "order": { "type": "integer", "minimum": 1, "maximum": 3 },
-        "penaltyPercent": { "type": "number", "minimum": 0, "maximum": 100 },
-        "title": { "type": "string", "minLength": 1 },
-        "text": { "type": "string", "minLength": 1 }
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "penaltyPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
-
     "completion": {
       "type": "object",
-      "required": ["headline", "subheadline", "messageLabel", "message", "historyFact"],
+      "required": [
+        "headline",
+        "subheadline",
+        "messageLabel",
+        "message",
+        "historyFact"
+      ],
       "additionalProperties": false,
       "properties": {
-        "headline": { "type": "string", "minLength": 1 },
-        "subheadline": { "type": "string", "minLength": 1 },
-        "messageLabel": { "type": "string", "minLength": 1 },
-        "message": { "type": "string", "minLength": 1 },
-        "historyFact": { "type": "string", "minLength": 1 }
+        "headline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subheadline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "messageLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "historyFact": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
-
     "mediaAsset": {
       "type": "object",
-      "required": ["id", "filename", "altText", "owner", "licence", "credit", "kind"],
+      "required": [
+        "id",
+        "filename",
+        "altText",
+        "owner",
+        "licence",
+        "credit",
+        "kind"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "filename": { "type": "string", "minLength": 1 },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        },
         "altText": {
           "type": "string",
           "minLength": 1,
           "description": "Forfattet af mennesket der valgte billedet — ikke genereret."
         },
-        "owner": { "type": "string", "minLength": 1 },
-        "licence": { "type": "string", "minLength": 1 },
-        "credit": { "type": "string", "minLength": 1 },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "licence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "credit": {
+          "type": "string",
+          "minLength": 1
+        },
         "kind": {
-          "enum": ["historical", "contemporary", "aiGenerated", "enhanced"],
+          "enum": [
+            "historical",
+            "contemporary",
+            "aiGenerated",
+            "enhanced"
+          ],
           "description": "AI-genererede billeder må aldrig præsenteres som autentiske historiske fotografier. 'enhanced' er et ægte fotografi, bearbejdet for stemningens skyld."
         },
-        "restrictions": { "type": ["string", "null"] },
-        "expiresAt": { "type": ["string", "null"], "format": "date" },
+        "restrictions": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "expiresAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
         "mediaType": {
-          "enum": ["image", "audio"],
+          "enum": [
+            "image",
+            "audio"
+          ],
           "description": "Udeladt betyder billede. Lyd er indtalt fortællerstemme og bærer aldrig et spor, teksten ikke også bærer."
         },
         "manipulation": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Hvad der er lavet om på fotografiet. Det, spilleren skal observere, må aldrig røres."
         }
       }
     },
-
     "source": {
       "type": "object",
-      "required": ["id", "title", "publisher", "url", "kind"],
+      "required": [
+        "id",
+        "title",
+        "publisher",
+        "url",
+        "kind"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "title": { "type": "string", "minLength": 1 },
-        "publisher": { "type": "string", "minLength": 1 },
-        "url": { "type": "string", "format": "uri" },
-        "kind": { "enum": ["officialTourism", "architectPrimary", "archive", "press", "municipal", "other"] }
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "kind": {
+          "enum": [
+            "officialTourism",
+            "architectPrimary",
+            "archive",
+            "press",
+            "municipal",
+            "other"
+          ]
+        }
       }
     }
   }

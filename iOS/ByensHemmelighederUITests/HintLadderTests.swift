@@ -82,10 +82,6 @@ final class HintLadderTests: FlowTestCase {
             reveal.tap()
         }
         app.buttons["Luk"].tap()
-
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
         enterCode("592", in: app)
         submitCode(in: app)
 

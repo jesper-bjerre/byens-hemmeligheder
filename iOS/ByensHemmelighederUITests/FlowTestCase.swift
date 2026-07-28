@@ -151,28 +151,25 @@ class FlowTestCase: XCTestCase {
         field.typeText(code)
     }
 
-    /// Tømmer kodefeltet med tastaturet.
+    /// Hævder, at kodefeltet er tomt.
     ///
-    /// Appen havde kortvarigt en "Ryd"-knap, som denne hjælper brugte. Den er
-    /// fjernet igen: spilleren kan selv slette, og hvert ekstra element er et
-    /// spørgsmål mere om, hvad man skal.
-    ///
-    /// Der trykkes på feltet **før hver** omgang sletninger. Efter et tryk på
-    /// "Svar" har feltet ikke nødvendigvis fokus længere, og tasteanslag uden
-    /// fokus falder på gulvet — feltet så uændret ud, uden at noget fejlede.
-    func clearCode(in app: XCUIApplication) {
+    /// Appen tømmer det selv efter et svar, der ikke var rigtigt. Hjælperen her
+    /// hed før `clearCode` og slettede baglæns med tastaturet — indtil det gik
+    /// op for os, at spilleren ikke *kunne* gøre andet: feltet holder præcis så
+    /// mange cifre, som koden er lang, så et fyldt felt kasserer alt nyt
+    /// tastetryk. Testen kæmpede med en blindgyde, appen havde, og ikke med
+    /// XCUITest.
+    func assertCodeFieldIsEmpty(in app: XCUIApplication) {
         let field = app.textFields["code.field"]
-        guard field.exists else { return }
-
-        for _ in 0..<3 {
-            if (field.value as? String) == "Tomt" { return }
-
-            field.tap()
-            guard app.keyboards.element.waitForExistence(timeout: Self.uiTimeout) else { continue }
-            field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 10))
-        }
-
-        XCTAssertEqual(field.value as? String, "Tomt", "Kodefeltet kunne ikke tømmes")
+        XCTAssertTrue(
+            field.waitForExistence(timeout: Self.uiTimeout),
+            "Kodefeltet forsvandt"
+        )
+        XCTAssertEqual(
+            field.value as? String,
+            "Tomt",
+            "Feltet blev ikke tømt efter et forkert svar — spilleren kan ikke taste videre"
+        )
     }
 
     /// Skriver et fritekstsvar (`freeText`-trin).
@@ -188,13 +185,13 @@ class FlowTestCase: XCTestCase {
     }
 
     func submitText(in app: XCUIApplication) {
-        let submit = app.buttons["text.submit"]
+        let submit = app.buttons[ChallengeIdentifiers.submit]
         XCTAssertTrue(submit.waitForExistence(timeout: Self.uiTimeout), "Svar-knappen mangler")
         submit.tap()
     }
 
     func submitCode(in app: XCUIApplication) {
-        let submit = app.buttons["code.submit"]
+        let submit = app.buttons[ChallengeIdentifiers.submit]
         XCTAssertTrue(submit.waitForExistence(timeout: Self.uiTimeout), "Send-knappen mangler")
         submit.tap()
     }
@@ -212,4 +209,14 @@ class FlowTestCase: XCTestCase {
             "Forventede \(points) point, skærmen sagde '\(reward.label)'"
         )
     }
+}
+
+/// Id'er, appen og testene deler.
+///
+/// Svarknappen hed før `code.submit` i én opgave og `text.submit` i en anden.
+/// To navne på den samme handling betyder, at en test skal vide, hvilken slags
+/// opgave den kigger på — og så er testene lige så uens, som skærmene var.
+enum ChallengeIdentifiers {
+    static let submit = "challenge.submit"
+    static let header = "challenge.header"
 }

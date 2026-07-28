@@ -16,7 +16,21 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
     public let tags: [String]
     /// Vises på intro og i infovisning (FR-007).
     public let fictionLabel: String
+    /// Tidligere det eneste billede. Bevaret, fordi kontrakter kun må ændres
+    /// additivt (ADR 0001). Nyt indhold bruger ``placeMediaId`` og
+    /// ``moodMediaId``; ``resolvedMoodMediaId`` falder tilbage hertil.
     public let heroMediaId: String?
+    /// Det realistiske foto: hvor spilleren fysisk skal stå og kigge hen.
+    ///
+    /// Det er et **orienteringsmiddel**, ikke stemning. Derfor må det aldrig
+    /// være AI-genereret — står der noget på billedet, som ikke findes på
+    /// stedet, sender vi et barn hen at lede efter det.
+    public let placeMediaId: String?
+    /// Stemningsbilledet, som er AI-genereret.
+    ///
+    /// Må aldrig bære information, opgaven skal løses med (ADR 0003). Facit
+    /// står i teksten; billedet sætter tonen.
+    public let moodMediaId: String?
     /// Indtalt introduktion, afspillet når spilleren går i gang.
     ///
     /// Stemning og uddybning — aldrig indhold. Alt nødvendigt for at løse
@@ -48,6 +62,8 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         fictionLabel: String,
         heroMediaId: String?,
         sourceIds: [String],
+        placeMediaId: String? = nil,
+        moodMediaId: String? = nil,
         narrationMediaId: String? = nil,
         steps: [Step],
         hints: [Hint],
@@ -69,6 +85,8 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         self.tags = tags
         self.fictionLabel = fictionLabel
         self.heroMediaId = heroMediaId
+        self.placeMediaId = placeMediaId
+        self.moodMediaId = moodMediaId
         self.narrationMediaId = narrationMediaId
         self.sourceIds = sourceIds
         self.steps = steps
@@ -79,8 +97,22 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         self.nextChapterId = nextChapterId
     }
 
+    /// Stemningsbilledet, med fald tilbage til det gamle `heroMediaId`.
+    ///
+    /// Indhold skrevet før de to felter fandtes, pegede med `heroMediaId` på et
+    /// AI-billede. Faldet gør, at sådant indhold stadig virker, uden at
+    /// kontrakten skal brydes.
+    public var resolvedMoodMediaId: String? { moodMediaId ?? heroMediaId }
+
     /// Trinnene i den rækkefølge, spilleren møder dem.
     public var orderedSteps: [Step] { steps.sorted { $0.order < $1.order } }
+
+    /// Det ene trin, spilleren skal svare på.
+    ///
+    /// Alle opgaver har præcis ét — se ``MissionShape``. Findes der flere eller
+    /// ingen, er det en indholdsfejl, som formvalideringen fanger; her tages
+    /// blot det første, så UI'et ikke behøver kende formen.
+    public var challengeStep: Step? { orderedSteps.first { $0.answerRule != nil } }
 
     /// Hints i den rækkefølge, de må åbnes.
     public var orderedHints: [Hint] { hints.sorted { $0.order < $1.order } }
@@ -148,6 +180,40 @@ public enum Step: Hashable, Sendable, Identifiable {
         case .numericCode(let step): step.answerRule
         case .freeText(let step): step.answerRule
         case .narrative, .unknown: nil
+        }
+    }
+
+    /// Spørgsmålets tekstdel, uafhængigt af hvordan der svares.
+    ///
+    /// Findes, så skærmen kan tegne hovedet **ét** sted frem for at bygge det
+    /// forfra i hver svartype. Det var netop dét, der lod dem drive fra
+    /// hinanden: kodetrinnet manglede et spørgsmålsfelt, valgtrinnet viste
+    /// aldrig et billede, og ingen havde besluttet nogen af delene.
+    public var prompt: ChallengePrompt? {
+        switch self {
+        case .singleChoice(let step):
+            ChallengePrompt(
+                eyebrow: step.eyebrow,
+                title: step.title,
+                question: step.question,
+                instruction: step.instruction
+            )
+        case .numericCode(let step):
+            ChallengePrompt(
+                eyebrow: step.eyebrow,
+                title: step.title,
+                question: step.question,
+                instruction: step.instruction
+            )
+        case .freeText(let step):
+            ChallengePrompt(
+                eyebrow: step.eyebrow,
+                title: step.title,
+                question: step.question,
+                instruction: step.instruction
+            )
+        case .narrative, .unknown:
+            nil
         }
     }
 
@@ -318,6 +384,23 @@ public struct SingleChoiceStep: Codable, Hashable, Sendable, Identifiable {
     }
 }
 
+/// Spørgsmålet, som spilleren læser det — ens for alle svartyper.
+public struct ChallengePrompt: Hashable, Sendable {
+    public let eyebrow: String?
+    public let title: String
+    public let question: String?
+    /// Afgrænsningen: hvad der skal ignoreres, eller hvad der skal svares på
+    /// (FR-009).
+    public let instruction: String
+
+    public init(eyebrow: String?, title: String, question: String?, instruction: String) {
+        self.eyebrow = eyebrow
+        self.title = title
+        self.question = question
+        self.instruction = instruction
+    }
+}
+
 public struct ChoiceOption: Codable, Hashable, Sendable, Identifiable {
     public let id: String
     public let label: String
@@ -335,6 +418,12 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
     public let order: Int
     public let eyebrow: String?
     public let title: String
+    /// Selve spørgsmålet.
+    ///
+    /// Tilføjet additivt, så kodetrinnet har **samme** felter som de to andre
+    /// svartyper. Uden det måtte UI'et bygge kodeskærmen anderledes end de
+    /// øvrige — og så var opgaverne ikke ens igen.
+    public let question: String?
     public let instruction: String
     public let length: Int
     /// Tidligere fundne deltal vises igen, så spilleren ikke skal huske dem (FR-010).
@@ -347,6 +436,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         order: Int,
         eyebrow: String?,
         title: String,
+        question: String? = nil,
         instruction: String,
         length: Int,
         evidenceCards: [EvidenceCard],
@@ -357,6 +447,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         self.order = order
         self.eyebrow = eyebrow
         self.title = title
+        self.question = question
         self.instruction = instruction
         self.length = length
         self.evidenceCards = evidenceCards
@@ -365,7 +456,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, order, kind, eyebrow, title, instruction
+        case id, order, kind, eyebrow, title, question, instruction
         case length, evidenceCards, answerRule, hintIds
     }
 
@@ -375,6 +466,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         order = try container.decode(Int.self, forKey: .order)
         eyebrow = try container.decodeIfPresent(String.self, forKey: .eyebrow)
         title = try container.decode(String.self, forKey: .title)
+        question = try container.decodeIfPresent(String.self, forKey: .question)
         instruction = try container.decode(String.self, forKey: .instruction)
         length = try container.decode(Int.self, forKey: .length)
         evidenceCards = try container.decode([EvidenceCard].self, forKey: .evidenceCards)
@@ -389,6 +481,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         try container.encode(Self.kind, forKey: .kind)
         try container.encodeIfPresent(eyebrow, forKey: .eyebrow)
         try container.encode(title, forKey: .title)
+        try container.encodeIfPresent(question, forKey: .question)
         try container.encode(instruction, forKey: .instruction)
         try container.encode(length, forKey: .length)
         try container.encode(evidenceCards, forKey: .evidenceCards)

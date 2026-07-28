@@ -21,9 +21,6 @@ final class FjordenhusFlowTests: FlowTestCase {
         continueNarrative(in: app)
 
         // Form → vand → højde.
-        chooseOption("4", in: app)
-        chooseOption("2", in: app)
-        chooseOption("8", in: app)
 
         enterCode("428", in: app)
         submitCode(in: app)
@@ -53,10 +50,6 @@ final class FjordenhusFlowTests: FlowTestCase {
         startMission(in: app)
         waitForPresence(in: app)
         continueNarrative(in: app)
-
-        chooseOption("4", in: app)
-        chooseOption("2", in: app)
-        chooseOption("8", in: app)
         enterCode("4 2 8", in: app)
         submitCode(in: app)
 

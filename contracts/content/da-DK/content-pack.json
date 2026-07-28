@@ -161,181 +161,13 @@
           "continueLabel": "Jeg er klar"
         },
         {
-          "id": "step.boelgen.oejet",
-          "order": 2,
-          "kind": "singleChoice",
-          "eyebrow": "SPOR 1 AF 3",
-          "title": "Øjet",
-          "question": "Hvor mange store, hvide bølgetoppe kan du se?",
-          "instruction": "Se på hele byggeriet på én gang. Tæl kun de store bølgetoppe – ikke vinduer, altaner, boliger, master eller refleksioner i vandet.",
-          "options": [
-            {
-              "id": "opt.boelgen.oejet.3",
-              "label": "3"
-            },
-            {
-              "id": "opt.boelgen.oejet.4",
-              "label": "4"
-            },
-            {
-              "id": "opt.boelgen.oejet.5",
-              "label": "5"
-            },
-            {
-              "id": "opt.boelgen.oejet.6",
-              "label": "6"
-            }
-          ],
-          "answerRule": {
-            "kind": "exact",
-            "canonicalAnswer": "5",
-            "acceptedAnswers": [
-              "5"
-            ],
-            "nearMissResponses": [
-              {
-                "answer": "4",
-                "feedback": "Du er tæt på. Kig efter en bølgetop mere – de yderste kan være svære at få øje på, hvis du står lidt skævt for byggeriet."
-              },
-              {
-                "answer": "6",
-                "feedback": "Du har vist talt en detalje med. Tæl kun de store, hvide bølgeformede hoveddele."
-              }
-            ],
-            "genericIncorrectFeedback": "Tæl de store, hvide bølgetoppe på hele byggeriet. Vinduer, altaner og master tæller ikke med."
-          },
-          "correctFeedback": "Rigtigt. Fem bølgeformede hoveddele rejser sig ved fjorden.",
-          "hintIds": [
-            "hint.boelgen.1"
-          ]
-        },
-        {
-          "id": "step.boelgen.etagerne",
-          "order": 3,
-          "kind": "singleChoice",
-          "eyebrow": "SPOR 2 AF 3",
-          "title": "Etagerne",
-          "question": "Hvor mange etager har hver bølge?",
-          "instruction": "Du skal ikke tælle etagerne på bygningen. Oplysningen står her: hver bølge består af ni etager.",
-          "options": [
-            {
-              "id": "opt.boelgen.etagerne.5",
-              "label": "5"
-            },
-            {
-              "id": "opt.boelgen.etagerne.7",
-              "label": "7"
-            },
-            {
-              "id": "opt.boelgen.etagerne.9",
-              "label": "9"
-            },
-            {
-              "id": "opt.boelgen.etagerne.11",
-              "label": "11"
-            }
-          ],
-          "answerRule": {
-            "kind": "exact",
-            "canonicalAnswer": "9",
-            "acceptedAnswers": [
-              "9"
-            ],
-            "nearMissResponses": [
-              {
-                "answer": "5",
-                "feedback": "Fem er antallet af bølger, ikke antallet af etager. Læs oplysningen om etagerne igen."
-              }
-            ],
-            "genericIncorrectFeedback": "Svaret står i teksten ovenfor. Hver bølge består af ni etager."
-          },
-          "correctFeedback": "Rigtigt. Hver bølge har ni etager.",
-          "hintIds": [
-            "hint.boelgen.2"
-          ]
-        },
-        {
-          "id": "step.boelgen.pausen",
-          "order": 4,
-          "kind": "singleChoice",
-          "eyebrow": "SPOR 3 AF 3",
-          "title": "Pausen",
-          "question": "Hvor mange bølger stod færdige før byggepausen?",
-          "instruction": "De første bølger stod færdige i 2009. Derefter gik byggeriet i stå, før de sidste blev opført. Hele Bølgen stod færdig i 2018. Spørgsmålet handler om antallet af bølger – ikke om årstallet.",
-          "options": [
-            {
-              "id": "opt.boelgen.pausen.1",
-              "label": "1"
-            },
-            {
-              "id": "opt.boelgen.pausen.2",
-              "label": "2"
-            },
-            {
-              "id": "opt.boelgen.pausen.3",
-              "label": "3"
-            },
-            {
-              "id": "opt.boelgen.pausen.5",
-              "label": "5"
-            }
-          ],
-          "answerRule": {
-            "kind": "exact",
-            "canonicalAnswer": "2",
-            "acceptedAnswers": [
-              "2"
-            ],
-            "nearMissResponses": [
-              {
-                "answer": "3",
-                "feedback": "De sidste tre bølger blev bygget efter pausen. Spørgsmålet handler om dem, der allerede stod færdige før."
-              }
-            ],
-            "genericIncorrectFeedback": "To bølger stod færdige, før byggeriet gik i stå. Læs teksten ovenfor igen."
-          },
-          "correctFeedback": "Rigtigt. To bølger stod færdige, før byggeriet gik i stå.",
-          "hintIds": [
-            "hint.boelgen.2"
-          ]
-        },
-        {
           "id": "step.boelgen.koden",
-          "order": 5,
+          "order": 2,
           "kind": "numericCode",
-          "eyebrow": "SAML KODEN",
-          "title": "Åbn beskeden",
-          "instruction": "Sæt de tre tal sammen i den rækkefølge, beskeden angiver: Øjet → Etagerne → Pausen.",
+          "title": "Den femte besked",
+          "instruction": "1. Tæl de store, hvide bølgetoppe. Kun de store — ikke vinduer, altaner eller master.\n2. Hver bølge har ni etager.\n3. To bølger stod færdige, før byggeriet gik i stå i 2009.",
           "length": 3,
-          "evidenceCards": [
-            {
-              "id": "card.boelgen.oejet",
-              "symbol": "eye",
-              "label": "Øjet",
-              "title": "Bølgetoppene",
-              "description": "Fem store, hvide bølgeformede hoveddele ved fjorden.",
-              "supportingText": "Det tal, du selv talte på stedet.",
-              "displayValue": "5"
-            },
-            {
-              "id": "card.boelgen.etagerne",
-              "symbol": "building",
-              "label": "Etagerne",
-              "title": "Ni etager",
-              "description": "Hver af de fem bølger består af ni etager.",
-              "supportingText": "Fra missionens historiske materiale.",
-              "displayValue": "9"
-            },
-            {
-              "id": "card.boelgen.pausen",
-              "symbol": "pause",
-              "label": "Pausen",
-              "title": "To før pausen",
-              "description": "To bølger stod færdige i 2009, før byggeriet gik i stå.",
-              "supportingText": "Fra missionens historiske materiale.",
-              "displayValue": "2"
-            }
-          ],
+          "evidenceCards": [],
           "answerRule": {
             "kind": "digitsOnly",
             "canonicalAnswer": "592",
@@ -372,7 +204,8 @@
             "hint.boelgen.1",
             "hint.boelgen.2",
             "hint.boelgen.3"
-          ]
+          ],
+          "question": "Hvilken trecifret kode åbner beskeden?"
         }
       ],
       "hints": [
@@ -407,7 +240,9 @@
       },
       "storyId": null,
       "chapterId": null,
-      "nextChapterId": null
+      "nextChapterId": null,
+      "placeMediaId": "media.boelgen.stedet",
+      "moodMediaId": "media.boelgen.stedet"
     },
     {
       "id": "mission.fjordenhus.vandets-tromler",
@@ -442,185 +277,13 @@
           "continueLabel": "Jeg er klar"
         },
         {
-          "id": "step.fjordenhus.form",
-          "order": 2,
-          "kind": "singleChoice",
-          "eyebrow": "SPOR 1 AF 3",
-          "title": "Form",
-          "question": "Hvor mange store, sammenhængende cylindriske hoveddele består huset af?",
-          "instruction": "Se på bygningen som en samlet form. Ignorér vinduer, åbninger, buer, glasfelter og gangbro.",
-          "options": [
-            {
-              "id": "opt.fjordenhus.form.2",
-              "label": "2"
-            },
-            {
-              "id": "opt.fjordenhus.form.3",
-              "label": "3"
-            },
-            {
-              "id": "opt.fjordenhus.form.4",
-              "label": "4"
-            },
-            {
-              "id": "opt.fjordenhus.form.6",
-              "label": "6"
-            }
-          ],
-          "answerRule": {
-            "kind": "exact",
-            "canonicalAnswer": "4",
-            "acceptedAnswers": [
-              "4"
-            ],
-            "nearMissResponses": [
-              {
-                "answer": "6",
-                "feedback": "Tæl kun husets store cylindriske hoveddele. Ignorér åbninger, vinduer, buer og gangbroen."
-              },
-              {
-                "answer": "2",
-                "feedback": "Første spor handler om husets samlede form – ikke om rummene eller åbningerne. Gå et skridt tilbage og se hele huset på én gang."
-              }
-            ],
-            "genericIncorrectFeedback": "Se huset som én samlet form, og tæl de store runde hoveddele. Detaljerne tæller ikke med."
-          },
-          "correctFeedback": "Rigtigt. Huset er bygget af fire sammenhængende cylindre.",
-          "hintIds": [
-            "hint.fjordenhus.1"
-          ]
-        },
-        {
-          "id": "step.fjordenhus.vand",
-          "order": 3,
-          "kind": "singleChoice",
-          "eyebrow": "SPOR 2 AF 3",
-          "title": "Vand",
-          "question": "Hvor mange rum gennemstrømmes af vand?",
-          "instruction": "Du skal ikke kunne se rummene fra kajen. Oplysningen står her: i stueetagen løber fjordens vand gennem to af husets rum.",
-          "options": [
-            {
-              "id": "opt.fjordenhus.vand.1",
-              "label": "1"
-            },
-            {
-              "id": "opt.fjordenhus.vand.2",
-              "label": "2"
-            },
-            {
-              "id": "opt.fjordenhus.vand.3",
-              "label": "3"
-            },
-            {
-              "id": "opt.fjordenhus.vand.4",
-              "label": "4"
-            }
-          ],
-          "answerRule": {
-            "kind": "exact",
-            "canonicalAnswer": "2",
-            "acceptedAnswers": [
-              "2"
-            ],
-            "nearMissResponses": [
-              {
-                "answer": "4",
-                "feedback": "Fire er antallet af hovedcylindre. Spørgsmålet her handler om de rum, vandet løber igennem."
-              }
-            ],
-            "genericIncorrectFeedback": "Svaret står i teksten ovenfor. Fjordens vand løber gennem to rum i stueetagen."
-          },
-          "correctFeedback": "Rigtigt. Fjorden løber gennem to af husets rum.",
-          "hintIds": [
-            "hint.fjordenhus.2"
-          ]
-        },
-        {
-          "id": "step.fjordenhus.hoejde",
-          "order": 4,
-          "kind": "singleChoice",
-          "eyebrow": "SPOR 3 AF 3",
-          "title": "Højde",
-          "question": "Fjordenhus er 28 meter højt. Hvilket ciffer skal du bruge?",
-          "instruction": "Arkitektnoten siger: brug det sidste ciffer i husets højde.",
-          "options": [
-            {
-              "id": "opt.fjordenhus.hoejde.2",
-              "label": "2"
-            },
-            {
-              "id": "opt.fjordenhus.hoejde.8",
-              "label": "8"
-            },
-            {
-              "id": "opt.fjordenhus.hoejde.28",
-              "label": "28"
-            },
-            {
-              "id": "opt.fjordenhus.hoejde.10",
-              "label": "10"
-            }
-          ],
-          "answerRule": {
-            "kind": "exact",
-            "canonicalAnswer": "8",
-            "acceptedAnswers": [
-              "8"
-            ],
-            "nearMissResponses": [
-              {
-                "answer": "28",
-                "feedback": "Højden skal kun give ét tal. Brug det sidste ciffer i 28."
-              },
-              {
-                "answer": "2",
-                "feedback": "Det er det første ciffer i 28. Arkitektnoten beder om det sidste."
-              }
-            ],
-            "genericIncorrectFeedback": "Huset er 28 meter højt, og du skal bruge det sidste ciffer i højden."
-          },
-          "correctFeedback": "Rigtigt. Det sidste ciffer i 28 er 8.",
-          "hintIds": [
-            "hint.fjordenhus.2"
-          ]
-        },
-        {
           "id": "step.fjordenhus.koden",
-          "order": 5,
+          "order": 2,
           "kind": "numericCode",
-          "eyebrow": "SAML KODEN",
-          "title": "Åbn beskeden",
-          "instruction": "Sæt de tre tal sammen i den rækkefølge, arkitektnoten angiver: form → vand → højde.",
+          "title": "Vandets tromler",
+          "instruction": "1. Tæl husets store, cylindriske hoveddele. Se formen som helhed — ignorér vinduer, buer og gangbro.\n2. Fjordens vand løber gennem to af husets rum.\n3. Huset er 28 meter højt. Brug det sidste ciffer.",
           "length": 3,
-          "evidenceCards": [
-            {
-              "id": "card.fjordenhus.form",
-              "symbol": "circles",
-              "label": "Form",
-              "title": "Fire cylindre",
-              "description": "Huset er bygget af fire sammenhængende cylindriske hovedformer.",
-              "supportingText": "Det tal, du selv talte på stedet.",
-              "displayValue": "4"
-            },
-            {
-              "id": "card.fjordenhus.vand",
-              "symbol": "water",
-              "label": "Vand",
-              "title": "To rum med vand",
-              "description": "I stueetagen løber fjordens vand gennem to af husets rum.",
-              "supportingText": "Fra missionens historiske materiale.",
-              "displayValue": "2"
-            },
-            {
-              "id": "card.fjordenhus.hoejde",
-              "symbol": "ruler",
-              "label": "Højde",
-              "title": "Sidste ciffer i 28",
-              "description": "Bygningen er 28 meter høj, og noten beder om det sidste ciffer.",
-              "supportingText": "Fra missionens historiske materiale.",
-              "displayValue": "8"
-            }
-          ],
+          "evidenceCards": [],
           "answerRule": {
             "kind": "digitsOnly",
             "canonicalAnswer": "428",
@@ -657,7 +320,8 @@
             "hint.fjordenhus.1",
             "hint.fjordenhus.2",
             "hint.fjordenhus.3"
-          ]
+          ],
+          "question": "Hvilken trecifret kode åbner beskeden?"
         }
       ],
       "hints": [
@@ -692,7 +356,9 @@
       },
       "storyId": null,
       "chapterId": null,
-      "nextChapterId": null
+      "nextChapterId": null,
+      "placeMediaId": "media.fjordenhus.stedet",
+      "moodMediaId": "media.fjordenhus.stedet"
     },
     {
       "id": "mission.frydenlund98.den-groenne-transmission",
@@ -728,21 +394,10 @@
           "id": "step.frydenlund98.koden",
           "order": 2,
           "kind": "numericCode",
-          "eyebrow": "SAGENS KODE",
           "title": "Find året",
           "instruction": "På fjernsynet ses Tour de France og Lidl-Trek. Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje. Indtast årstallet som en kode på fire cifre.",
           "length": 4,
-          "evidenceCards": [
-            {
-              "id": "card.frydenlund98.sportsarkiv",
-              "symbol": "archive",
-              "label": "Sportsarkiv",
-              "title": "4. etape til Foix",
-              "description": "Mads Pedersen vandt etapen og overtog Tourens grønne førertrøje for første gang.",
-              "supportingText": "Arkivets mappe er mærket med løbsåret, men de fire cifre er blevet fjernet.",
-              "displayValue": "????"
-            }
-          ],
+          "evidenceCards": [],
           "answerRule": {
             "kind": "digitsOnly",
             "canonicalAnswer": "2026",
@@ -771,7 +426,8 @@
             "hint.frydenlund98.1",
             "hint.frydenlund98.2",
             "hint.frydenlund98.3"
-          ]
+          ],
+          "question": "Hvilken kode åbner beskeden?"
         }
       ],
       "hints": [
@@ -806,7 +462,9 @@
       },
       "storyId": null,
       "chapterId": null,
-      "nextChapterId": null
+      "nextChapterId": null,
+      "placeMediaId": null,
+      "moodMediaId": "media.frydenlund98.stue"
     },
     {
       "id": "mission.frydenlund98.veras-hemmelige-snack",
@@ -844,7 +502,6 @@
           "id": "step.vera.gaaden",
           "order": 2,
           "kind": "freeText",
-          "eyebrow": "VERAS GÅDE",
           "title": "Hvad er jeg?",
           "question": "Jeg gemmer mig under jorden, men mit grønne hår kan ses. Jeg er lang og orange, og kaniner siges at holde af mig.",
           "instruction": "Skriv svaret som ét ord.",
@@ -909,7 +566,9 @@
       },
       "storyId": null,
       "chapterId": null,
-      "nextChapterId": null
+      "nextChapterId": null,
+      "placeMediaId": "media.vera.stedet",
+      "moodMediaId": "media.vera.stedet"
     }
   ],
   "media": [
@@ -923,6 +582,45 @@
       "kind": "aiGenerated",
       "restrictions": "MÅ IKKE UDGIVES. Tv-billedet kan gengive ophavsretligt beskyttet transmission, grafik og holdlogoer. Se opgavedokumentets afsnit 20.",
       "expiresAt": null
+    },
+    {
+      "id": "media.boelgen.stedet",
+      "filename": "boelgen.jpg",
+      "altText": "Bølgen ved Vejle Fjord i blåtimen. Fem hvide, bølgeformede bygninger står side om side og spejler sig i det stille vand. På stenstranden i forgrunden ligger en notesbog og en lup, og en lygte lyser hen over aftryk i sandet.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "enhanced",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Bearbejdet for stemningens skyld: blåtime, tåge og lyssætning er forstærket, og detektivrekvisitterne i forgrunden er tilføjet. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+    },
+    {
+      "id": "media.fjordenhus.stedet",
+      "filename": "fjordenhus.jpg",
+      "altText": "Fjordenhus på Vejle Havn i blåtimen. Husets buede mursten­tårne står ude i vandet med lys i de høje, spidse vinduer. På kajen i forgrunden ligger en lup, en notesbog, et forseglet brev og en gammel nøgle.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "enhanced",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Bearbejdet for stemningens skyld: blåtime, tåge og lyssætning er forstærket, og detektivrekvisitterne i forgrunden er tilføjet. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+    },
+    {
+      "id": "media.vera.stedet",
+      "filename": "vera.jpg",
+      "altText": "En have ved Frydenlund 98 i skumringen. Et indhegnet kaninbur med et lille hus står på græsplænen foran et parcelhus, og der ligger tåge over græsset. I forgrunden ligger en lup, en notesbog og et forseglet brev.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "enhanced",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Bearbejdet for stemningens skyld: blåtime, tåge og lyssætning er forstærket, og detektivrekvisitterne i forgrunden er tilføjet. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
     }
   ],
   "sources": [

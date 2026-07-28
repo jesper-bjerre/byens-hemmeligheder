@@ -24,8 +24,12 @@ struct NarrativeStepView: View {
                     .foregroundStyle(BHColor.ink)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if let heroMediaId = mission.heroMediaId {
-                    MissionHeroImage(mediaId: heroMediaId)
+                // Stemningsbilledet hører til her og kun her. Det er
+                // AI-genereret og bærer aldrig noget, opgaven skal løses med;
+                // stedbilledet, spilleren skal orientere sig efter, vises på
+                // selve spørgsmålet.
+                if let moodMediaId = mission.resolvedMoodMediaId {
+                    MissionHeroImage(mediaId: moodMediaId)
                 }
 
                 Text(step.body)

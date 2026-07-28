@@ -141,10 +141,6 @@ final class SolvedMissionTests: FlowTestCase {
         app.buttons["hints.open"].tap()
         app.buttons["hint.reveal.1"].tap()
         app.buttons["Luk"].tap()
-
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
         enterCode("592", in: app)
         submitCode(in: app)
         assertReward(points: 97, in: app)
@@ -162,10 +158,6 @@ final class SolvedMissionTests: FlowTestCase {
             "Hinthistorikken blev nulstillet af en genspilning"
         )
         app.buttons["Luk"].tap()
-
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
         enterCode("592", in: app)
         submitCode(in: app)
 
@@ -179,10 +171,6 @@ final class SolvedMissionTests: FlowTestCase {
         startMission(in: app)
         waitForPresence(in: app)
         continueNarrative(in: app)
-
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
         enterCode("592", in: app)
         submitCode(in: app)
 

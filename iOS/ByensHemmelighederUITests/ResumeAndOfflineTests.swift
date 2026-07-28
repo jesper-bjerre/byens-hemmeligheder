@@ -17,10 +17,8 @@ final class ResumeAndOfflineTests: FlowTestCase {
         waitForPresence(in: app)
         continueNarrative(in: app)
 
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-
-        // Vi står nu på tredje spor. Dræb appen.
+        // Vi står nu på spørgsmålet — bag tilstedeværelsesgaten, som tog tid at
+        // komme igennem. Dræb appen.
         app.terminate()
 
         // Start igen **uden** at nulstille progressionen.
@@ -30,14 +28,17 @@ final class ResumeAndOfflineTests: FlowTestCase {
             resettingProgress: false
         )
 
-        // Samme trin skal komme frem igen — ikke kortet, ikke forfra.
-        let pausen = app.buttons["option.2"]
+        // Spørgsmålet skal komme frem igen — ikke kortet, og ikke gaten forfra.
+        //
+        // Opgaven har kun ét spørgsmål nu, så testen kan ikke længere vise, at
+        // man lander på spor 3 af 3. Det, der stadig kan gå tabt, er hele
+        // vejen dertil: kortet, tilstedeværelsen og fortællingen.
+        let field = app.textFields["code.field"]
         XCTAssertTrue(
-            pausen.waitForExistence(timeout: Self.presenceTimeout),
+            field.waitForExistence(timeout: Self.presenceTimeout),
             "Appen genoptog ikke på det trin, spilleren stod på"
         )
 
-        pausen.tap()
         enterCode("592", in: app)
         submitCode(in: app)
         assertReward(points: 100, in: app)
@@ -95,10 +96,6 @@ final class ResumeAndOfflineTests: FlowTestCase {
         startMission(in: app)
         waitForPresence(in: app)
         continueNarrative(in: app)
-
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
         enterCode("592", in: app)
         submitCode(in: app)
 

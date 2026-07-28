@@ -3,14 +3,26 @@ import BHDesignSystem
 import BHGameCore
 import SwiftUI
 
-/// Opgavetrinnet — både valgspørgsmål og talkode.
+/// Opgaveskærmen. **Én** skærm for alle opgaver.
 ///
-/// ## Én skærm, to trintyper, nul opgavespecifik kode
+/// ## Kun svarkontrollen skifter
 ///
-/// Alt kommer fra kontrakten: spørgsmålet, afgrænsningen, svarmulighederne,
-/// bevis­kortene og feltets etiketter. Det er dét, der gør Fjordenhus til en ren
-/// indholdsleverance — hvis denne fil skal ændres for at tilføje en opgave, har
-/// feature 001 fejlet (US2).
+/// Skærmen var før tre skærme i forklædning: `singleChoice`, `numericCode` og
+/// `freeText` byggede hver sit layout. Følgerne var ikke besluttet af nogen —
+/// en opgave med svarmuligheder viste slet intet billede, mens en kodeopgave
+/// viste tre bevis-kort. Nu tegnes hovedet og billedet ét sted, og kun det
+/// felt, man svarer i, afhænger af typen.
+///
+/// Alt kommer fra kontrakten: spørgsmålet, afgrænsningen, svarmulighederne og
+/// feltets etiketter. Skal denne fil ændres for at tilføje en opgave, er formen
+/// brudt — se ``MissionShape``.
+///
+/// ## De to billeder
+///
+/// Stedbilledet hører til her: det viser, hvor spilleren fysisk skal stå og
+/// kigge hen, mens svaret findes. Stemningsbilledet hører til introen og vises
+/// ikke igen — det bærer ingen information, og gentaget ville det bare skubbe
+/// spørgsmålet ned under skærmkanten.
 struct ChallengeView: View {
     let mission: Mission
     let step: Step
@@ -28,6 +40,13 @@ struct ChallengeView: View {
     /// den præmis, opgaverne er bygget på.
     static let submitLabel = "Svar"
 
+    /// Ét id på svarknappen, uanset svartype.
+    ///
+    /// Der stod før `code.submit` og `text.submit`. To navne på den samme
+    /// handling betyder, at en test skal vide, hvilken slags opgave den kigger
+    /// på — og så er testene lige så uens som skærmene var.
+    static let submitIdentifier = "challenge.submit"
+
     @State private var typedCode = ""
     @State private var typedText = ""
     @State private var selectedOptionId: String?
@@ -37,16 +56,16 @@ struct ChallengeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: BHSpacing.loose) {
-                switch step {
-                case .singleChoice(let choice):
-                    singleChoice(choice)
-                case .numericCode(let code):
-                    numericCode(code)
-                case .freeText(let text):
-                    freeText(text)
-                case .narrative, .unknown:
-                    EmptyView()
+                if let prompt = step.prompt {
+                    header(prompt)
                 }
+
+                // Det realistiske foto: hvor står jeg, og hvad kigger jeg på?
+                if let placeMediaId = mission.placeMediaId {
+                    MissionHeroImage(mediaId: placeMediaId)
+                }
+
+                answerControl
 
                 feedback
                 hintButton
@@ -61,33 +80,55 @@ struct ChallengeView: View {
         }
     }
 
-    // MARK: - Valgspørgsmål
+    // MARK: - Spørgsmålet
 
-    @ViewBuilder
-    private func singleChoice(_ choice: SingleChoiceStep) -> some View {
+    /// Ét hoved for alle svartyper.
+    private func header(_ prompt: ChallengePrompt) -> some View {
         VStack(alignment: .leading, spacing: BHSpacing.snug) {
-            if let eyebrow = choice.eyebrow {
+            if let eyebrow = prompt.eyebrow {
                 Text(eyebrow)
                     .font(BHFont.eyebrow)
                     .foregroundStyle(BHColor.accent)
                     .accessibilityLabel(eyebrow.lowercased())
             }
-            Text(choice.title)
+            Text(prompt.title)
                 .font(BHFont.title)
                 .foregroundStyle(BHColor.ink)
-            Text(choice.question)
-                .font(BHFont.heading)
-                .foregroundStyle(BHColor.ink)
-                .fixedSize(horizontal: false, vertical: true)
-
+            if let question = prompt.question {
+                Text(question)
+                    .font(BHFont.heading)
+                    .foregroundStyle(BHColor.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             // Afgrænsningen: hvad skal ignoreres (FR-009).
-            Text(choice.instruction)
+            Text(prompt.instruction)
                 .font(BHFont.body)
                 .foregroundStyle(BHColor.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("challenge.header")
+    }
 
+    // MARK: - Svaret
+
+    /// Det eneste, der afhænger af svartypen.
+    @ViewBuilder
+    private var answerControl: some View {
+        switch step {
+        case .singleChoice(let choice):
+            choices(choice)
+        case .numericCode(let code):
+            codeField(code)
+        case .freeText(let text):
+            textField(text)
+        case .narrative, .unknown:
+            EmptyView()
+        }
+    }
+
+    /// Fire knapper. Antallet er fast — se ``MissionShape/choiceCount``.
+    private func choices(_ choice: SingleChoiceStep) -> some View {
         VStack(spacing: BHSpacing.snug) {
             ForEach(choice.options) { option in
                 Button {
@@ -126,73 +167,6 @@ struct ChallengeView: View {
         }
     }
 
-    // MARK: - Talkode
-
-    @ViewBuilder
-    private func numericCode(_ code: NumericCodeStep) -> some View {
-        VStack(alignment: .leading, spacing: BHSpacing.snug) {
-            if let eyebrow = code.eyebrow {
-                Text(eyebrow)
-                    .font(BHFont.eyebrow)
-                    .foregroundStyle(BHColor.accent)
-                    .accessibilityLabel(eyebrow.lowercased())
-            }
-            Text(code.title)
-                .font(BHFont.title)
-                .foregroundStyle(BHColor.ink)
-            Text(code.instruction)
-                .font(BHFont.body)
-                .foregroundStyle(BHColor.inkMuted)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .accessibilityElement(children: .combine)
-
-        // For en billedopgave *er* billedet gåden. Det skal kunne studeres,
-        // mens koden tastes — ikke kun på introen.
-        if let heroMediaId = mission.heroMediaId {
-            MissionHeroImage(mediaId: heroMediaId)
-        }
-
-        // FR-010: deltallene vises igen, så ingen skal huske dem hjem fra
-        // trin 2 — heller ikke den yngste i familien, der taster koden.
-        VStack(spacing: BHSpacing.snug) {
-            ForEach(code.evidenceCards) { card in
-                evidenceCard(card)
-            }
-        }
-
-        codeField(code)
-    }
-
-    private func evidenceCard(_ card: EvidenceCard) -> some View {
-        BHCard {
-            HStack(alignment: .top, spacing: BHSpacing.regular) {
-                Text(card.displayValue)
-                    .font(BHFont.code)
-                    .foregroundStyle(BHColor.accent)
-                    .frame(minWidth: BHMetrics.minimumTapTarget)
-
-                VStack(alignment: .leading, spacing: BHSpacing.hairline) {
-                    Text(card.label)
-                        .font(BHFont.eyebrow)
-                        .foregroundStyle(BHColor.inkMuted)
-                    Text(card.title)
-                        .font(BHFont.heading)
-                        .foregroundStyle(BHColor.ink)
-                    Text(card.description)
-                        .font(BHFont.body)
-                        .foregroundStyle(BHColor.inkMuted)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Text(card.supportingText)
-                        .font(BHFont.caption)
-                        .foregroundStyle(BHColor.inkMuted)
-                }
-            }
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(card.label): \(card.displayValue). \(card.title). \(card.description)")
-    }
-
     /// Feltet navngives med fortællingens egne ord, så formularen underviser i
     /// reglen og ingen hjælpetekst er nødvendig (FR-011).
     private func codeField(_ code: NumericCodeStep) -> some View {
@@ -227,47 +201,11 @@ struct ChallengeView: View {
                 .accessibilityValue(typedCode.isEmpty ? "Tomt" : typedCode.map(String.init).joined(separator: " "))
                 .accessibilityIdentifier("code.field")
 
-            Button(Self.submitLabel) {
-                Task { await answer(typedCode) }
-            }
-            .buttonStyle(.bhPrimary)
-            .disabled(typedCode.isEmpty)
-            .accessibilityIdentifier("code.submit")
-
+            submitButton(isEnabled: !typedCode.isEmpty) { await answer(typedCode) }
         }
     }
 
-    // MARK: - Fritekst
-
-    @ViewBuilder
-    private func freeText(_ step: FreeTextStep) -> some View {
-        VStack(alignment: .leading, spacing: BHSpacing.snug) {
-            if let eyebrow = step.eyebrow {
-                Text(eyebrow)
-                    .font(BHFont.eyebrow)
-                    .foregroundStyle(BHColor.accent)
-                    .accessibilityLabel(eyebrow.lowercased())
-            }
-            Text(step.title)
-                .font(BHFont.title)
-                .foregroundStyle(BHColor.ink)
-            if let question = step.question {
-                Text(question)
-                    .font(BHFont.heading)
-                    .foregroundStyle(BHColor.ink)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Text(step.instruction)
-                .font(BHFont.body)
-                .foregroundStyle(BHColor.inkMuted)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .accessibilityElement(children: .combine)
-
-        if let heroMediaId = mission.heroMediaId {
-            MissionHeroImage(mediaId: heroMediaId)
-        }
-
+    private func textField(_ step: FreeTextStep) -> some View {
         VStack(alignment: .leading, spacing: BHSpacing.snug) {
             TextField(step.placeholder ?? "", text: $typedText)
                 .font(BHFont.heading)
@@ -291,13 +229,21 @@ struct ChallengeView: View {
                 .accessibilityLabel(step.question ?? step.title)
                 .accessibilityIdentifier("text.field")
 
-            Button(Self.submitLabel) {
-                Task { await answer(typedText) }
-            }
-            .buttonStyle(.bhPrimary)
-            .disabled(typedText.trimmingCharacters(in: .whitespaces).isEmpty)
-            .accessibilityIdentifier("text.submit")
+            submitButton(
+                isEnabled: !typedText.trimmingCharacters(in: .whitespaces).isEmpty
+            ) { await answer(typedText) }
         }
+    }
+
+    /// Én svarknap, ét id, én tekst — uanset hvad man har svaret i.
+    private func submitButton(
+        isEnabled: Bool,
+        action: @escaping () async -> Void
+    ) -> some View {
+        Button(Self.submitLabel) { Task { await action() } }
+            .buttonStyle(.bhPrimary)
+            .disabled(!isEnabled)
+            .accessibilityIdentifier(Self.submitIdentifier)
     }
 
     // MARK: - Feedback
@@ -357,7 +303,21 @@ struct ChallengeView: View {
 
     private func answer(_ input: String) async {
         let outcome = await engine.submit(input, for: step, in: mission)
-        guard outcome.isCorrect else { return }
+
+        guard outcome.isCorrect else {
+            // Kodefeltet tømmes efter et svar, der ikke var rigtigt.
+            //
+            // Uden dette er spilleren kørt fast: feltet holder præcis så mange
+            // cifre, som koden er lang, så når der står tre, bliver alt nyt
+            // tastetryk kasseret af længdegrænsen. Der skete ingenting, og den
+            // eneste vej videre var at slette baglæns — hvilket intet på
+            // skærmen fortalte. Det var netop dét, en test faldt over.
+            //
+            // Kun koden ryddes. Et fritekstsvar er spillerens egne ord, og de
+            // skal kunne rettes til frem for at forsvinde.
+            if case .numericCode = step { typedCode = "" }
+            return
+        }
 
         codeFieldFocused = false
         textFieldFocused = false

@@ -579,6 +579,19 @@ struct MissionSummary: View {
     var body: some View {
         BHCard {
             VStack(alignment: .leading, spacing: BHSpacing.tight) {
+                // Miniaturen fra designforslaget: et stående billede af stedet,
+                // så spilleren kan se, hvad hen skal lede efter, allerede fra
+                // kortet.
+                //
+                // Den ligger **over** teksten og ikke ved siden af. Designet
+                // viser dem side om side, men ved de store
+                // tilgængelighedsstørrelser klemmer en fast billedbredde
+                // titlen ud i én bogstav pr. linje — præcis den fejl,
+                // auditten allerede har fanget her én gang.
+                if let placeMediaId = mission.placeMediaId {
+                    MissionThumbnail(mediaId: placeMediaId)
+                }
+
                 // Titlen får hele bredden. Stod status ved siden af, ville
                 // titlen blive klemt og klippet ved de store
                 // tilgængelighedsstørrelser — auditten fandt netop dét.

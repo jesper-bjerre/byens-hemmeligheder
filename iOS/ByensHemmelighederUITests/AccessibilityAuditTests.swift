@@ -89,9 +89,6 @@ final class AccessibilityAuditTests: FlowTestCase {
         continueNarrative(in: app)
 
         try audit(app, screen: "Valgspørgsmål")
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
 
         try audit(app, screen: "Talkode")
     }
@@ -120,10 +117,6 @@ final class AccessibilityAuditTests: FlowTestCase {
         startMission(in: app)
         waitForPresence(in: app)
         continueNarrative(in: app)
-
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
         enterCode("592", in: app)
         submitCode(in: app)
 

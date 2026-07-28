@@ -1,3 +1,4 @@
+import BHContentKit
 import BHContracts
 import BHDesignSystem
 import SwiftUI
@@ -49,17 +50,21 @@ struct MissionHeroImage: View {
         }
         .task(id: mediaId) {
             guard let asset, asset.resolvedMediaType == .image, image == nil else { return }
-            image = await ImageCache.shared.image(named: asset.filename)
+            image = await ImageCache.shared.image(for: asset)
         }
     }
 
     @ViewBuilder
     private func imageOrPlaceholder(_ asset: MediaAsset) -> some View {
         if let image {
+            // Loftet er der, fordi billederne er stående 3:4. I fuld bredde
+            // ville et af dem fylde over 500 punkter og skubbe spørgsmålet ned
+            // under skærmkanten — og så skal spilleren rulle for at finde ud
+            // af, hvad hen skal.
             image
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: 340)
                 .clipShape(RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous))
                 .accessibilityLabel(asset.altText)
                 .accessibilityAddTraits(.isImage)
@@ -76,30 +81,81 @@ struct MissionHeroImage: View {
     }
 }
 
+/// Det samme billede, men lille — som i designforslagets opgavekort.
+///
+/// Deler ``ImageCache`` med ``MissionHeroImage``, så billedet kun afkodes én
+/// gang, selvom kortet, introen og spørgsmålet alle viser det.
+///
+/// Højden er fast og bredden følger med i 3:4. Det er samme forhold, som
+/// filerne er beskåret til, så der hverken strækkes eller klippes.
+struct MissionThumbnail: View {
+    let mediaId: String
+
+    @Environment(MissionEngine.self) private var engine
+    @State private var image: Image?
+
+    private static let height: CGFloat = 132
+
+    private var asset: MediaAsset? { engine.pack?.media(id: mediaId) }
+
+    var body: some View {
+        Group {
+            if let image {
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: Self.height * 3 / 4, height: Self.height)
+                    .clipShape(RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous))
+            } else {
+                RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous)
+                    .fill(BHColor.surface)
+                    .frame(width: Self.height * 3 / 4, height: Self.height)
+            }
+        }
+        // Alt-teksten hører til det store billede. Her ville den blive læst op
+        // midt i opgavekortets sammensatte etiket og gøre den uoverskuelig.
+        .accessibilityHidden(true)
+        .task(id: mediaId) {
+            guard let asset, asset.resolvedMediaType == .image, image == nil else { return }
+            image = await ImageCache.shared.image(for: asset)
+        }
+    }
+}
+
 /// Afkodede billeder, holdt i hukommelsen.
 ///
 /// En `actor`, fordi afkodningen sker uden for hovedtråden, og flere skærme kan
 /// bede om det samme billede samtidig — introen og opgavetrinnet viser det
 /// samme fotografi. Uden den ville de afkode hver sin kopi.
+/// ## Bytes hentes gennem ``MediaSource``, ikke fra `Bundle.main`
+///
+/// Cachen kaldte tidligere `Bundle.main` direkte. Det virkede, men det låste
+/// billederne til appen: skiftet til en server ville betyde, at netop denne fil
+/// skulle laves om — og den er en visnings-hjælper, ikke et sted, nogen leder
+/// efter indhentningslogik.
+///
+/// Nu er kilden injiceret. Serveren kommer først, når quizmasterne har prøvet
+/// en TestFlight-version, og til den tid er ændringen at sætte en anden
+/// ``MediaSource`` ind i ``shared``.
 actor ImageCache {
-    static let shared = ImageCache()
+    static let shared = ImageCache(source: BundledMediaSource(bundle: .main))
 
+    private let source: any MediaSource
     private var cached: [String: Image] = [:]
 
-    func image(named filename: String) -> Image? {
-        if let existing = cached[filename] { return existing }
+    init(source: any MediaSource) {
+        self.source = source
+    }
 
-        guard let url = Bundle.main.url(
-            forResource: (filename as NSString).deletingPathExtension,
-            withExtension: (filename as NSString).pathExtension,
-            subdirectory: "media"
-        ),
-        let data = try? Data(contentsOf: url),
-        let uiImage = UIImage(data: data)
+    func image(for asset: MediaAsset) async -> Image? {
+        if let existing = cached[asset.id] { return existing }
+
+        guard case .data(let data, _) = try? await source.fetch(asset, ifNoneMatch: nil),
+              let uiImage = UIImage(data: data)
         else { return nil }
 
         let image = Image(uiImage: uiImage)
-        cached[filename] = image
+        cached[asset.id] = image
         return image
     }
 }

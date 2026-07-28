@@ -29,9 +29,6 @@ final class BoelgenFlowTests: FlowTestCase {
         continueNarrative(in: app)
 
         // De tre spor.
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
 
         // Registreret fejlsvar: vejledningen skal handle om rækkefølgen.
         enterCode("529", in: app)
@@ -43,8 +40,10 @@ final class BoelgenFlowTests: FlowTestCase {
             "529 skulle give sin egen vejledning om rækkefølgen"
         )
 
+        // Feltet skal være tomt igen, ellers kan der ikke tastes videre.
+        assertCodeFieldIsEmpty(in: app)
+
         // Ufærdigt svar: må ikke tælle som fejlforsøg (FR-014).
-        clearCode(in: app)
         enterCode("59", in: app)
         submitCode(in: app)
         XCTAssertTrue(
@@ -55,7 +54,6 @@ final class BoelgenFlowTests: FlowTestCase {
         )
 
         // Accepteret alternativ form.
-        clearCode(in: app)
         enterCode("592", in: app)
         submitCode(in: app)
 
@@ -79,10 +77,6 @@ final class BoelgenFlowTests: FlowTestCase {
         startMission(in: app)
         waitForPresence(in: app)
         continueNarrative(in: app)
-
-        chooseOption("5", in: app)
-        chooseOption("9", in: app)
-        chooseOption("2", in: app)
 
         // Åbn alle tre hints på kodetrinnet.
         app.buttons["hints.open"].tap()
