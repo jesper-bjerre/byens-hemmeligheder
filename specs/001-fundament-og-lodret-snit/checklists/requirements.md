@@ -39,7 +39,7 @@ Specifikationen er holdt op mod `.specify/memory/constitution.md`:
 | II. Entydigt og bevisbart facit | FR-012 til FR-015, FR-042 til FR-047, SC-007 |
 | III. AI assisterer, mennesker udgiver | FR-048; opgavedokumenterne som kilde til sandhed |
 | IV. Sikkerhed, adgang og rettigheder | FR-006, FR-008, FR-042, FR-048 |
-| V. Offline-tolerant og versionsfastholdt | FR-032 til FR-036, SC-003, SC-006 |
+| V. Serverbåret og versionsfastholdt | FR-032 til FR-036, SC-003, SC-006 |
 | VI. Privatliv og dataminimering | FR-031, FR-049 |
 | VII. Tilgængelig familieoplevelse uden tidspres | FR-016 til FR-022, FR-037 til FR-041, SC-005, SC-009 |
 

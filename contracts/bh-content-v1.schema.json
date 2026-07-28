@@ -124,6 +124,10 @@
         "tags": { "type": "array", "items": { "type": "string" } },
         "fictionLabel": { "type": "string", "minLength": 1 },
         "heroMediaId": { "type": ["string", "null"] },
+        "narrationMediaId": {
+          "type": ["string", "null"],
+          "description": "Indtalt introduktion. Stemning og uddybning — aldrig indhold."
+        },
         "sourceIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
         "steps": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/step" } },
         "hints": {
@@ -306,11 +310,19 @@
         "licence": { "type": "string", "minLength": 1 },
         "credit": { "type": "string", "minLength": 1 },
         "kind": {
-          "enum": ["historical", "contemporary", "aiGenerated"],
-          "description": "AI-genererede billeder må aldrig præsenteres som autentiske historiske fotografier."
+          "enum": ["historical", "contemporary", "aiGenerated", "enhanced"],
+          "description": "AI-genererede billeder må aldrig præsenteres som autentiske historiske fotografier. 'enhanced' er et ægte fotografi, bearbejdet for stemningens skyld."
         },
         "restrictions": { "type": ["string", "null"] },
-        "expiresAt": { "type": ["string", "null"], "format": "date" }
+        "expiresAt": { "type": ["string", "null"], "format": "date" },
+        "mediaType": {
+          "enum": ["image", "audio"],
+          "description": "Udeladt betyder billede. Lyd er indtalt fortællerstemme og bærer aldrig et spor, teksten ikke også bærer."
+        },
+        "manipulation": {
+          "type": ["string", "null"],
+          "description": "Hvad der er lavet om på fotografiet. Det, spilleren skal observere, må aldrig røres."
+        }
       }
     },
 

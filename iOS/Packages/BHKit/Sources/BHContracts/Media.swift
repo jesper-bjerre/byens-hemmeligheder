@@ -21,6 +21,21 @@ public struct MediaAsset: Codable, Hashable, Sendable, Identifiable {
     public let restrictions: String?
     public let expiresAt: String?
 
+    /// Billede eller lyd. Udeladt betyder billede — feltet kom til efter de
+    /// første medier, og additive felter er altid optional (ADR 0001).
+    public let mediaType: Tolerant<MediaType>?
+
+    /// Hvad der er lavet om på fotografiet.
+    ///
+    /// Stemningsbearbejdning er tilladt: farvegradering, mørke, regn, lys,
+    /// beskæring, fjernelse af personer og nummerplader. Det, spilleren skal
+    /// **observere**, er fredet — ændres det, er facit ikke længere bevisbart
+    /// (ADR 0003, forfatningens princip II).
+    ///
+    /// Feltet er dokumentation til den næste redaktør, ikke til spilleren. Er
+    /// noget rørt, skal det stå her.
+    public let manipulation: String?
+
     public init(
         id: String,
         filename: String,
@@ -30,7 +45,9 @@ public struct MediaAsset: Codable, Hashable, Sendable, Identifiable {
         credit: String,
         kind: Tolerant<MediaKind>,
         restrictions: String? = nil,
-        expiresAt: String? = nil
+        expiresAt: String? = nil,
+        mediaType: Tolerant<MediaType>? = nil,
+        manipulation: String? = nil
     ) {
         self.id = id
         self.filename = filename
@@ -41,13 +58,34 @@ public struct MediaAsset: Codable, Hashable, Sendable, Identifiable {
         self.kind = kind
         self.restrictions = restrictions
         self.expiresAt = expiresAt
+        self.mediaType = mediaType
+        self.manipulation = manipulation
     }
+
+    /// Behandler et udeladt felt som billede.
+    public var resolvedMediaType: MediaType {
+        mediaType?.known ?? .image
+    }
+}
+
+/// Hvilken slags fil medieposten peger på.
+public enum MediaType: String, TolerantEnum {
+    case image
+    /// Indtalt fortællerstemme. Sætter stemning — bærer aldrig et spor,
+    /// teksten ikke også bærer (ADR 0003).
+    case audio
 }
 
 public enum MediaKind: String, TolerantEnum {
     case historical
     case contemporary
     case aiGenerated
+    /// Et ægte fotografi, bearbejdet for stemningens skyld.
+    ///
+    /// Hverken `contemporary` — det er ikke længere som virkeligheden så ud —
+    /// eller `aiGenerated`, for motivet er ægte og optaget på stedet. ``MediaAsset/manipulation``
+    /// skal beskrive hvad der er rørt (ADR 0003).
+    case enhanced
 }
 
 /// Den dokumenterede kilde bag opgavens fakta (FR-042).

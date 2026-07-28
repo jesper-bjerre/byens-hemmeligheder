@@ -133,7 +133,9 @@ og skærmen forklarer fradraget.
 **Genoptagelse** (SC-006): dræb appen mellem trin 5 og 6, start igen → samme
 trin, samme hintstatus, samme forsøgshistorik.
 
-**Offline** (SC-003): sæt simulatoren i flytilstand og gennemfør hele missionen.
+**Netværksudfald** (SC-003): sæt simulatoren i flytilstand **midt** i en opgave.
+Appen skal sige tydeligt, at forbindelsen mangler — ikke lade det ligne, at
+opgaven er i stykker. Slå netværket til igen: turen genoptages på samme trin.
 
 **Anden opgave** (SC-002): gentag med Fjordenhus og facit `428`.
 
@@ -217,7 +219,7 @@ indholdspakken mangler, og som blokerer `publishReady` (V-10).
 | Kriterium | Lag |
 |---|---|
 | SC-002 Fjordenhus uden ny kode | 2 |
-| SC-003 Fuld offline | 2 |
+| SC-003 Udfald koster ikke progression | 2 |
 | SC-004 Nul blindgyder | 3 |
 | SC-005 88 point med alle hints | 2 |
 | SC-006 Genoptagelse efter afbrydelse | 2 |
@@ -234,7 +236,7 @@ Lag 1–3 kan alle køres uden at forlade skrivebordet. Kun SC-001 kræver felte
 | Kriterium | Automatiseret |
 |---|---|
 | SC-002 Fjordenhus uden ny kode | ✅ `EngineIsContentDrivenTests` |
-| SC-003 Fuld offline | ⚠️ Delvist. `testFullFlowMakesNoNetworkRequests` beviser, at gennemløbet ikke kalder netværket. Simulatoren kan ikke sættes i flytilstand programmatisk — den fysiske test er manuel |
+| SC-003 Udfald koster ikke progression | ❌ **Endnu ikke.** Kræver netværkskilden. `testFullFlowMakesNoNetworkRequests` hævder i dag det modsatte og skal vendes, når indholdet hentes fra tjenesten (ADR 0004) |
 | SC-004 Nul blindgyder | ✅ `PresenceProblemContent` er en totalfunktion; `GPX-scenarier` hævder handlingsmulighed |
 | SC-005 88 point med alle hints | ✅ Både unit test og UI-test |
 | SC-006 Genoptagelse | ✅ `ResumeAndOfflineTests` |

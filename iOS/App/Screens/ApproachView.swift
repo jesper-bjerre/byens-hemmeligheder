@@ -14,6 +14,7 @@ struct ApproachView: View {
 
     @Environment(MissionEngine.self) private var engine
     @Environment(Router.self) private var router
+    @Environment(\.openURL) private var openURL
 
     private var location: Location? { engine.location(for: mission) }
     private var problem: PresenceProblemContent? { PresenceProblemContent.forState(engine.presence) }
@@ -35,9 +36,9 @@ struct ApproachView: View {
         .task {
             engine.startLocationUpdates()
         }
-        .onDisappear {
-            engine.stopLocationUpdates()
-        }
+        // Bevidst ingen `onDisappear`-stop. Positionen skal blive ved med at
+        // komme: kortet bruger den, og strømmen kan ikke åbnes igen, når den
+        // først er lukket.
         .onChange(of: engine.presence.isVerified) { _, verified in
             guard verified, let first = mission.orderedSteps.first else { return }
             router.replaceTop(with: .step(missionId: mission.id, stepId: first.id))
@@ -122,6 +123,26 @@ struct ApproachView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// Udfører tilstandens egen handling.
+    private func perform(_ action: PresenceProblemContent.Action) {
+        switch action {
+        case .requestAuthorization:
+            engine.requestLocationAuthorization()
+        case .requestFullAccuracy:
+            engine.requestFullAccuracy()
+        case .openSettings:
+            #if os(iOS)
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                openURL(url)
+            }
+            #endif
+        case .confirmManually:
+            Task { await engine.acceptSoftOverride() }
+        case .dismiss:
+            break
+        }
+    }
+
     // MARK: - Handlinger
 
     @ViewBuilder
@@ -134,11 +155,24 @@ struct ApproachView: View {
             }
             .buttonStyle(.bhPrimary)
             .accessibilityIdentifier("approach.start")
-        } else if problem != nil {
-            Button("Hvad sker der?") {
-                router.presentedSheet = .presenceProblem(missionId: mission.id)
+        } else if let problem, problem.primaryAction != .dismiss {
+            // Kun når der faktisk er noget at gøre.
+            //
+            // Her stod før en knap, der altid hed "Hvad sker der?". Den dukkede
+            // op i de sekunder, hvor positionen bare var på vej, og stillede et
+            // spørgsmål frem for at tilbyde en handling. Forklaringen står i
+            // forvejen i statuskortet ovenfor.
+            //
+            // Tilbage er den handling, tilstanden faktisk peger på — "Jeg står
+            // her nu", "Giv adgang til position" — og kun når der er en.
+            // Uden den ville en spiller med dårligt signal stå uden vej videre,
+            // og forfatningens krav om nul blindgyder ville være brudt (SC-004).
+            Button(problem.primaryAction.label) {
+                perform(problem.primaryAction)
             }
             .buttonStyle(.bhSecondary)
+            .accessibilityIdentifier("approach.action")
+            .accessibilityHint(problem.message)
         }
     }
 }

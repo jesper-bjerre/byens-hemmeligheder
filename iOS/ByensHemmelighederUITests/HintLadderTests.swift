@@ -47,7 +47,6 @@ final class HintLadderTests: FlowTestCase {
         let app = reachHintSheet()
 
         app.buttons["hint.reveal.1"].tap()
-        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Vis hintet")).firstMatch.tap()
 
         XCTAssertTrue(
             app.buttons["hint.reveal.2"].waitForExistence(timeout: Self.uiTimeout),
@@ -64,7 +63,6 @@ final class HintLadderTests: FlowTestCase {
             let reveal = app.buttons["hint.reveal.\(order)"]
             XCTAssertTrue(reveal.waitForExistence(timeout: Self.uiTimeout), "Hint \(order) mangler")
             reveal.tap()
-            app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Vis hintet")).firstMatch.tap()
         }
 
         XCTAssertTrue(
@@ -82,7 +80,6 @@ final class HintLadderTests: FlowTestCase {
             let reveal = app.buttons["hint.reveal.\(order)"]
             XCTAssertTrue(reveal.waitForExistence(timeout: Self.uiTimeout), "Hint \(order) var låst")
             reveal.tap()
-            app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Vis hintet")).firstMatch.tap()
         }
         app.buttons["Luk"].tap()
 

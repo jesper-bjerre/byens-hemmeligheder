@@ -49,6 +49,84 @@ struct MissionStartRuleTests {
         #expect(outcome.canStart, "Spilleren må ikke straffes for, at opmålingen mangler")
     }
 
+    // MARK: - En gåde løses kun én gang
+
+    /// Anden gang kender man facit. Så måler pointene ikke længere det, de skal.
+    @Test("En løst opgave kan ikke startes igen")
+    func aSolvedMissionCannotBeReplayed() {
+        let outcome = MissionStartRule.evaluate(
+            isCompleted: true,
+            distanceMetres: 0,
+            activationRadiusMetres: 45
+        )
+        #expect(outcome == .alreadySolved)
+        #expect(outcome.canStart == false)
+    }
+
+    /// Den vigtige rækkefølge: "løst" slår alt andet.
+    ///
+    /// Uden dette ville en lokation uden koordinater falde igennem til
+    /// ``MissionStartability/notGated``, som *kan* startes — og så ville netop
+    /// de opgaver, felten endnu ikke har opmålt, kunne spilles om.
+    @Test("Løst slår både afstand, manglende position og manglende koordinater")
+    func solvedBeatsEveryOtherOutcome() {
+        let cases: [(Double?, Double?)] = [
+            (0, 45),        // ville været .ready
+            (4000, 45),     // ville været .tooFar
+            (nil, 45),      // ville været .locationUnknown
+            (nil, nil),     // ville været .notGated — og dermed startbar
+        ]
+
+        for (distance, radius) in cases {
+            let outcome = MissionStartRule.evaluate(
+                isCompleted: true,
+                distanceMetres: distance,
+                activationRadiusMetres: radius
+            )
+            #expect(
+                outcome == .alreadySolved,
+                "afstand \(String(describing: distance)), radius \(String(describing: radius)) gav \(outcome)"
+            )
+        }
+    }
+
+    /// Positiv kontrol. Uden den ville ovenstående også bestå, hvis reglen
+    /// begyndte at svare `.alreadySolved` på alt.
+    @Test("En uløst opgave rammes ikke af spærringen")
+    func anUnsolvedMissionIsUnaffected() {
+        #expect(
+            MissionStartRule.evaluate(
+                isCompleted: false,
+                distanceMetres: 0,
+                activationRadiusMetres: 45
+            ) == .ready
+        )
+    }
+
+    @Test("Kun spærringen for en løst opgave er endelig")
+    func onlySolvedIsPermanent() {
+        #expect(MissionStartability.alreadySolved.isPermanent)
+        #expect(MissionStartability.tooFar(metresRemaining: 500).isPermanent == false)
+        #expect(MissionStartability.locationUnknown.isPermanent == false)
+        #expect(MissionStartability.ready.isPermanent == false)
+        #expect(MissionStartability.notGated.isPermanent == false)
+    }
+
+    @Test("Ingen opgave i pakken kan spilles om")
+    func noMissionInThePackCanBeReplayed() throws {
+        let pack = try ContractFixtures.contentPack()
+
+        for mission in pack.missions {
+            let location = try #require(pack.location(id: mission.locationId))
+            let outcome = MissionStartRule.evaluate(
+                isCompleted: true,
+                distanceMetres: 0,
+                activationRadiusMetres: location.activationRadiusMetres
+            )
+            #expect(outcome.canStart == false, "\(mission.id) kunne startes igen efter at være løst")
+        }
+    }
+
     @Test("Margenen er dokumenteret og ikke tilfældig")
     func slackIsDocumented() {
         #expect(MissionStartRule.slack == 1.5)

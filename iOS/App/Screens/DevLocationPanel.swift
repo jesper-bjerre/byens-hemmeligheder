@@ -15,6 +15,7 @@ import SwiftUI
 /// skrivebord.
 struct DevLocationPanel: View {
     @Environment(MissionEngine.self) private var engine
+    @Environment(AmbiencePlayer.self) private var ambience
     @Environment(\.dismiss) private var dismiss
 
     @State private var pace: ScriptedLocationProvider.Pace = .walking
@@ -30,6 +31,7 @@ struct DevLocationPanel: View {
                         unavailable
                     } else {
                         status
+                        audioStatus
                         pacePicker
                         signalToggle
                         missionControls
@@ -93,6 +95,29 @@ struct DevLocationPanel: View {
         case .dwelling(let credit, let required): "Står stille — \(Int(credit)) af \(Int(required)) sekunder."
         case .softOverrideOffered: "Tilbyder selvbekræftelse."
         case .verified(let evidence): "Verificeret via \(evidence.method.rawValue)."
+        }
+    }
+
+    /// Lydens tilstand, så en tavs afspiller kan fejlsøges frem for gættes på.
+    private var audioStatus: some View {
+        BHCard {
+            VStack(alignment: .leading, spacing: BHSpacing.tight) {
+                Text("Baggrundslyd")
+                    .font(BHFont.eyebrow)
+                    .foregroundStyle(BHColor.inkMuted)
+                Text(ambience.isEnabled ? "Slået til" : "Slået fra")
+                    .font(BHFont.body)
+                    .foregroundStyle(BHColor.ink)
+                Text(ambience.isPlaying ? "Spiller nu" : "Spiller ikke")
+                    .font(BHFont.body)
+                    .foregroundStyle(ambience.isPlaying ? BHColor.success : BHColor.caution)
+                if let failure = ambience.lastFailure {
+                    Text(failure)
+                        .font(BHFont.caption)
+                        .foregroundStyle(BHColor.danger)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
         }
     }
 

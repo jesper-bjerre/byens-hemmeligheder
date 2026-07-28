@@ -69,7 +69,7 @@ Spilleren står det rigtige sted, men positionen vil ikke falde på plads — h�
 
 Midt i opgaven ringer telefonen, batteriet er lavt, eller der er ingen dækning. Spilleren vender tilbage og fortsætter præcis, hvor hun slap — med samme trin, samme brugte hints og samme forsøgshistorik.
 
-**Why this priority**: Tabt progression efter en halv times gåtur er den mest tillidsødelæggende fejl, produktet kan lave, og hele opgaven kan gennemføres uden netværk overhovedet.
+**Why this priority**: Tabt progression efter en halv times gåtur er den mest tillidsødelæggende fejl, produktet kan lave. Indholdet hentes fra tjenesten, men progressionen skrives lokalt først — netop for at et kortvarigt udfald koster ventetid og ikke en tur.
 
 **Independent Test**: Start en opgave, afbryd på hver af trinnene, genstart appen, og bekræft at tilstanden er intakt. Gennemfør derefter hele opgaven med enheden i flytilstand.
 
@@ -111,7 +111,7 @@ Den, der skriver eller retter en opgave, får besked med det samme, hvis indhold
 - Alle fem bølgetoppe kan ikke ses på grund af afspærring, arrangement eller byggeri. Opgaven skal kunne markeres som midlertidigt utilgængelig uden at fjerne den.
 - Spilleren gennemfører opgaven, mens indholdet ændres. Den igangværende session skal afsluttes på den version, den startede på.
 - Telefonen har blokeret positionsadgang gennem forældrestyring. Appen skal forklare det og tilbyde en vej videre.
-- Spilleren åbner appen første gang uden netværk. Alt indhold skal allerede være til stede.
+- Spilleren åbner appen uden netværk. Appen skal sige det tydeligt og vise, hvad hen kan gøre — ikke fremstå som om opgaven er i stykker.
 
 ## Requirements *(mandatory)*
 
@@ -151,6 +151,8 @@ Den, der skriver eller retter en opgave, får besked med det samme, hvis indhold
 - **FR-021**: Fradragene MUST komme fra indholdet og ikke fra koden.
 - **FR-022**: Forløbet tid MUST ikke påvirke point.
 - **FR-023**: Grundpoint MUST kun tildeles én gang pr. opgave.
+- **FR-052**: En gennemført opgave MUST ikke kunne startes igen i en udgivelsesbygning. Anden gang kender spilleren facit, og et gennemløb uden hints siger da intet om, hvad hen fandt ud af. Spærringen MUST være udledt af hændelsesloggen, så den overlever en genstart, og MUST håndhæves i motoren og ikke kun i den knap, der skjules. Afgrænsning: dette er ikke i strid med FR-027, som handler om at bekræfte tilstedeværelse — den blokering er midlertidig og har en udvej; denne er endelig og tilsigtet.
+- **FR-053**: I en udviklingsbygning MUST den samme opgave kunne gennemføres igen og igen, så et gennemløb kan afprøves uden at nulstille progressionen. Genspilning MUST ikke ændre regnskabet: hverken grundpoint (FR-023) eller hintfradrag MUST tælles på ny, og et hint, der er åbnet, MUST stadig stå som åbnet (FR-019). Undtagelsen MUST ikke kunne slås til udefra i en udgivelsesbygning (FR-051), og release-adfærden MUST kunne efterprøves maskinelt fra en udviklingsbygning.
 
 **Position**
 
@@ -165,7 +167,7 @@ Den, der skriver eller retter en opgave, får besked med det samme, hvis indhold
 
 **Progression og afvikling**
 
-- **FR-032**: Hele opgaven MUST kunne gennemføres uden netværksforbindelse.
+- **FR-032**: Systemet MUST hente indhold fra den centrale tjeneste og MUST vise en forståelig tilstand, når forbindelsen mangler. En igangværende tur MUST IKKE gå tabt ved et kortvarigt udfald.
 - **FR-033**: Progression MUST gemmes som en tilføj-kun hændelseslog med klient-genererede, entydige nøgler, så en senere synkronisering kan gentages uden at skabe dubletter.
 - **FR-034**: Afledt tilstand — point, gennemførte opgaver, brugte hints — MUST kunne genskabes udelukkende ud fra hændelsesloggen.
 - **FR-035**: En påbegyndt opgave MUST fastholde den indholdsversion, den blev startet på.
@@ -217,7 +219,7 @@ Den, der skriver eller retter en opgave, får besked med det samme, hvis indhold
 
 - **SC-001**: En testperson, der ikke har set appen før, kan stilles ved lokationen uden mundtlig instruktion og gennemføre opgaven fra kort til belønningsskærm.
 - **SC-002**: Begge opgaver kan spilles selvstændigt og i vilkårlig rækkefølge, og den anden opgave blev tilføjet uden opgavespecifik programlogik.
-- **SC-003**: Hele opgaven kan gennemføres med enheden uden netværksforbindelse fra start til slut.
+- **SC-003**: Et kortvarigt netværksudfald under en igangværende opgave koster ventetid, ikke progression — turen kan genoptages på samme trin, når forbindelsen vender tilbage.
 - **SC-004**: Ingen tilstand i positionsbekræftelsen efterlader spilleren uden en forklaring og en handling — nul blindgyder på tværs af samtlige tilstande.
 - **SC-005**: En spiller, der bruger alle tre hints, får præcis 88 point, og belønningsskærmen forklarer fradraget.
 - **SC-006**: En afbrudt opgave genoptages på samme trin med bevaret hint- og forsøgsstatus i alle testede afbrydelsespunkter.

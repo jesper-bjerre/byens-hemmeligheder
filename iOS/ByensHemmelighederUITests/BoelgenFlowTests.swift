@@ -90,12 +90,6 @@ final class BoelgenFlowTests: FlowTestCase {
             let reveal = app.buttons["hint.reveal.\(order)"]
             XCTAssertTrue(reveal.waitForExistence(timeout: Self.uiTimeout), "Hint \(order) mangler")
             reveal.tap()
-            // Bekræftelsesdialogen viser prisen, før hintet åbnes (FR-018).
-            let confirm = app.buttons.matching(
-                NSPredicate(format: "label BEGINSWITH %@", "Vis hintet")
-            ).firstMatch
-            XCTAssertTrue(confirm.waitForExistence(timeout: Self.uiTimeout), "Prisen blev ikke vist før åbning")
-            confirm.tap()
         }
         app.buttons["Luk"].tap()
 

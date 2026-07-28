@@ -10,6 +10,7 @@ import SwiftUI
 struct ByensHemmelighederApp: App {
     @State private var engine: MissionEngine
     @State private var router = Router()
+    @State private var ambience = AmbiencePlayer()
 
     init() {
         let repository = ContentRepository(source: BundledContentPackSource(bundle: .main))
@@ -63,6 +64,7 @@ struct ByensHemmelighederApp: App {
             RootView()
                 .environment(engine)
                 .environment(router)
+                .environment(ambience)
                 .tint(BHColor.accent)
         }
     }
@@ -72,6 +74,8 @@ struct ByensHemmelighederApp: App {
 struct RootView: View {
     @Environment(MissionEngine.self) private var engine
     @Environment(Router.self) private var router
+    @Environment(AmbiencePlayer.self) private var ambience
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         @Bindable var router = router
@@ -83,6 +87,7 @@ struct RootView: View {
                 }
         }
         .task {
+            ambience.start()
             await engine.load()
             // Genoptag på samme trin efter fuld terminering (FR-036).
             router.restore(validatingAgainst: Set(engine.playableMissions.map(\.id)))
@@ -90,6 +95,21 @@ struct RootView: View {
         }
         .sheet(item: $router.presentedSheet) { sheet in
             sheetContent(for: sheet)
+        }
+        // Appen har ingen baggrundslyd-tilstand, så lyden stopper, når den
+        // lægges væk. Uden dette kom musikken aldrig igen — og det så ud, som
+        // om løkken var holdt op.
+        .onChange(of: scenePhase) { _, phase in
+            switch phase {
+            case .active:
+                ambience.start()
+                engine.startLocationUpdates()
+            case .background:
+                ambience.stop()
+                // Kilden hviler, mens appen er væk. Strømmen lever videre.
+                engine.pauseLocationUpdates()
+            default: break
+            }
         }
         .overlay {
             if let failure = engine.loadFailure {
@@ -170,6 +190,11 @@ struct RootView: View {
     }
 
     /// Efter genstart skal motoren kende den mission, stien peger på.
+    ///
+    /// Om opgaven må genåbnes, afgør `startSession` alene — reglen skal have ét
+    /// hjem. Afvises den, fordi opgaven er løst, peger stien på
+    /// belønningsskærmen, og den klarer sig uden en session: point og opdeling
+    /// hentes fra spillertilstanden, ikke fra sessionen.
     private func resumeSessionIfNeeded() async {
         guard let route = router.path.last,
               let mission = engine.pack?.mission(id: route.missionId),

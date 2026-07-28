@@ -18,6 +18,16 @@ struct ChallengeView: View {
     @Environment(MissionEngine.self) private var engine
     @Environment(Router.self) private var router
 
+    /// Samme ord på svarknappen i alle trintyper.
+    ///
+    /// "Åbn beskeden" hørte til Bølgens fortælling og gav ingen mening i en
+    /// billedopgave. Én tekst betyder ét mindre spørgsmål om, hvad man skal.
+    ///
+    /// "Svar" frem for "Gæt": opgavedokumenterne slår fast, at ingen gætteri er
+    /// nødvendigt — facit kan bevises. En knap, der hedder "Gæt", ville modsige
+    /// den præmis, opgaverne er bygget på.
+    static let submitLabel = "Svar"
+
     @State private var typedCode = ""
     @State private var typedText = ""
     @State private var selectedOptionId: String?
@@ -186,10 +196,8 @@ struct ChallengeView: View {
     /// Feltet navngives med fortællingens egne ord, så formularen underviser i
     /// reglen og ingen hjælpetekst er nødvendig (FR-011).
     private func codeField(_ code: NumericCodeStep) -> some View {
-        let fieldNames = code.evidenceCards.map(\.label).joined(separator: " → ")
-
-        return VStack(alignment: .leading, spacing: BHSpacing.snug) {
-            Text(fieldNames)
+        VStack(alignment: .leading, spacing: BHSpacing.snug) {
+            Text("Indtast koden")
                 .font(BHFont.eyebrow)
                 .foregroundStyle(BHColor.inkMuted)
 
@@ -215,27 +223,17 @@ struct ChallengeView: View {
                 }
                 // Container-label, så VoiceOver annoncerer feltets betydning og
                 // ikke bare "tekstfelt" (FR-040).
-                .accessibilityLabel("Koden. \(code.length) cifre, i rækkefølgen \(fieldNames)")
+                .accessibilityLabel("Indtast koden. \(code.length) cifre.")
                 .accessibilityValue(typedCode.isEmpty ? "Tomt" : typedCode.map(String.init).joined(separator: " "))
                 .accessibilityIdentifier("code.field")
 
-            Button("Åbn beskeden") {
+            Button(Self.submitLabel) {
                 Task { await answer(typedCode) }
             }
             .buttonStyle(.bhPrimary)
             .disabled(typedCode.isEmpty)
             .accessibilityIdentifier("code.submit")
 
-            // Et forkert tastet ciffer skal kunne fortrydes uden at slette
-            // bagfra ét ad gangen — særligt med handsker på ved en havnekant.
-            if !typedCode.isEmpty {
-                Button("Ryd") {
-                    typedCode = ""
-                }
-                .buttonStyle(.bhSecondary)
-                .accessibilityIdentifier("code.clear")
-                .accessibilityHint("Tømmer kodefeltet")
-            }
         }
     }
 
@@ -293,7 +291,7 @@ struct ChallengeView: View {
                 .accessibilityLabel(step.question ?? step.title)
                 .accessibilityIdentifier("text.field")
 
-            Button("Svar") {
+            Button(Self.submitLabel) {
                 Task { await answer(typedText) }
             }
             .buttonStyle(.bhPrimary)

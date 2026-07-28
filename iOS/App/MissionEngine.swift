@@ -98,12 +98,34 @@ final class MissionEngine {
         playerState.completedMissionIds.contains(mission.id)
     }
 
+    /// Om opgaven er lukket for genspilning.
+    ///
+    /// Adskilt fra ``isCompleted(_:)`` med vilje. "Løst" er en kendsgerning om
+    /// spillerens historik og styrer flueben på kortet og "Løst"-mærket;
+    /// "spærret" er en beslutning om, hvad man må. I Debug er en opgave løst
+    /// uden at være spærret, og de to må ikke smelte sammen.
+    var blocksReplay: Bool { !LaunchArguments.allowsMissionReplay }
+
     // MARK: - Session
 
     /// Starter en mission og **binder den til indholdsversionen** (FR-035).
     /// En indholdsopdatering midt i turen skifter ikke facit under spilleren.
-    func startSession(for mission: Mission, now: Date = Date()) async {
-        guard let pack else { return }
+    ///
+    /// En løst opgave startes ikke igen — i Release. Spærringen står her og
+    /// ikke kun i kortets knap; samme grund som ved ``reveal(_:in:now:)``: en
+    /// regel, der kun findes i et view, holder kun så længe alle veje til
+    /// handlingen går gennem netop dét view, og der er allerede to kaldesteder.
+    ///
+    /// I Debug må den samme opgave køres igen og igen. Hint- og pointhistorik
+    /// nulstilles **ikke** af det: `revealedHintIds` genlæses nedenfor fra
+    /// spillertilstanden, og ``complete(_:now:)`` skriver ikke en gennemførelse
+    /// nummer to. En genspilning tilføjer altså ingen point og glemmer intet.
+    ///
+    /// - Returns: `false`, hvis opgaven ikke blev åbnet. Kaldere skal så **ikke**
+    ///   navigere videre — ellers står spilleren på et opgavetrin uden session.
+    @discardableResult
+    func startSession(for mission: Mission, now: Date = Date()) async -> Bool {
+        guard let pack, !(blocksReplay && isCompleted(mission)) else { return false }
 
         session = GameSession(
             missionId: mission.id,
@@ -134,6 +156,7 @@ final class MissionEngine {
         }
 
         await record(.missionOpened, missionId: mission.id, now: now)
+        return true
     }
 
     func markSafetyInterstitialSeen() {
@@ -142,11 +165,22 @@ final class MissionEngine {
 
     // MARK: - Position
 
-    /// Idempotent. Kortet og approach-skærmen kalder begge — men kun én
-    /// strøm-læser må findes, ellers tælles hvert fix dobbelt.
+    /// Åbner positionsstrømmen.
+    ///
+    /// ## Strømmen lukkes aldrig igen
+    ///
+    /// `AsyncStream` kan forbruges **én gang**. Annulleres den `Task`, der
+    /// itererer den, afsluttes strømmen for altid, og en ny `for await` på den
+    /// samme strøm returnerer med det samme. Det kostede en fejl, hvor kun den
+    /// første opgave kunne gennemføres: approach-skærmen lukkede strømmen, når
+    /// den forsvandt, og derefter kom der aldrig flere positioner — heller ikke
+    /// til kortet.
+    ///
+    /// Forbrugeren oprettes derfor én gang og lever, så længe appen gør.
+    /// ``pauseLocationUpdates()`` standser kun kilden, ikke strømmen.
     func startLocationUpdates() {
-        guard locationTask == nil else { return }
         locationProvider.start()
+        guard locationTask == nil else { return }
 
         locationTask = Task { [weak self] in
             guard let self else { return }
@@ -162,11 +196,10 @@ final class MissionEngine {
         }
     }
 
-    func stopLocationUpdates() {
-        locationTask?.cancel()
-        authorizationTask?.cancel()
-        locationTask = nil
-        authorizationTask = nil
+    /// Beder kilden holde op med at måle. Strømmen forbliver åben.
+    ///
+    /// Bruges, når appen lægges i baggrunden — ikke når en skærm forsvinder.
+    func pauseLocationUpdates() {
         locationProvider.stop()
     }
 
@@ -206,6 +239,7 @@ final class MissionEngine {
     /// Om "Start opgave" må trykkes fra dér, hvor spilleren står (princip I).
     func startability(for mission: Mission) -> MissionStartability {
         MissionStartRule.evaluate(
+            isCompleted: blocksReplay && isCompleted(mission),
             distanceMetres: distanceMetres(to: mission),
             activationRadiusMetres: location(for: mission)?.activationRadiusMetres
         )

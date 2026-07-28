@@ -17,6 +17,11 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
     /// Vises på intro og i infovisning (FR-007).
     public let fictionLabel: String
     public let heroMediaId: String?
+    /// Indtalt introduktion, afspillet når spilleren går i gang.
+    ///
+    /// Stemning og uddybning — aldrig indhold. Alt nødvendigt for at løse
+    /// opgaven står som tekst på skærmen (ADR 0003).
+    public let narrationMediaId: String?
     public let sourceIds: [String]
     public let steps: [Step]
     /// Præcis 3 (FR-017, V-09).
@@ -43,6 +48,7 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         fictionLabel: String,
         heroMediaId: String?,
         sourceIds: [String],
+        narrationMediaId: String? = nil,
         steps: [Step],
         hints: [Hint],
         completion: Completion,
@@ -63,6 +69,7 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         self.tags = tags
         self.fictionLabel = fictionLabel
         self.heroMediaId = heroMediaId
+        self.narrationMediaId = narrationMediaId
         self.sourceIds = sourceIds
         self.steps = steps
         self.hints = hints

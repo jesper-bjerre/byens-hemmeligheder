@@ -28,6 +28,7 @@ import SwiftUI
 struct ExploreMapView: View {
     @Environment(MissionEngine.self) private var engine
     @Environment(Router.self) private var router
+    @Environment(AmbiencePlayer.self) private var ambience
 
     @State private var camera: MapCameraPosition = .region(Self.vejleHarbour)
     /// Følger kortet spilleren? Slås fra, når brugeren selv panorerer.
@@ -53,7 +54,12 @@ struct ExploreMapView: View {
 
     private var content: some View {
         VStack(spacing: 0) {
-            BHBrandHeader { headerTrailing }
+            BHBrandHeader {
+                HStack(spacing: BHSpacing.tight) {
+                    ambienceButton
+                    headerTrailing
+                }
+            }
             map
                 .overlay(alignment: .topTrailing) { mapActions }
                 .overlay(alignment: .bottom) { preview }
@@ -81,6 +87,25 @@ struct ExploreMapView: View {
                 DevLocationPanel()
                 #endif
             }
+    }
+
+    /// Slår baggrundsstemningen fra. Ét tryk, og valget huskes.
+    ///
+    /// Knappen er ikke gemt i en indstillingsskærm. Spilleren står udendørs,
+    /// måske ved siden af andre — lyden skal kunne slukkes dér, hvor den
+    /// generer, ikke tre menuer nede.
+    private var ambienceButton: some View {
+        Button {
+            ambience.toggle()
+        } label: {
+            Image(systemName: ambience.isEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                .font(BHFont.heading)
+                .foregroundStyle(BHColor.onBrand)
+                .frame(width: BHMetrics.minimumTapTarget, height: BHMetrics.minimumTapTarget)
+                .overlay(Circle().strokeBorder(BHColor.onBrand, lineWidth: 1.5))
+        }
+        .accessibilityLabel(ambience.isEnabled ? "Slå baggrundslyd fra" : "Slå baggrundslyd til")
+        .accessibilityIdentifier("ambience.toggle")
     }
 
     /// Udviklerknappen findes **kun** i Debug.
@@ -137,7 +162,19 @@ struct ExploreMapView: View {
                         Annotation(mission.shortTitle, coordinate: point.coordinate) {
                             missionPin(mission)
                         }
-                        .annotationTitles(.hidden)
+                        // MapKit tegner titlen selv.
+                        //
+                        // Den lå tidligere i vores eget indhold, og så indgik
+                        // den i markørens udstrækning: elementet blev op mod
+                        // 167 pt bredt, mens hit-testen ledte inden for 66 pt
+                        // af ankeret — et tryk på etikettens kant ramte
+                        // ingenting. Låste vi bredden, kunne teksten ikke vokse
+                        // med Dynamic Type.
+                        //
+                        // MapKits egen titel ligger uden for vores indhold og
+                        // dermed uden for hit-testen. Så kan titlen være der,
+                        // uden at de to krav strides om den samme etiket.
+                        .annotationTitles(.automatic)
                     }
                 }
             }
@@ -185,26 +222,42 @@ struct ExploreMapView: View {
     /// siger hvad der menes.
     private static let mapSpace = "bh.map"
 
+    /// Markørens halve udstrækning, som den tegnes — plus lidt slør.
+    ///
+    /// ## Hvorfor markøren ikke har en etiket
+    ///
+    /// Den havde det. Titlen gjorde elementet op mod 167 pt bredt, mens
+    /// hit-testen ledte inden for 66 pt af ankeret — et tryk på etikettens kant
+    /// ramte ingenting. Låste man så bredden fast, kunne teksten ikke længere
+    /// vokse med Dynamic Type, og tilgængelighedsauditten afviste den med rette.
+    ///
+    /// De to krav kan ikke opfyldes samtidig af den samme etiket. Titlen står i
+    /// stedet i kortet, der åbnes ved tryk, og VoiceOver læser den fulde
+    /// beskrivelse direkte fra markøren. Tilbage er en cirkel, hvis udstrækning
+    /// er kendt — og så kan tegning og hit-test ikke være uenige.
+    private static let pinHalfWidth: CGFloat = 34
+    private static let pinHalfHeight: CGFloat = 34
+
     /// Finder den markør, spilleren ramte — hvis nogen.
     ///
-    /// Hit-testen sker i **skærmpunkter**, ikke i meter. Trykfladen er dermed
-    /// lige stor uanset zoomniveau, og der er ingen omregning at tage fejl af.
+    /// Hit-testen sker i **skærmpunkter** mod et rektangel, der svarer til det,
+    /// der er tegnet — ikke mod en cirkel. En markør er bred og lav, ikke rund.
+    /// Rammer flere, vinder den nærmeste.
     private func handleTap(at screenPoint: CGPoint, proxy: MapProxy) {
-        // Rundhåndet trykflade. Markørerne ligger hundredvis af meter fra
-        // hinanden, så et bredt vindue kan ikke ramme den forkerte — og en
-        // finger på en telefon i blæsevejr rammer ikke præcist.
-        let radius = BHMetrics.minimumTapTarget * 1.5
-
         let hit = mappableMissions
             .compactMap { mission -> (Mission, CGFloat)? in
                 guard let point = displayPoint(for: mission),
                       let pinPoint = proxy.convert(point.coordinate, to: .named(Self.mapSpace))
                 else { return nil }
+
                 let dx = pinPoint.x - screenPoint.x
                 let dy = pinPoint.y - screenPoint.y
-                return (mission, sqrt(dx * dx + dy * dy))
+                guard abs(dx) <= Self.pinHalfWidth, abs(dy) <= Self.pinHalfHeight else { return nil }
+
+                // Lodret vægtes tungere: markører, der deler adresse, spredes
+                // netop lodret, og dér skal de kunne skelnes.
+                return (mission, sqrt(dx * dx + (dy * 2) * (dy * 2)))
             }
-            .filter { $0.1 <= radius }
             .min { $0.1 < $1.1 }
 
         withAnimation(.snappy(duration: 0.25)) {
@@ -221,25 +274,21 @@ struct ExploreMapView: View {
     private func missionPin(_ mission: Mission) -> some View {
         let solved = engine.isCompleted(mission)
 
-        return VStack(spacing: 2) {
-            ZStack {
-                Circle()
-                    .fill(solved ? BHColor.success : BHColor.accent)
-                    .frame(width: 36, height: 36)
-                    .shadow(radius: 2, y: 1)
-                Image(systemName: solved ? "checkmark" : "questionmark")
-                    .font(.headline)
-                    .foregroundStyle(BHColor.onAccent)
-            }
-            Text(mission.shortTitle)
-                .font(BHFont.eyebrow)
-                .foregroundStyle(BHColor.ink)
-                .padding(.horizontal, BHSpacing.tight)
-                .padding(.vertical, 2)
-                .background(Capsule().fill(BHColor.surface.opacity(0.9)))
-                .fixedSize()
+        return ZStack {
+            // Uløst er brandets petrol; løst er neutralt grå.
+            //
+            // To grønne nuancer var for tæt på hinanden. Forskellen ligger nu i
+            // mætning og lyshed, ikke kun i kulør — det virker også for den,
+            // der ikke skelner farverne, og en løst opgave skal i forvejen ikke
+            // konkurrere om opmærksomheden med dem, der mangler.
+            Circle()
+                .fill(solved ? BHColor.inkMuted : BHColor.accent)
+                .frame(width: BHMetrics.minimumTapTarget, height: BHMetrics.minimumTapTarget)
+                .shadow(radius: 2, y: 1)
+            Image(systemName: solved ? "checkmark" : "questionmark")
+                .font(BHFont.heading)
+                .foregroundStyle(BHColor.onAccent)
         }
-        .frame(minWidth: BHMetrics.minimumTapTarget, minHeight: BHMetrics.minimumTapTarget)
         .allowsHitTesting(false)
         .accessibilityElement(children: .ignore)
         .accessibilityAction { selectedMission = mission }
@@ -255,9 +304,11 @@ struct ExploreMapView: View {
     /// den prik, hen står oven på. Opgaven **startes** ikke automatisk; det
     /// blivende tryk på "Start opgave" er stadig spillerens eget.
     private func announceArrivalIfNeeded() {
-        let arrived = mappableMissions.first {
-            !engine.isCompleted($0) && engine.startability(for: $0) == .ready
-        }
+        // `.ready` udelukker allerede en spærret opgave, så der spørges ikke
+        // særskilt til `isCompleted`. I Debug betyder det, at en løst opgave
+        // melder sig igen, når man kommer tilbage til stedet — hvilket er hele
+        // pointen med at kunne køre det samme gennemløb flere gange.
+        let arrived = mappableMissions.first { engine.startability(for: $0) == .ready }
 
         guard let arrived else {
             // Gået væk igen. Næste ankomst må gerne melde sig på ny.
@@ -272,11 +323,6 @@ struct ExploreMapView: View {
     }
 
     /// Kortet, der lægger sig over kortet, når en markør er valgt.
-    ///
-    /// Bevidst **ikke** et ark. Et ark med fast højde komprimerer sit nederste
-    /// element, så knapteksten ikke kan vokse med Dynamic Type — og et ark i
-    /// fuld højde er ikke en popup. Et overlay bestemmer selv sin højde ud fra
-    /// indholdet og har ingen af delene som problem.
     @ViewBuilder
     private var preview: some View {
         if let mission = selectedMission {
@@ -297,7 +343,7 @@ struct ExploreMapView: View {
     private func start(_ mission: Mission) {
         selectedMission = nil
         Task {
-            await engine.startSession(for: mission)
+            guard await engine.startSession(for: mission) else { return }
             router.push(.approach(missionId: mission.id))
         }
     }
@@ -349,9 +395,14 @@ struct ExploreMapView: View {
 
     /// Hvor langt markører spredes, når de deler adresse.
     ///
-    /// 25 m er nok til at adskille dem på almindeligt zoomniveau og lidt nok
-    /// til, at markøren stadig peger på det rigtige sted.
-    private static let fanRadiusMetres = 25.0
+    /// 25 m blev prøvet og var for lidt: ved almindeligt zoom svarer det til
+    /// under 30 punkter, og to markører på 44 punkter overlapper hinanden. Både
+    /// en finger og en test rammer da den forkerte.
+    ///
+    /// 55 m adskiller dem tydeligt. Markøren peger derved et stykke fra det
+    /// nøjagtige standpunkt, men det er kun et visuelt spredningspunkt —
+    /// positionsgaten måler stadig mod lokationens rigtige koordinat.
+    private static let fanRadiusMetres = 55.0
 
     /// To standpunkter regnes som samme sted inden for cirka en meter.
     private static func isSameSpot(_ first: GeoPoint, _ second: GeoPoint) -> Bool {
@@ -454,12 +505,18 @@ struct MissionPreviewCard: View {
             }
 
             // Princip I: stedet er spillet. Knappen er lukket hjemmefra.
-            Button("Start opgave", action: onOpen)
-                .buttonStyle(.bhPrimary)
-                .disabled(!startability.canStart)
-                .opacity(startability.canStart ? 1 : 0.45)
-                .accessibilityIdentifier("preview.open")
-                .accessibilityHint(startability.canStart ? "" : startabilityNote ?? "")
+            //
+            // På en løst opgave vises den slet ikke. En grå knap, der aldrig
+            // kan trykkes, er et element mere at undre sig over — og "Løst"
+            // står allerede på kortet.
+            if !startability.isPermanent {
+                Button("Start opgave", action: onOpen)
+                    .buttonStyle(.bhPrimary)
+                    .disabled(!startability.canStart)
+                    .opacity(startability.canStart ? 1 : 0.45)
+                    .accessibilityIdentifier("preview.open")
+                    .accessibilityHint(startability.canStart ? "" : startabilityNote ?? "")
+            }
 
             if let note = startabilityNote {
                 Text(note)
@@ -496,6 +553,8 @@ struct MissionPreviewCard: View {
         switch startability {
         case .ready, .notGated:
             return nil
+        case .alreadySolved:
+            return "Gåden er løst. Den kan kun løses én gang."
         case .locationUnknown:
             return "(Finder din position — du kan først starte, når du står ved \(place))"
         case .tooFar(let remaining):

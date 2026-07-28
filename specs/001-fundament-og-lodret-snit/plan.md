@@ -8,7 +8,7 @@
 
 Feature 001 leverer et lodret snit gennem hele spilleroplevelsen: en iPhone-app
 der kan afvikle **to** fritstående, stedsbaserede opgaver — Bølgen (facit `592`)
-og Fjordenhus (facit `428`) — fra kort til belønningsskærm, uden netværk, uden
+og Fjordenhus (facit `428`) — fra kort til belønningsskærm, uden
 konti og uden backend.
 
 Den bærende tekniske beslutning er, at **indhold er data, ikke kode**. Begge
@@ -44,11 +44,12 @@ iPad, ingen web, ingen Android
 **Project Type**: Native mobilapp med bundlet indhold. Ingen server-komponent i
 denne feature
 
-**Performance Goals**: Hele missionen gennemføres uden netværk.
+**Performance Goals**: Indhold hentes fra tjenesten (ADR 0004). Et kortvarigt
+udfald koster ventetid, ikke progression.
 Positionsbekræftelse ved standpunktet inden for 30 s under normale forhold.
 Ingen mærkbar forsinkelse ved indlæsning af indholdspakken
 
-**Constraints**: Offline fra start til slut. Ingen data forlader enheden. Ingen
+**Constraints**: Indhold hentes fra tjenesten; progression skrives lokalt først. Ingen
 personoplysninger indsamles. Kortfliser må ikke caches (R-008). Udviklerværktøjer
 må ikke findes i en udgivelsesbygning (FR-051)
 
@@ -65,7 +66,7 @@ testpersoner i felttest
 | **II. Entydigt og bevisbart facit** (NON-NEG.) | Ét kanonisk facit, eksplicitte alternativer, løsningsbevis | ✅ | `AnswerEvaluator` med fire udfald (R-006). Selvkonsistenstesten kræver, at facit bedømmes korrekt af sin egen regel, og at ingen near-miss accepteres (R-010) |
 | **III. AI assisterer, mennesker udgiver** (NON-NEG.) | Ingen automatisk publicering; medier mærket | ✅ | Opgavedokumenterne er kilden til sandhed; pakken er afledt. `aiGenerated` er obligatorisk felt, håndhævet af skemaet |
 | **IV. Sikkerhed, adgang, rettigheder** (NON-NEG.) | Sikkerhedsreview, rettighedslog, pausefunktion | ⚠️ | Sikkerheds- og rettighedsfelter er obligatoriske og skema-håndhævede. **Pausefunktion er udskudt** — se Complexity Tracking |
-| **V. Offline og versionsfastholdt** | Fuld offline; idempotent; session bundet til indholdsversion | ✅ | Bundlet pakke, append-only log med klientgenererede UUID'er (R-005). App-versionen *er* indholdsversionen i 001 |
+| **V. Serverbåret og versionsfastholdt** | Indhold fra tjenesten; idempotent; session bundet til indholdsversion | ✅ | Bundlet pakke, append-only log med klientgenererede UUID'er (R-005). App-versionen *er* indholdsversionen i 001 |
 | **VI. Privatliv og dataminimering** (NON-NEG.) | Ingen konti, ingen rutehistorik, ingen tredjepart | ✅ | Ingen backend, ingen SDK'er (R-009). Kun `requestWhenInUseAuthorization`. Privacy-manifest med tomt `NSPrivacyCollectedDataTypes` |
 | **VII. Tilgængelig familieoplevelse** | Ingen tidspres; små hintfradrag; VoiceOver; Dynamic Type | ✅ | Tid registreres ikke i point. Fradrag kommer fra indhold (FR-021). `performAccessibilityAudit` på hver skærm (R-010) |
 

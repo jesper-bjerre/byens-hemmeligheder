@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "2026-07-27.1",
+  "contentVersion": "2026-07-28.1",
   "locale": "da-DK",
   "areas": [
     {
@@ -99,7 +99,7 @@
       "longitude": 9.62027,
       "activationRadiusMetres": 45,
       "maxAcceptableAccuracyMetres": 40,
-      "dwellSeconds": 20,
+      "dwellSeconds": 5,
       "accuracyProfile": "standard",
       "vantagePoint": {
         "latitude": 55.734897,
@@ -827,6 +827,7 @@
       ],
       "fictionLabel": "Fiktiv gåde. Kaninen Vera er virkelig.",
       "heroMediaId": null,
+      "narrationMediaId": null,
       "sourceIds": [
         "source.frydenlund98.vera"
       ],
@@ -837,7 +838,7 @@
           "kind": "narrative",
           "title": "Vera og den skjulte snack",
           "body": "Kaninen Vera hygger sig i sit bur. Hun hopper rundt, snuser til græsset og graver små huller i jorden.\n\nI dag har hun gravet efter noget særligt. Det er sprødt, orange og gemmer sig normalt under jorden.\n\nKan du løse Veras gåde og finde navnet på hendes hemmelige snack?",
-          "continueLabel": "Hør gåden"
+          "continueLabel": "Løs gåden"
         },
         {
           "id": "step.vera.gaaden",

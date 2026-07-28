@@ -15,13 +15,19 @@ public enum MissionStartability: Hashable, Sendable {
     /// startes — spilleren skal ikke straffes for, at opmålingen mangler, og
     /// tilstedeværelsen stemples som ``PresenceMethod/demo``.
     case notGated
+    /// Opgaven er løst. En gåde kan kun løses første gang.
+    case alreadySolved
 
     public var canStart: Bool {
         switch self {
         case .ready, .notGated: true
-        case .tooFar, .locationUnknown: false
+        case .tooFar, .locationUnknown, .alreadySolved: false
         }
     }
+
+    /// Om spærringen er endelig. Afstand og position kan ændre sig, mens
+    /// spilleren står der; en løst opgave bliver aldrig uløst igen.
+    public var isPermanent: Bool { self == .alreadySolved }
 }
 
 /// Afgør, om "Start opgave" må trykkes.
@@ -40,6 +46,17 @@ public enum MissionStartability: Hashable, Sendable {
 /// nøjagtighed og medianfiltrering. Reglen her må derfor aldrig være strengere
 /// end gaten: ellers ville knappen være lukket et sted, hvor gaten ville have
 /// åbnet, og spilleren ville stå og undre sig.
+///
+/// ## Hvorfor "løst" hører til her og ikke kun i pointregnskabet
+///
+/// En gåde kan kun løses første gang. Anden gang kender man facit, og så måler
+/// pointene ikke længere det, de skal måle.
+///
+/// Regnskabet er allerede sikret to steder — ``MissionEngine/complete(_:now:)``
+/// skriver ikke en hændelse to gange, og folden i `StateProjection` tæller kun
+/// den første `missionCompleted`. Men *pointene* var aldrig det egentlige
+/// problem: det var, at spillet kunne spilles om. Derfor lukkes indgangen, ikke
+/// kun kassen.
 public enum MissionStartRule {
 
     /// Hvor meget længere ude end aktiveringsradius knappen stadig åbner.
@@ -51,9 +68,14 @@ public enum MissionStartRule {
     public static let slack = 1.5
 
     public static func evaluate(
+        isCompleted: Bool = false,
         distanceMetres: Double?,
         activationRadiusMetres: Double?
     ) -> MissionStartability {
+        // Først af alt. Står spilleren midt på standpunktet med perfekt
+        // nøjagtighed, ændrer det ingenting: gåden er løst.
+        if isCompleted { return .alreadySolved }
+
         guard let activationRadiusMetres else { return .notGated }
         guard let distanceMetres else { return .locationUnknown }
 

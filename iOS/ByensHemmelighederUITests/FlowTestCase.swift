@@ -82,7 +82,10 @@ class FlowTestCase: XCTestCase {
         }
 
         pin.tap()
-        if !app.buttons["preview.open"].waitForExistence(timeout: 3) {
+        // Der ventes på lukkeknappen og ikke på "Start opgave": den sidste
+        // findes ikke på en løst opgave, og så ville hvert eneste tryk her
+        // koste tre sekunder og et overflødigt gentryk.
+        if !app.buttons["preview.close"].waitForExistence(timeout: 3) {
             pin.tap()
         }
     }
@@ -111,9 +114,23 @@ class FlowTestCase: XCTestCase {
         XCTFail("Positionen blev ikke bekræftet inden for \(Int(Self.presenceTimeout)) sekunder")
     }
 
+    /// Går videre fra den narrative intro.
+    ///
+    /// **Ét tryk, aldrig to.** Et gentagelsesforsøg blev prøvet og forkastet:
+    /// når skærmen allerede var skiftet, landede andet tryk på det næste trin
+    /// og ramte en anden knap. Kuren var værre end sygdommen.
+    ///
+    /// Ventetiden på `isHittable` er den rigtige beskyttelse — knappen kan
+    /// findes, mens visningen stadig glider ind, og et tryk midt i en overgang
+    /// lander ingen steder.
     func continueNarrative(in app: XCUIApplication) {
         let button = app.buttons["narrative.continue"]
         XCTAssertTrue(button.waitForExistence(timeout: Self.uiTimeout), "Den narrative intro mangler")
+
+        let deadline = Date().addingTimeInterval(5)
+        while !button.isHittable, Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.2)
+        }
         button.tap()
     }
 
@@ -134,20 +151,46 @@ class FlowTestCase: XCTestCase {
         field.typeText(code)
     }
 
-    /// Tømmer kodefeltet via appens egen ryd-knap.
+    /// Tømmer kodefeltet med tastaturet.
     ///
-    /// Tidligere sendte testen sletteanslag ind i feltet. Det var upålideligt:
-    /// feltets rapporterede værdi nåede at være forældet mellem anslagene, og
-    /// testen efterlod rester, der først viste sig som et forkert svar flere
-    /// skridt senere. En knap i appen er både mere robust at teste og bedre for
-    /// en spiller med handsker på.
+    /// Appen havde kortvarigt en "Ryd"-knap, som denne hjælper brugte. Den er
+    /// fjernet igen: spilleren kan selv slette, og hvert ekstra element er et
+    /// spørgsmål mere om, hvad man skal.
+    ///
+    /// Der trykkes på feltet **før hver** omgang sletninger. Efter et tryk på
+    /// "Svar" har feltet ikke nødvendigvis fokus længere, og tasteanslag uden
+    /// fokus falder på gulvet — feltet så uændret ud, uden at noget fejlede.
     func clearCode(in app: XCUIApplication) {
-        let clear = app.buttons["code.clear"]
-        guard clear.waitForExistence(timeout: Self.uiTimeout) else { return }
-        clear.tap()
-
         let field = app.textFields["code.field"]
+        guard field.exists else { return }
+
+        for _ in 0..<3 {
+            if (field.value as? String) == "Tomt" { return }
+
+            field.tap()
+            guard app.keyboards.element.waitForExistence(timeout: Self.uiTimeout) else { continue }
+            field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 10))
+        }
+
         XCTAssertEqual(field.value as? String, "Tomt", "Kodefeltet kunne ikke tømmes")
+    }
+
+    /// Skriver et fritekstsvar (`freeText`-trin).
+    func enterText(_ text: String, in app: XCUIApplication) {
+        let field = app.textFields["text.field"]
+        XCTAssertTrue(field.waitForExistence(timeout: Self.uiTimeout), "Tekstfeltet mangler")
+        field.tap()
+        XCTAssertTrue(
+            app.keyboards.element.waitForExistence(timeout: Self.uiTimeout),
+            "Tastaturet kom ikke op til tekstfeltet"
+        )
+        field.typeText(text)
+    }
+
+    func submitText(in app: XCUIApplication) {
+        let submit = app.buttons["text.submit"]
+        XCTAssertTrue(submit.waitForExistence(timeout: Self.uiTimeout), "Svar-knappen mangler")
+        submit.tap()
     }
 
     func submitCode(in app: XCUIApplication) {

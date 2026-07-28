@@ -1,6 +1,22 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version: 1.0.0 → 2.0.0
+Bump-type: MAJOR (princip V omdefineret bagudinkompatibelt)
+
+Ændring 2026-07-27 — princip V:
+  Var:  "Offline-tolerant og versionsfastholdt afvikling" — sessionen SKULLE
+        kunne gennemføres uden netværk, og indholdet var bundlet med appen.
+  Nu:   "Serverbåret og versionsfastholdt afvikling" — alt indhold hentes fra en
+        central tjeneste, og appen kræver forbindelse.
+  Hvorfor: to kilder til indhold (bundle + server) kan drive fra hinanden, og
+        princip IV's krav om øjeblikkelig pause uden deploy er umuligt, når
+        facit ligger i en binær på tusind telefoner. Se docs/ADR/0004.
+  Pris: en tur uden dækning kan ikke gennemføres. Bevidst byttehandel.
+  Uændret: progression skrives lokalt først og synkroniseres idempotent;
+        GameSession fastholder sin indholdsversion.
+
+Historik:
 Version: TEMPLATE (ikke-udfyldt) → 1.0.0
 Bump-type: MAJOR (første ratificering — alle principper defineret fra bunden)
 
@@ -9,7 +25,7 @@ Principper (nye):
   II.  Entydigt og bevisbart facit — NON-NEGOTIABLE
   III. AI assisterer, mennesker udgiver — NON-NEGOTIABLE
   IV.  Sikkerhed, adgang og rettigheder går forud for spilværdi — NON-NEGOTIABLE
-  V.   Offline-tolerant og versionsfastholdt afvikling
+  V.   Serverbåret og versionsfastholdt afvikling
   VI.  Privatliv ved design og dataminimering — NON-NEGOTIABLE
   VII. Tilgængelig familieoplevelse uden tidspres
 
@@ -140,28 +156,34 @@ Konkrete krav:
 trække indhold tilbage inden for minutter er derfor lige så vigtig som evnen til
 at publicere det.
 
-### V. Offline-tolerant og versionsfastholdt afvikling
+### V. Serverbåret og versionsfastholdt afvikling
 
-Spilleren står udendørs med ustabil dækning. Sessionen SKAL kunne gennemføres
-uden netværk, og en påbegyndt tur SKAL IKKE kunne gå tabt eller ændre sig under
-spilleren.
+Alt indhold bor på en central tjeneste. Appen kræver forbindelse, og en påbegyndt
+tur SKAL IKKE kunne gå tabt eller ændre sig under spilleren.
 
 Konkrete krav:
 
-- Den aktive mission SKAL kunne downloades komplet: historie, kapitler, opgaver,
-  billeder i passende størrelse, svarregler, hints og nødvendige kortdata.
+- Indhold SKAL hentes fra tjenesten. Appen SKAL IKKE bære en indholdspakke, der
+  kan drive fra serverens.
+- Appen SKAL fortælle spilleren tydeligt, hvornår forbindelsen mangler, og hvad
+  hen kan gøre. Manglende dækning SKAL IKKE fremstå som en fejl i opgaven eller
+  i spillerens svar.
 - Svarforsøg, point og progression SKAL skrives lokalt først og synkroniseres
-  **idempotent**, når forbindelsen vender tilbage. Gentagen synkronisering af
-  samme hændelse SKAL IKKE skabe dubletter eller dobbeltpoint.
+  **idempotent**. Gentagen synkronisering af samme hændelse SKAL IKKE skabe
+  dubletter eller dobbeltpoint.
 - En `GameSession` SKAL fastholde den indholdsversion, spilleren startede på.
-  Indhold SKAL versionsstyres, så en publiceret rettelse ikke ændrer en igangværende tur.
+  En publiceret rettelse SKAL IKKE ændre facit eller point under en igangværende
+  tur.
 - Point SKAL gemmes som forklarlige transaktioner (fx `+100 løst opgave`,
   `-3 hint 1`), så ethvert resultat kan rekonstrueres efter senere rettelser.
 - Serveren er autoritativ ved konflikt, men en spiller SKAL IKKE miste en
-  gennemført tur på grund af kortvarig manglende dækning.
+  gennemført tur på grund af et kortvarigt udfald.
 
-*Begrundelse:* Tabt progression efter en times gåtur er den mest tillidsødelæggende
-fejl, produktet kan lave, og den er teknisk fuldt undgåelig.
+*Begrundelse:* Én kilde til indhold gør det muligt at rette en fejl eller pause
+en opgave uden en app-udgivelse — hvilket princip IV kræver som P0. Prisen er, at
+dækning bliver en forudsætning, og derfor er det ikke nok at fejle stille: den
+lokale hændelseslog og versionsfastholdelsen findes netop for, at et udfald
+koster ventetid og ikke en tur.
 
 ### VI. Privatliv ved design og dataminimering (NON-NEGOTIABLE)
 
@@ -343,4 +365,4 @@ prioritering, historisk/redaktionel kvalitet, fysisk sikkerhed, GDPR og
 rettigheder, teknik og drift samt support og indholdsfejl. Uden en navngiven ejer
 for et område må der ikke publiceres indhold, som falder inden for det område.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-25
+**Version**: 2.0.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-27

@@ -146,7 +146,7 @@ struct MissionSheet: View {
     private var startButton: some View {
         Button("Tag afsted") {
             Task {
-                await engine.startSession(for: mission)
+                guard await engine.startSession(for: mission) else { return }
                 if engine.hasSeenSafetyInterstitial {
                     router.push(.approach(missionId: mission.id))
                 } else {

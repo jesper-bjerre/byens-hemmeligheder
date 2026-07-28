@@ -32,6 +32,7 @@ struct RewardView: View {
                 message
                 scoreBreakdown
                 historyFact
+                provenance
                 presenceNote
                 doneButton
             }
@@ -138,6 +139,85 @@ struct RewardView: View {
                 .labelStyle(.titleAndIcon)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    /// Kilder og rettigheder.
+    ///
+    /// ## Hvorfor de står her og ikke på vej derhen
+    ///
+    /// De lå tidligere på missionsarket, som forsvandt ud af flowet. Dermed var
+    /// FR-042 brudt uden at nogen kunne se det: kilderne var stadig i
+    /// indholdet, bare ikke på nogen skærm.
+    ///
+    /// Belønningsskærmen er det rigtige sted. Spilleren står stille, opgaven er
+    /// løst, og det er præcis dér, spørgsmålet "hvor ved I det fra?" opstår.
+    /// Undervejs ville de have været støj.
+    ///
+    /// ## Rettighederne følger med
+    ///
+    /// Forfatningens princip IV kræver registreret ejer, licens og kreditering
+    /// på hvert medie. Registreret er ikke nok, hvis ingen ser det — så
+    /// krediteringen står her sammen med kilderne.
+    @ViewBuilder
+    private var provenance: some View {
+        let sources = mission.sourceIds.compactMap { engine.pack?.source(id: $0) }
+        let media = [mission.heroMediaId, mission.narrationMediaId]
+            .compactMap { $0 }
+            .compactMap { engine.pack?.media(id: $0) }
+
+        if !sources.isEmpty || !media.isEmpty {
+            BHCard {
+                VStack(alignment: .leading, spacing: BHSpacing.snug) {
+                    Label("Hvor ved vi det fra", systemImage: "text.book.closed")
+                        .font(BHFont.heading)
+                        .foregroundStyle(BHColor.ink)
+                        .labelStyle(.bhLeadingIcon)
+
+                    ForEach(sources) { source in
+                        VStack(alignment: .leading, spacing: BHSpacing.hairline) {
+                            Text(source.title)
+                                .font(BHFont.body)
+                                .foregroundStyle(BHColor.ink)
+                            Text(source.publisher)
+                                .font(BHFont.caption)
+                                .foregroundStyle(BHColor.inkMuted)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("Kilde: \(source.title), \(source.publisher)")
+                    }
+
+                    if !media.isEmpty {
+                        Divider().overlay(BHColor.separator)
+
+                        ForEach(media) { asset in
+                            Text(Self.creditLine(for: asset))
+                                .font(BHFont.caption)
+                                .foregroundStyle(BHColor.inkMuted)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+            }
+            .accessibilityIdentifier("reward.provenance")
+        }
+    }
+
+    /// Én linje pr. medie: kreditering, licens og — når det er AI — mærkningen.
+    ///
+    /// AI-mærkningen står her, fordi princip III forbyder at fremstille
+    /// AI-materiale som autentisk. Et manipuleret fotografi (`enhanced`) mærkes
+    /// derimod ikke over for spilleren: motivet er ægte, og bearbejdningen er
+    /// dokumenteret i indholdet for den næste redaktør (ADR 0003).
+    static func creditLine(for asset: MediaAsset) -> String {
+        var parts = [asset.credit]
+        if asset.kind == .known(.aiGenerated) {
+            parts.append(asset.resolvedMediaType == .audio ? "AI-genereret stemme" : "AI-genereret billede")
+        }
+        parts.append(asset.licence)
+        return parts.joined(separator: " · ")
     }
 
     private var doneButton: some View {

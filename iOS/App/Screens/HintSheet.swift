@@ -4,8 +4,11 @@ import SwiftUI
 
 /// Hints med fradraget skrevet på knappen.
 ///
-/// Spilleren får **prisen at vide før købet** (FR-018), bekræfter aktivt, og
-/// kan derefter genåbne hintet gratis så mange gange, det skal være (FR-019).
+/// Spilleren får **prisen at vide før købet** (FR-018): den står på selve
+/// knappen. Der var tidligere en bekræftelsesdialog oven i, men den gentog blot
+/// tallet fra knappen, spilleren netop havde læst — to tryk for én beslutning.
+///
+/// Hintet kan derefter genåbnes gratis så mange gange, det skal være (FR-019).
 /// Fradragene kommer fra indholdet, ikke fra koden (FR-021).
 struct HintSheet: View {
     let mission: Mission
@@ -13,8 +16,6 @@ struct HintSheet: View {
 
     @Environment(MissionEngine.self) private var engine
     @Environment(\.dismiss) private var dismiss
-
-    @State private var pendingHint: Hint?
 
     var body: some View {
         NavigationStack {
@@ -49,29 +50,6 @@ struct HintSheet: View {
         // tilgængelighedsauditten fanger det. Tre hintkort med brødtekst vil
         // i forvejen have hele skærmen.
         .presentationDetents([.large])
-        .confirmationDialog(
-            confirmationTitle,
-            isPresented: Binding(
-                get: { pendingHint != nil },
-                set: { if !$0 { pendingHint = nil } }
-            ),
-            titleVisibility: .visible
-        ) {
-            if let hint = pendingHint {
-                Button("Vis hintet — det koster \(engine.penalty(for: hint, in: mission)) point") {
-                    Task {
-                        await engine.reveal(hint, in: mission)
-                        pendingHint = nil
-                    }
-                }
-                Button("Nej tak", role: .cancel) { pendingHint = nil }
-            }
-        }
-    }
-
-    private var confirmationTitle: String {
-        guard let hint = pendingHint else { return "" }
-        return "\(hint.title) koster \(engine.penalty(for: hint, in: mission)) point"
     }
 
     private func hintCard(_ hint: Hint) -> some View {
@@ -116,7 +94,7 @@ struct HintSheet: View {
                 } else {
                     // Fradraget står på selve knappen — ikke i en note nedenunder.
                     Button("Vis hint — \(engine.penalty(for: hint, in: mission)) point") {
-                        pendingHint = hint
+                        Task { await engine.reveal(hint, in: mission) }
                     }
                     .buttonStyle(.bhSecondary)
                     .accessibilityHint("Åbner hint \(hint.order) og trækker \(engine.penalty(for: hint, in: mission)) point fra")

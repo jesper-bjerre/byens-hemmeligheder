@@ -58,7 +58,6 @@ final class ResumeAndOfflineTests: FlowTestCase {
         // Åbn hint 1 på observationstrinnet.
         app.buttons["hints.open"].tap()
         app.buttons["hint.reveal.1"].tap()
-        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Vis hintet")).firstMatch.tap()
         app.buttons["Luk"].tap()
 
         app.terminate()
