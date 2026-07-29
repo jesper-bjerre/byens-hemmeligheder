@@ -78,7 +78,7 @@ gennemløbet verificeres indendørs (quickstart.md, lag 2).
 ### Indhold
 
 - [X] T019 [US1] Forfat Bølgen-missionen i `contracts/content/da-DK/content-pack.json` ud fra `docs/design af opgaver/opgaver/7100/Boelgen_Opgave.md`: facit `592`, accepterede former `592`/`5 9 2`/`5-9-2`, fem near-miss-svar, tre hints med 3/4/5 %, status `fieldTestReady`, koordinater `null`
-- [ ] T020 [P] [US1] Tilføj hero-medie til `contracts/content/da-DK/media/` med udfyldt `altText`, `owner`, `licence`, `credit` og `kind`
+- [X] T020 [P] [US1] Tilføj hero-medie til `contracts/content/da-DK/media/` med udfyldt `altText`, `owner`, `licence`, `credit` og `kind` — *felterne er udfyldt, men `licence` er "Intern test" og `restrictions` siger MÅ IKKE UDGIVES. Rettighederne skal afklares før TestFlight.*
 
 ### Svarmotor
 
@@ -131,7 +131,7 @@ gennemløbet verificeres indendørs (quickstart.md, lag 2).
 mediefiler alene, er historien bestået. Fjordenhus skal kunne spilles uden Bølgen.
 
 - [X] T045 [US2] Forfat Fjordenhus-missionen i `contracts/content/da-DK/content-pack.json` ud fra `docs/design af opgaver/opgaver/7100/Fjordenhus_Opgave.md`: facit `428`, kodefelter `form`/`vand`/`højde`, tre hints, status `fieldTestReady`
-- [ ] T046 [P] [US2] Tilføj Fjordenhus hero-medie til `contracts/content/da-DK/media/` med fulde rettighedsfelter
+- [X] T046 [P] [US2] Tilføj Fjordenhus hero-medie til `contracts/content/da-DK/media/` med fulde rettighedsfelter — *samme forbehold som T020*
 - [X] T047 [US2] Verificér og dokumentér i `specs/001-fundament-og-lodret-snit/quickstart.md`, at T045–T046 ikke krævede ændringer i `iOS/Packages/BHKit/Sources/` eller `iOS/App/Screens/` (SC-002)
 - [X] T048 [US2] Skriv XCUITest for Fjordenhus-gennemløbet med facit `428` i `iOS/ByensHemmeligheder UITests/FjordenhusFlowTests.swift`
 

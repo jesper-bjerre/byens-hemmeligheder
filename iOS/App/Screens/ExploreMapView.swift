@@ -57,6 +57,7 @@ struct ExploreMapView: View {
             BHBrandHeader {
                 HStack(spacing: BHSpacing.tight) {
                     ambienceButton
+                    scoreboardButton
                     headerTrailing
                 }
             }
@@ -115,6 +116,25 @@ struct ExploreMapView: View {
     /// — og dét viste sig først i en Release-bygning, dengang knappen sad i
     /// værktøjslinjen.
     @ViewBuilder
+    /// Vejen til point og rangliste.
+    ///
+    /// I headeren og ikke i en fanebjælke: appen har én skærm, kortet, og en
+    /// fanebjælke ville tage plads fra det uden at føre nogen steder hen, man
+    /// ikke kan komme med ét tryk.
+    private var scoreboardButton: some View {
+        Button {
+            router.push(.scoreboard)
+        } label: {
+            Image(systemName: "rosette")
+                .font(BHFont.heading)
+                .foregroundStyle(BHColor.onBrand)
+                .frame(width: BHMetrics.minimumTapTarget, height: BHMetrics.minimumTapTarget)
+                .overlay(Circle().strokeBorder(BHColor.onBrand, lineWidth: 1.5))
+        }
+        .accessibilityLabel("Dine point")
+        .accessibilityIdentifier("scoreboard.open")
+    }
+
     private var headerTrailing: some View {
         #if BH_DEV_TOOLS
         Button {
@@ -622,8 +642,15 @@ struct MissionSummary: View {
 
     @ViewBuilder
     private var thumbnail: some View {
-        if let placeMediaId = mission.placeMediaId {
-            MissionThumbnail(mediaId: placeMediaId)
+        // `resolvedThumbnailMediaId` og ikke `placeMediaId`.
+        //
+        // Miniaturen blev skrevet, før `thumbnailMediaId` fandtes, og læste
+        // derfor stedbilledet. To opgaver har intet stedbillede — Mads
+        // P-opgaven og Broen — og stod som tomme kort på kortet, selvom begge
+        // havde en miniature valgt. Faldbagsvejen, feltet blev bygget med, blev
+        // aldrig taget i brug.
+        if let thumbnailMediaId = mission.resolvedThumbnailMediaId {
+            MissionThumbnail(mediaId: thumbnailMediaId)
         }
     }
 

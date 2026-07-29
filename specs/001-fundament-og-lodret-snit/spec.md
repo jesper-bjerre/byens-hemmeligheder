@@ -194,7 +194,9 @@ Den, der skriver eller retter en opgave, får besked med det samme, hvis indhold
 **Afgrænsning i denne feature**
 
 - **FR-049**: Systemet MUST ikke oprette brugerkonti, indsamle personoplysninger eller sende data fra enheden.
-- **FR-050**: Systemet MUST ikke indeholde inventory, ruter, kapitelprogression eller highscore.
+- **FR-050**: Systemet MUST ikke indeholde inventory, ruter eller kapitelprogression.
+- **FR-054**: Spilleren MUST kunne se sine samlede point og hvilke gåder hen har løst. Tallene MUST udledes af hændelsesloggen (FR-034) og MUST ikke være opdigtede.
+- **FR-055**: Appen MÅ vise en rangliste som attrap, så testerne kan se, hvad version 1 skal kunne. En sådan attrap MUST være mærket som eksempel **både** med et synligt mærkat og med en sætning i klartekst, og navnene MUST være tydeligt fiktive. Begrundelse: forfatningens princip III forbyder at præsentere noget opdigtet som ægte, og en tester, der tror hen er nummer fire i Vejle, har fået en forkert idé om både spillet og sin egen indsats.
 - **FR-051**: Værktøjer, der omgår positionsbekræftelse til udviklingsbrug, MUST ikke være til stede i en udgivelsesbygning.
 
 ### Key Entities

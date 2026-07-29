@@ -41,8 +41,8 @@ class FlowTestCase: XCTestCase {
     // MARK: - Standpunkter fra indholdspakken
 
     enum Vantage {
-        static let boelgen = (latitude: 55.7089, longitude: 9.5481)
-        static let fjordenhus = (latitude: 55.7069, longitude: 9.5518)
+        static let boelgen = (latitude: 55.710503, longitude: 9.557547)
+        static let fjordenhus = (latitude: 55.706393, longitude: 9.554360)
         /// To opgaver deler denne adresse — derfor spredes markørerne her.
         static let frydenlund98 = (latitude: 55.734897, longitude: 9.620270)
     }

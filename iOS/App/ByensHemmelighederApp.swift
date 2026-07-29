@@ -126,7 +126,9 @@ struct RootView: View {
 
     @ViewBuilder
     private func destination(for route: Route) -> some View {
-        if let mission = engine.pack?.mission(id: route.missionId) {
+        if case .scoreboard = route {
+            ScoreboardView()
+        } else if let mission = engine.pack?.mission(id: route.missionId) {
             switch route {
             case .missionDetail:
                 MissionSheet(mission: mission)
@@ -136,6 +138,10 @@ struct RootView: View {
                 stepDestination(mission: mission, stepId: stepId)
             case .reward:
                 RewardView(mission: mission)
+            case .scoreboard:
+                // Fanget ovenfor. Grenen findes kun, fordi `switch` skal
+                // dække alle tilfælde.
+                ScoreboardView()
             }
         } else {
             // En rute, der peger på indhold, som ikke længere findes, må ikke

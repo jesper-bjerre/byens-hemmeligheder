@@ -111,22 +111,67 @@ struct MissionShapeTests {
         }
     }
 
-    /// Positiv kontrol: reglen skal faktisk fyre, hvis statussen skiftes.
+    /// Positiv kontrol: reglen skal faktisk fyre.
     ///
-    /// Uden den beviser testen ovenfor kun, at ingen opgave *tilfældigvis* står
-    /// forkert lige nu — ikke at noget ville stoppe den, der skiftede den.
-    @Test("Skiftes en opgave uden facit til felttestklar, fanges det")
+    /// Opgaven bygges her frem for at findes i pakken. Testen hentede før en
+    /// opgave med `unsetFacit` fra indholdet — og gik i stå den dag, "Den
+    /// forsvundne landevej" fik sit facit. En regel skal kunne efterprøves,
+    /// også når intet indhold tilfældigvis overtræder den.
+    @Test("En spilbar opgave uden facit fanges")
     func promotingAMissionWithoutAFacitIsCaught() throws {
         let pack = try ContractFixtures.contentPack()
-        let unfinished = try #require(
-            pack.missions.first {
-                ($0.challengeStep?.answerRule?.acceptedAnswers ?? []).contains(MissionShape.unsetFacit)
-            },
-            "Ingen opgave i pakken mangler facit — testen dækker intet"
+        let good = try #require(pack.missions.first)
+
+        let unfinished = SingleChoiceStep(
+            id: "step.ufaerdig",
+            order: 1,
+            eyebrow: nil,
+            title: "Uden facit",
+            question: "Hvilken vej?",
+            instruction: "Retningen er ikke målt endnu.",
+            options: ["Nord", "Syd", "Øst", "Vest"].map { ChoiceOption(id: "opt.\($0)", label: $0) },
+            answerRule: AnswerRule(
+                kind: .known(.exact),
+                canonicalAnswer: MissionShape.unsetFacit,
+                acceptedAnswers: [MissionShape.unsetFacit],
+                nearMissResponses: [],
+                genericIncorrectFeedback: "Prøv igen."
+            ),
+            correctFeedback: "Rigtigt.",
+            hintIds: []
         )
 
-        let promoted = unfinished.copy(status: .known(.fieldTestReady))
+        let promoted = good.copy(
+            steps: [.singleChoice(unfinished)],
+            status: .known(.fieldTestReady)
+        )
         #expect(MissionShape.violations(of: promoted).contains(.playableWithoutAnswer))
+    }
+
+    /// Modstykket: den samme opgave er i orden, så længe den ikke kan spilles.
+    @Test("Den samme opgave er i orden som researchklar")
+    func theSameMissionIsFineWhileResearchReady() throws {
+        let pack = try ContractFixtures.contentPack()
+        let good = try #require(pack.missions.first)
+
+        let rule = AnswerRule(
+            kind: .known(.exact),
+            canonicalAnswer: MissionShape.unsetFacit,
+            acceptedAnswers: [MissionShape.unsetFacit],
+            nearMissResponses: [],
+            genericIncorrectFeedback: "Prøv igen."
+        )
+        let step = FreeTextStep(
+            id: "step.ufaerdig",
+            order: 1,
+            title: "Uden facit",
+            instruction: "Facit mangler.",
+            answerRule: rule,
+            hintIds: []
+        )
+
+        let draft = good.copy(steps: [.freeText(step)], status: .known(.researchReady))
+        #expect(!MissionShape.violations(of: draft).contains(.playableWithoutAnswer))
     }
 
     // MARK: - Positive kontroller

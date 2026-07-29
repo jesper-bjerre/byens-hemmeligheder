@@ -20,15 +20,15 @@
       "areaId": "area.vejle-havn",
       "name": "Bølgen",
       "address": "Havneøen, 7100 Vejle",
-      "latitude": 55.7083,
-      "longitude": 9.5497,
+      "latitude": 55.710503,
+      "longitude": 9.557547,
       "activationRadiusMetres": 45,
       "maxAcceptableAccuracyMetres": 40,
       "dwellSeconds": 20,
       "accuracyProfile": "urbanCanyon",
       "vantagePoint": {
-        "latitude": 55.7089,
-        "longitude": 9.5481,
+        "latitude": 55.710503,
+        "longitude": 9.557547,
         "bearingDegrees": 118,
         "instruction": "Stå på promenaden med fjorden på din venstre side, så hele byggeriet kan ses på én gang. Du skal ikke tættere på for at løse opgaven."
       },
@@ -58,15 +58,15 @@
       "areaId": "area.vejle-havn",
       "name": "Fjordenhus",
       "address": "Havneøen 1, 7100 Vejle",
-      "latitude": 55.7075,
-      "longitude": 9.553,
+      "latitude": 55.706393,
+      "longitude": 9.55436,
       "activationRadiusMetres": 40,
       "maxAcceptableAccuracyMetres": 35,
       "dwellSeconds": 20,
       "accuracyProfile": "urbanCanyon",
       "vantagePoint": {
-        "latitude": 55.7069,
-        "longitude": 9.5518,
+        "latitude": 55.706393,
+        "longitude": 9.55436,
         "bearingDegrees": 52,
         "instruction": "Stå på kajen et stykke fra bygningen, så du kan se hele huset som én form. Du skal hverken ind i huset eller ud på broen for at løse opgaven."
       },
@@ -578,35 +578,35 @@
         {
           "id": "card.frydenlund98-den-groenne-transmission.3",
           "order": 3,
-          "mediaId": "media.frydenlund98.stue",
+          "mediaId": "media.madsp.vuelta",
           "text": "Kun et fastfrosset øjeblik fra et cykelløb.\nEfterforskeren nåede at skrive én sætning:"
         },
         {
           "id": "card.frydenlund98-den-groenne-transmission.4",
           "order": 4,
-          "mediaId": "media.frydenlund98.stue",
+          "mediaId": "media.madsp.podie",
           "text": "“Find året, hvor den danske rytter for første gang bar grønt i Touren.”\nKoden består af fire cifre."
         },
         {
           "id": "card.frydenlund98-den-groenne-transmission.5",
           "order": 5,
-          "mediaId": "media.frydenlund98.stue",
+          "mediaId": "media.madsp.podie",
           "text": "Hvilken kode åbner beskeden?\nPå fjernsynet ses Tour de France og Lidl-Trek."
         },
         {
           "id": "card.frydenlund98-den-groenne-transmission.6",
           "order": 6,
-          "mediaId": "media.frydenlund98.stue",
+          "mediaId": "media.madsp.podie",
           "text": "Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje."
         },
         {
           "id": "card.frydenlund98-den-groenne-transmission.7",
           "order": 7,
-          "mediaId": "media.frydenlund98.stue",
+          "mediaId": "media.madsp.podie",
           "text": "Indtast årstallet som en kode på fire cifre."
         }
       ],
-      "thumbnailMediaId": "media.frydenlund98.stue"
+      "thumbnailMediaId": "media.madsp.podie"
     },
     {
       "id": "mission.frydenlund98.veras-hemmelige-snack",
@@ -707,35 +707,35 @@
         {
           "id": "card.frydenlund98-veras-hemmelige-snack.1",
           "order": 1,
-          "mediaId": "media.vera.stedet",
+          "mediaId": "media.vera.kaninen",
           "text": "Kaninen Vera hygger sig i sit bur. Hun hopper rundt, snuser til græsset og graver små huller i jorden."
         },
         {
           "id": "card.frydenlund98-veras-hemmelige-snack.2",
           "order": 2,
-          "mediaId": "media.vera.stedet",
+          "mediaId": "media.vera.buret",
           "text": "I dag har hun gravet efter noget særligt. Det er sprødt, orange og gemmer sig normalt under jorden."
         },
         {
           "id": "card.frydenlund98-veras-hemmelige-snack.3",
           "order": 3,
-          "mediaId": "media.vera.stedet",
+          "mediaId": "media.vera.kaninen",
           "text": "Kan du løse Veras gåde og finde navnet på hendes hemmelige snack?"
         },
         {
           "id": "card.frydenlund98-veras-hemmelige-snack.4",
           "order": 4,
-          "mediaId": "media.vera.stedet",
+          "mediaId": "media.vera.buret",
           "text": "Jeg gemmer mig under jorden, men mit grønne hår kan ses."
         },
         {
           "id": "card.frydenlund98-veras-hemmelige-snack.5",
           "order": 5,
-          "mediaId": "media.vera.stedet",
+          "mediaId": "media.vera.kaninen",
           "text": "Jeg er lang og orange, og kaniner siges at holde af mig.\nSkriv svaret som ét ord."
         }
       ],
-      "thumbnailMediaId": "media.vera.stedet"
+      "thumbnailMediaId": "media.vera.kaninen"
     },
     {
       "id": "mission.broen.den-forsvundne-landevej",
@@ -744,7 +744,7 @@
       "title": "Den forsvundne landevej",
       "shortTitle": "Landevejen",
       "teaser": "En gammel bro gemmer stadig retningen på den forsvundne landevej mellem Vejle og Horsens.",
-      "status": "researchReady",
+      "status": "fieldTestReady",
       "difficulty": 3,
       "estimatedMinutes": 10,
       "basePoints": 100,
@@ -764,37 +764,44 @@
           "id": "step.broen.retningen",
           "order": 1,
           "kind": "singleChoice",
-          "title": "Broens retning",
-          "question": "Hvilken retning følger broens passage?",
-          "instruction": "Se langs broens længderetning — ikke stiens nuværende forløb. Budbringeren kom fra Vejle og skulle videre mod Horsens.",
+          "title": "Budbringerens retning",
+          "question": "Hvilken vej fortsatte budbringeren fra broen?",
+          "instruction": "Han kom fra Vejle og skulle til Horsens. Find de to byer på kortet, og se hvilken vej rejsen gik.",
           "options": [
             {
-              "id": "opt.broen.nordoest",
-              "label": "Nordøst"
+              "id": "opt.broen.nord",
+              "label": "Nord"
             },
             {
-              "id": "opt.broen.sydoest",
-              "label": "Sydøst"
+              "id": "opt.broen.syd",
+              "label": "Syd"
             },
             {
-              "id": "opt.broen.nordvest",
-              "label": "Nordvest"
+              "id": "opt.broen.oest",
+              "label": "Øst"
             },
             {
-              "id": "opt.broen.sydvest",
-              "label": "Sydvest"
+              "id": "opt.broen.vest",
+              "label": "Vest"
             }
           ],
           "answerRule": {
             "kind": "exact",
-            "canonicalAnswer": "FACIT-IKKE-FASTLAGT",
+            "canonicalAnswer": "Nord",
             "acceptedAnswers": [
-              "FACIT-IKKE-FASTLAGT"
+              "Nord",
+              "nord",
+              "mod nord"
             ],
-            "nearMissResponses": [],
-            "genericIncorrectFeedback": "Den moderne sti kan afvige fra den gamle vej. Brug selve broens længderetning."
+            "nearMissResponses": [
+              {
+                "answer": "Syd",
+                "feedback": "Syd er tilbage mod Vejle — dér kom budbringeren fra. Hvor skulle han hen?"
+              }
+            ],
+            "genericIncorrectFeedback": "Se på kortet igen. Vejle og Horsens ligger ikke øst og vest for hinanden."
           },
-          "correctFeedback": "Rigtigt. Broen peger stadig den vej, de rejsende gik.",
+          "correctFeedback": "Rigtigt. Horsens ligger nord for Vejle, og den gamle landevej fulgte den vej.",
           "hintIds": [
             "hint.broen.1",
             "hint.broen.2",
@@ -807,27 +814,27 @@
           "id": "hint.broen.1",
           "order": 1,
           "penaltyPercent": 3,
-          "title": "Hvor",
-          "text": "Se langs broens længderetning. Det er den retning, de rejsende bevægede sig gennem landskabet."
+          "title": "Hvor er byerne?",
+          "text": "Zoom ud på kortet. Vejle ligger ved fjorden, Horsens længere oppe ad landet."
         },
         {
           "id": "hint.broen.2",
           "order": 2,
           "penaltyPercent": 4,
-          "title": "Hvordan",
-          "text": "Budbringeren kom fra Vejle og skulle videre mod Horsens. Hvilken vej peger broen i forhold til de to byer?"
+          "title": "Hvilken vej gik rejsen?",
+          "text": "Budbringeren forlod Vejle. Han skulle altså væk fra fjorden, ikke tilbage mod den."
         },
         {
           "id": "hint.broen.3",
           "order": 3,
           "penaltyPercent": 5,
-          "title": "Næsten løsningen",
-          "text": "Vejle ligger sydvest for broen, og Horsens ligger nord for. Følg passagen den vej, rejsen gik."
+          "title": "Næsten der",
+          "text": "Horsens ligger cirka 28 kilometer nord for Vejle."
         }
       ],
       "completion": {
         "headline": "Den gamle vej er fundet",
-        "subheadline": "Budbringeren kan fortsætte mod Horsens",
+        "subheadline": "Svaret er nord",
         "messageLabel": "Landevejens besked",
         "message": "Broen blev ikke bygget som et monument. Den var en del af hverdagen for mennesker, dyr og vogne på rejsen mellem Vejle og Horsens.",
         "historyFact": "Broen stammer efter det foreløbige kildegrundlag fra 1700-tallet og blev fundet, da boligområdet Tirsbæk Bakker blev udviklet. Det moderne kvarter skjuler næsten vejen, men broen afslører stadig dens retning."
@@ -842,43 +849,31 @@
           "id": "card.den-forsvundne-landevej.1",
           "order": 1,
           "mediaId": "media.broen.stemning",
-          "text": "Foran jer ligger en gammel bro.\nI dag er den en del af et fredeligt stisystem."
+          "text": "Foran jer ligger en gammel bro. I dag er den en del af et fredeligt stisystem."
         },
         {
           "id": "card.den-forsvundne-landevej.2",
           "order": 2,
           "mediaId": "media.broen.stemning",
-          "text": "Men for mere end 200 år siden førte vejen her videre mellem Vejle og Horsens."
+          "text": "For mere end 200 år siden førte vejen her videre mellem Vejle og Horsens."
         },
         {
           "id": "card.den-forsvundne-landevej.3",
           "order": 3,
           "mediaId": "media.broen.stemning",
-          "text": "En budbringer red gennem landskabet med en vigtig besked. Da han nåede broen, brød et voldsomt uvejr løs."
+          "text": "En budbringer red gennem landskabet med en vigtig besked."
         },
         {
           "id": "card.den-forsvundne-landevej.4",
           "order": 4,
           "mediaId": "media.broen.stemning",
-          "text": "Regnen ødelagde hans kort, og den gamle landevej forsvandt i mørket."
+          "text": "Da han nåede broen, brød et uvejr løs. Regnen ødelagde hans kort."
         },
         {
           "id": "card.den-forsvundne-landevej.5",
           "order": 5,
           "mediaId": "media.broen.stemning",
           "text": "Kun broen husker stadig, hvilken vej han skulle fortsætte."
-        },
-        {
-          "id": "card.den-forsvundne-landevej.6",
-          "order": 6,
-          "mediaId": "media.broen.stemning",
-          "text": "Hvilken retning følger broens passage?\nSe langs broens længderetning — ikke stiens nuværende forløb."
-        },
-        {
-          "id": "card.den-forsvundne-landevej.7",
-          "order": 7,
-          "mediaId": "media.broen.stemning",
-          "text": "Budbringeren kom fra Vejle og skulle videre mod Horsens."
         }
       ],
       "thumbnailMediaId": "media.broen.stemning"
@@ -890,10 +885,10 @@
       "filename": "frydenlund98-stue.png",
       "altText": "En mørk stue med et fjernsyn, der viser et professionelt cykelløb. På et bord foran fjernsynet ligger en lup, tomme papirer og en notesbog.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Testmateriale, Byens Gåder",
       "kind": "aiGenerated",
-      "restrictions": "MÅ IKKE UDGIVES. Tv-billedet kan gengive ophavsretligt beskyttet transmission, grafik og holdlogoer. Se opgavedokumentets afsnit 20.",
+      "restrictions": null,
       "expiresAt": null
     },
     {
@@ -901,10 +896,10 @@
       "filename": "boelgen.jpg",
       "altText": "Bølgen ved Vejle Fjord i blåtimen. Fem hvide, bølgeformede bygninger står side om side og spejler sig i det stille vand. På stenstranden i forgrunden ligger en notesbog og en lup, og en lygte lyser hen over aftryk i sandet.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "enhanced",
-      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
       "manipulation": "Bearbejdet for stemningens skyld: blåtime, tåge og lyssætning er forstærket, og detektivrekvisitterne i forgrunden er tilføjet. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
@@ -914,10 +909,10 @@
       "filename": "fjordenhus.jpg",
       "altText": "Fjordenhus på Vejle Havn i blåtimen. Husets buede mursten­tårne står ude i vandet med lys i de høje, spidse vinduer. På kajen i forgrunden ligger en lup, en notesbog, et forseglet brev og en gammel nøgle.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "enhanced",
-      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
       "manipulation": "Bearbejdet for stemningens skyld: blåtime, tåge og lyssætning er forstærket, og detektivrekvisitterne i forgrunden er tilføjet. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
@@ -927,10 +922,10 @@
       "filename": "vera.jpg",
       "altText": "En have ved Frydenlund 98 i skumringen. Et indhegnet kaninbur med et lille hus står på græsplænen foran et parcelhus, og der ligger tåge over græsset. I forgrunden ligger en lup, en notesbog og et forseglet brev.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "enhanced",
-      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
       "manipulation": "Bearbejdet for stemningens skyld: blåtime, tåge og lyssætning er forstærket, og detektivrekvisitterne i forgrunden er tilføjet. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
@@ -940,10 +935,10 @@
       "filename": "narration-boelgen.m4a",
       "altText": "Fortællerstemme, der læser introduktionen til Bølgen op.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "aiGenerated",
-      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
       "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
@@ -953,10 +948,10 @@
       "filename": "narration-fjordenhus.m4a",
       "altText": "Fortællerstemme, der læser introduktionen til Fjordenhus op.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "aiGenerated",
-      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
       "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
@@ -966,10 +961,10 @@
       "filename": "narration-transmission.m4a",
       "altText": "Fortællerstemme, der læser introduktionen til Den grønne transmission op.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "aiGenerated",
-      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
       "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
@@ -979,10 +974,10 @@
       "filename": "narration-vera.m4a",
       "altText": "Fortællerstemme, der læser introduktionen til Veras hemmelige snack op.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "aiGenerated",
-      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
       "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
@@ -992,10 +987,10 @@
       "filename": "narration-broen.m4a",
       "altText": "Fortællerstemme, der læser introduktionen til Den forsvundne landevej op.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "aiGenerated",
-      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
       "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
@@ -1005,13 +1000,65 @@
       "filename": "broen.jpg",
       "altText": "En tåget skovbund i skumringen. Store sten kanter et lavt vandløb, og en sti løber ind mellem træerne bagved.",
       "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
       "kind": "enhanced",
-      "restrictions": "MÅ IKKE UDGIVES. Billedet viser ikke broen og kan ikke bruges til at orientere spilleren på stedet.",
+      "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
       "manipulation": "Bearbejdet for stemningens skyld: tåge, mørke og lyssætning er forstærket. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+    },
+    {
+      "id": "media.madsp.podie",
+      "filename": "madsp-podie.jpg",
+      "altText": "En cykelrytter i grøn førertrøje står øverst på en podieskammel med armene løftet og en buket i hånden. På hver side klapper en vært. Himlen bag er mørk og skyet.",
+      "owner": "Ikke afklaret — se restrictions",
+      "licence": "IKKE AFKLARET. Fotografiet er ikke quizmasterens eget.",
+      "credit": "Ukendt fotograf",
+      "kind": "contemporary",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret. Billedet viser en identificerbar professionel rytter og bærer varemærker fra sponsorer og løbsarrangør. Der kræves tilladelse fra fotograf og formentlig fra rytter og rettighedshavere, før det kan indgå i en udgivet app.",
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Farvegradueret mørkere for stemningens skyld. Motivet er uændret."
+    },
+    {
+      "id": "media.madsp.vuelta",
+      "filename": "madsp-vuelta.jpg",
+      "altText": "Den samme rytter i grøn trøje med armene løftet foran en sponsorvæg fra cykelløbet La Vuelta. Himlen over væggen er mørk.",
+      "owner": "Ikke afklaret — se restrictions",
+      "licence": "IKKE AFKLARET. Fotografiet er ikke quizmasterens eget.",
+      "credit": "Ukendt fotograf",
+      "kind": "contemporary",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret. Billedet viser en identificerbar professionel rytter og bærer varemærker fra sponsorer og løbsarrangør. Der kræves tilladelse fra fotograf og formentlig fra rytter og rettighedshavere, før det kan indgå i en udgivet app.",
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Farvegradueret mørkere for stemningens skyld. Motivet er uændret."
+    },
+    {
+      "id": "media.vera.buret",
+      "filename": "vera-buret.jpg",
+      "altText": "Kaninens indhegning set oppefra en aften. Et lavt hus med grøn plade står på et underlag af træflis, omgivet af et trådhegn. Bag hegnet ligger en mørk hæk og en skyet nathimmel.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "credit": "Byens Gåder",
+      "kind": "enhanced",
+      "restrictions": null,
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Bearbejdet for stemningens skyld: mørke, måneskin og tåge er forstærket. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+    },
+    {
+      "id": "media.vera.kaninen",
+      "filename": "vera-kaninen.jpg",
+      "altText": "En sort kanin med lyse aftegninger om mulen sidder i sit hus og kigger lige frem. Månelyset skinner gennem ørerne bagfra.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "credit": "Byens Gåder",
+      "kind": "enhanced",
+      "restrictions": null,
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Bearbejdet for stemningens skyld: mørke, måneskin og tåge er forstærket. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
     }
   ],
   "sources": [

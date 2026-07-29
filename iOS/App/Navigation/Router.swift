@@ -11,6 +11,8 @@ enum Route: Hashable, Codable, Sendable {
     case approach(missionId: String)
     case step(missionId: String, stepId: String)
     case reward(missionId: String)
+    /// Point og rangliste. Hører ikke til en opgave.
+    case scoreboard
 
     var missionId: String {
         switch self {
@@ -18,6 +20,11 @@ enum Route: Hashable, Codable, Sendable {
             id
         case .step(let id, _):
             id
+        case .scoreboard:
+            // Ruten hører ikke til en opgave. Genskabelsen validerer mod
+            // kendte opgave-id'er, og en tom streng falder derfor bevidst
+            // igennem — pointskærmen genåbnes ikke efter en genstart.
+            ""
         }
     }
 }
