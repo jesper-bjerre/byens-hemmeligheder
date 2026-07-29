@@ -54,8 +54,8 @@ final class MapTapTests: FlowTestCase {
 
         // Spilleren står ved Bølgen, så dens kort popper op af sig selv og
         // dækker en del af kortet. Luk det først.
-        if app.buttons["preview.close"].waitForExistence(timeout: Self.uiTimeout) {
-            app.buttons["preview.close"].tap()
+        if app.buttons["preview.dismiss"].waitForExistence(timeout: Self.uiTimeout) {
+            app.buttons["preview.dismiss"].tap()
         }
 
         let pin = app.buttons[fjordenhus]
@@ -102,8 +102,8 @@ final class MapTapTests: FlowTestCase {
         let target = CGPoint(x: frame.midX, y: frame.minY + frame.height * 0.3)
 
         tapWindow(at: target, in: app)
-        XCTAssertTrue(app.buttons["preview.close"].waitForExistence(timeout: Self.uiTimeout))
-        app.buttons["preview.close"].tap()
+        XCTAssertTrue(app.buttons["preview.dismiss"].waitForExistence(timeout: Self.uiTimeout))
+        app.buttons["preview.dismiss"].tap()
 
         XCTAssertFalse(app.buttons["preview.open"].waitForExistence(timeout: 3), "Kortet lukkede ikke")
 
@@ -134,9 +134,19 @@ final class MapTapTests: FlowTestCase {
     }
 
     /// Hjemmefra kan den ikke — og det står der hvorfor.
+    ///
+    /// Flaget kører release-reglen. I Debug må en quizmaster åbne enhver
+    /// opgave uden at simulere turen derhen; uden flaget ville denne test
+    /// derfor bevise det modsatte af, hvad den hedder. Flaget findes ikke i
+    /// Release — dér er værdien en konstant — så det kan ikke bruges til at
+    /// åbne gaten hos en spiller.
     func testStartIsDisabledAwayFromTheLocation() {
         // Vejle Banegård, ~1 km fra begge opgaver.
-        let app = launchApp(atLatitude: 55.7050, longitude: 9.5350)
+        let app = launchApp(
+            atLatitude: 55.7050,
+            longitude: 9.5350,
+            extraArguments: ["-BHEnforcePresenceGate"]
+        )
 
         // Zoom ud, indtil markøren er synlig.
         let map = app.maps.firstMatch

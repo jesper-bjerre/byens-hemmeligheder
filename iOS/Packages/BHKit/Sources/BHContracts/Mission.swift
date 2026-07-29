@@ -31,6 +31,21 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
     /// Må aldrig bære information, opgaven skal løses med (ADR 0003). Facit
     /// står i teksten; billedet sætter tonen.
     public let moodMediaId: String?
+    /// Miniaturen på kortets opgaveoverlay.
+    ///
+    /// Udfyldes af quizmasteren. Adskilt fra ``placeMediaId``, fordi et
+    /// orienteringsfoto sjældent er det, der ser bedst ud i et lille format —
+    /// det, der skal få en til at trykke, er ikke nødvendigvis det, der viser,
+    /// hvor man skal stå.
+    public let thumbnailMediaId: String?
+    /// Opgavens kort, som i et escape room-spil.
+    ///
+    /// Hvert kort er et billede med lidt tekst i bunden. Det første bærer
+    /// introduktionen og har derfor en længere tekst end de øvrige.
+    ///
+    /// Valgfri i kontrakten, fordi feltet er tilføjet efter ``steps``: en
+    /// ældre pakke uden kort skal stadig kunne afkodes (ADR 0001).
+    public let cards: [MissionCard]?
     /// Indtalt introduktion, afspillet når spilleren går i gang.
     ///
     /// Stemning og uddybning — aldrig indhold. Alt nødvendigt for at løse
@@ -64,6 +79,8 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         sourceIds: [String],
         placeMediaId: String? = nil,
         moodMediaId: String? = nil,
+        thumbnailMediaId: String? = nil,
+        cards: [MissionCard]? = nil,
         narrationMediaId: String? = nil,
         steps: [Step],
         hints: [Hint],
@@ -87,6 +104,8 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         self.heroMediaId = heroMediaId
         self.placeMediaId = placeMediaId
         self.moodMediaId = moodMediaId
+        self.thumbnailMediaId = thumbnailMediaId
+        self.cards = cards
         self.narrationMediaId = narrationMediaId
         self.sourceIds = sourceIds
         self.steps = steps
@@ -103,6 +122,17 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
     /// AI-billede. Faldet gør, at sådant indhold stadig virker, uden at
     /// kontrakten skal brydes.
     public var resolvedMoodMediaId: String? { moodMediaId ?? heroMediaId }
+
+    /// Kortene i den rækkefølge, spilleren møder dem.
+    public var orderedCards: [MissionCard] { (cards ?? []).sorted { $0.order < $1.order } }
+
+    /// Miniaturen, med fald tilbage til stedbilledet og derefter stemningen.
+    ///
+    /// Faldet gør, at et kort på kortet aldrig står tomt, blot fordi
+    /// quizmasteren endnu ikke har valgt en særskilt miniature.
+    public var resolvedThumbnailMediaId: String? {
+        thumbnailMediaId ?? placeMediaId ?? resolvedMoodMediaId
+    }
 
     /// Trinnene i den rækkefølge, spilleren møder dem.
     public var orderedSteps: [Step] { steps.sorted { $0.order < $1.order } }
@@ -398,6 +428,29 @@ public struct ChallengePrompt: Hashable, Sendable {
         self.title = title
         self.question = question
         self.instruction = instruction
+    }
+}
+
+/// Ét kort i opgaven: et billede og lidt tekst.
+///
+/// Formen er lånt fra escape room-brætspil, hvor gåden ligger i en bunke kort,
+/// man breder ud på bordet. Billedet er det primære; teksten står i bunden og
+/// siger kun det nødvendige.
+public struct MissionCard: Codable, Hashable, Sendable, Identifiable {
+    public let id: String
+    public let order: Int
+    /// Kortets billede. Uden det er kortet ren tekst — tilladt, men sjældent
+    /// det, kortet er til for.
+    public let mediaId: String?
+    /// Teksten i bunden af billedet. Det første kort bærer introduktionen og
+    /// har derfor en længere tekst end de øvrige.
+    public let text: String
+
+    public init(id: String, order: Int, mediaId: String?, text: String) {
+        self.id = id
+        self.order = order
+        self.mediaId = mediaId
+        self.text = text
     }
 }
 

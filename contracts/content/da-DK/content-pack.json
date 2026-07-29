@@ -125,6 +125,40 @@
       },
       "fieldVerified": false,
       "lastPhysicallyVerified": null
+    },
+    {
+      "id": "loc.vejle-oest.tirsbaek-broen",
+      "areaId": "area.vejle-oest",
+      "name": "Den gamle bro i Tirsbæk Bakker",
+      "address": "Tirsbæk Bakker, 7120 Vejle",
+      "latitude": 55.7261,
+      "longitude": 9.63084,
+      "activationRadiusMetres": 10,
+      "maxAcceptableAccuracyMetres": 10,
+      "dwellSeconds": 5,
+      "accuracyProfile": "standard",
+      "vantagePoint": {
+        "latitude": 55.7261,
+        "longitude": 9.63084,
+        "bearingDegrees": 0,
+        "instruction": "Standpunktet er endnu ikke opmålt i felten. Bliv på det offentlige stisystem, bloker ikke stien, og klatr ikke på broen."
+      },
+      "publicAccess": true,
+      "safety": {
+        "flags": [],
+        "notes": "Sikkerheden er ikke fysisk kontrolleret endnu. Opgaven er researchklar og vises ikke i appen."
+      },
+      "accessibility": {
+        "surface": "Ikke registreret",
+        "incline": "Ikke registreret",
+        "steps": false,
+        "wheelchair": "unknown",
+        "stroller": "unknown",
+        "distanceFromAccessMetres": null,
+        "notes": "Tilgængelighed skal registreres ved felttest."
+      },
+      "fieldVerified": false,
+      "lastPhysicallyVerified": null
     }
   ],
   "missions": [
@@ -153,16 +187,8 @@
       ],
       "steps": [
         {
-          "id": "step.boelgen.intro",
-          "order": 1,
-          "kind": "narrative",
-          "title": "Den femte besked",
-          "body": "I 2009 stod kun begyndelsen af Bølgen færdig.\n\nEn glemt besked fortæller, at den først kan åbnes, når alle bølger er rejst ved fjorden.\n\nTre symboler viser vejen:\n\nØjet → Etagerne → Pausen\n\nFind de tre tal, og åbn beskeden.",
-          "continueLabel": "Jeg er klar"
-        },
-        {
           "id": "step.boelgen.koden",
-          "order": 2,
+          "order": 1,
           "kind": "numericCode",
           "title": "Den femte besked",
           "instruction": "1. Tæl de store, hvide bølgetoppe. Kun de store — ikke vinduer, altaner eller master.\n2. Hver bølge har ni etager.\n3. To bølger stod færdige, før byggeriet gik i stå i 2009.",
@@ -242,7 +268,47 @@
       "chapterId": null,
       "nextChapterId": null,
       "placeMediaId": "media.boelgen.stedet",
-      "moodMediaId": "media.boelgen.stedet"
+      "moodMediaId": "media.boelgen.stedet",
+      "narrationMediaId": "media.narration.boelgen",
+      "cards": [
+        {
+          "id": "card.boelgen-den-femte-besked.1",
+          "order": 1,
+          "mediaId": "media.boelgen.stedet",
+          "text": "I 2009 stod kun begyndelsen af Bølgen færdig."
+        },
+        {
+          "id": "card.boelgen-den-femte-besked.2",
+          "order": 2,
+          "mediaId": "media.boelgen.stedet",
+          "text": "En glemt besked fortæller, at den først kan åbnes, når alle bølger er rejst ved fjorden."
+        },
+        {
+          "id": "card.boelgen-den-femte-besked.3",
+          "order": 3,
+          "mediaId": "media.boelgen.stedet",
+          "text": "Tre symboler viser vejen:\nØjet → Etagerne → Pausen\nFind de tre tal, og åbn beskeden."
+        },
+        {
+          "id": "card.boelgen-den-femte-besked.4",
+          "order": 4,
+          "mediaId": "media.boelgen.stedet",
+          "text": "Hvilken trecifret kode åbner beskeden?"
+        },
+        {
+          "id": "card.boelgen-den-femte-besked.5",
+          "order": 5,
+          "mediaId": "media.boelgen.stedet",
+          "text": "1. Tæl de store, hvide bølgetoppe. Kun de store — ikke vinduer, altaner eller master."
+        },
+        {
+          "id": "card.boelgen-den-femte-besked.6",
+          "order": 6,
+          "mediaId": "media.boelgen.stedet",
+          "text": "2. Hver bølge har ni etager.\n3. To bølger stod færdige, før byggeriet gik i stå i 2009."
+        }
+      ],
+      "thumbnailMediaId": "media.boelgen.stedet"
     },
     {
       "id": "mission.fjordenhus.vandets-tromler",
@@ -269,16 +335,8 @@
       ],
       "steps": [
         {
-          "id": "step.fjordenhus.intro",
-          "order": 1,
-          "kind": "narrative",
-          "title": "Arkitektens note",
-          "body": "Fjorden har gemt en besked i huset.\n\nMen huset skal ikke læses gennem vinduerne eller de mange åbninger. Det skal læses som tre enkle spor:\n\nForm. Vand. Højde.\n\nFørst det, der bærer huset.\nSå det, fjorden får lov at løbe igennem.\nTil sidst det sidste ciffer i husets højde.\n\nFind de tre tal, og åbn beskeden.",
-          "continueLabel": "Jeg er klar"
-        },
-        {
           "id": "step.fjordenhus.koden",
-          "order": 2,
+          "order": 1,
           "kind": "numericCode",
           "title": "Vandets tromler",
           "instruction": "1. Tæl husets store, cylindriske hoveddele. Se formen som helhed — ignorér vinduer, buer og gangbro.\n2. Fjordens vand løber gennem to af husets rum.\n3. Huset er 28 meter højt. Brug det sidste ciffer.",
@@ -358,7 +416,53 @@
       "chapterId": null,
       "nextChapterId": null,
       "placeMediaId": "media.fjordenhus.stedet",
-      "moodMediaId": "media.fjordenhus.stedet"
+      "moodMediaId": "media.fjordenhus.stedet",
+      "narrationMediaId": "media.narration.fjordenhus",
+      "cards": [
+        {
+          "id": "card.fjordenhus-vandets-tromler.1",
+          "order": 1,
+          "mediaId": "media.fjordenhus.stedet",
+          "text": "Fjorden har gemt en besked i huset."
+        },
+        {
+          "id": "card.fjordenhus-vandets-tromler.2",
+          "order": 2,
+          "mediaId": "media.fjordenhus.stedet",
+          "text": "Men huset skal ikke læses gennem vinduerne eller de mange åbninger. Det skal læses som tre enkle spor:"
+        },
+        {
+          "id": "card.fjordenhus-vandets-tromler.3",
+          "order": 3,
+          "mediaId": "media.fjordenhus.stedet",
+          "text": "Form. Vand. Højde.\nFørst det, der bærer huset.\nSå det, fjorden får lov at løbe igennem."
+        },
+        {
+          "id": "card.fjordenhus-vandets-tromler.4",
+          "order": 4,
+          "mediaId": "media.fjordenhus.stedet",
+          "text": "Til sidst det sidste ciffer i husets højde.\nFind de tre tal, og åbn beskeden."
+        },
+        {
+          "id": "card.fjordenhus-vandets-tromler.5",
+          "order": 5,
+          "mediaId": "media.fjordenhus.stedet",
+          "text": "Hvilken trecifret kode åbner beskeden?"
+        },
+        {
+          "id": "card.fjordenhus-vandets-tromler.6",
+          "order": 6,
+          "mediaId": "media.fjordenhus.stedet",
+          "text": "1. Tæl husets store, cylindriske hoveddele. Se formen som helhed — ignorér vinduer, buer og gangbro."
+        },
+        {
+          "id": "card.fjordenhus-vandets-tromler.7",
+          "order": 7,
+          "mediaId": "media.fjordenhus.stedet",
+          "text": "2. Fjordens vand løber gennem to af husets rum.\n3. Huset er 28 meter højt. Brug det sidste ciffer."
+        }
+      ],
+      "thumbnailMediaId": "media.fjordenhus.stedet"
     },
     {
       "id": "mission.frydenlund98.den-groenne-transmission",
@@ -383,16 +487,8 @@
       ],
       "steps": [
         {
-          "id": "step.frydenlund98.intro",
-          "order": 1,
-          "kind": "narrative",
-          "title": "Sag 07 – Den grønne transmission",
-          "body": "Et fjernsyn står stadig tændt i det forladte værelse.\n\nDen ukendte person har ikke efterladt et brev, et navn eller en dato. Kun et fastfrosset øjeblik fra et cykelløb.\n\nEfterforskeren nåede at skrive én sætning:\n\n“Find året, hvor den danske rytter for første gang bar grønt i Touren.”\n\nKoden består af fire cifre.",
-          "continueLabel": "Undersøg værelset"
-        },
-        {
           "id": "step.frydenlund98.koden",
-          "order": 2,
+          "order": 1,
           "kind": "numericCode",
           "title": "Find året",
           "instruction": "På fjernsynet ses Tour de France og Lidl-Trek. Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje. Indtast årstallet som en kode på fire cifre.",
@@ -464,7 +560,53 @@
       "chapterId": null,
       "nextChapterId": null,
       "placeMediaId": null,
-      "moodMediaId": "media.frydenlund98.stue"
+      "moodMediaId": "media.frydenlund98.stue",
+      "narrationMediaId": "media.narration.transmission",
+      "cards": [
+        {
+          "id": "card.frydenlund98-den-groenne-transmission.1",
+          "order": 1,
+          "mediaId": "media.frydenlund98.stue",
+          "text": "Et fjernsyn står stadig tændt i det forladte værelse."
+        },
+        {
+          "id": "card.frydenlund98-den-groenne-transmission.2",
+          "order": 2,
+          "mediaId": "media.frydenlund98.stue",
+          "text": "Den ukendte person har ikke efterladt et brev, et navn eller en dato."
+        },
+        {
+          "id": "card.frydenlund98-den-groenne-transmission.3",
+          "order": 3,
+          "mediaId": "media.frydenlund98.stue",
+          "text": "Kun et fastfrosset øjeblik fra et cykelløb.\nEfterforskeren nåede at skrive én sætning:"
+        },
+        {
+          "id": "card.frydenlund98-den-groenne-transmission.4",
+          "order": 4,
+          "mediaId": "media.frydenlund98.stue",
+          "text": "“Find året, hvor den danske rytter for første gang bar grønt i Touren.”\nKoden består af fire cifre."
+        },
+        {
+          "id": "card.frydenlund98-den-groenne-transmission.5",
+          "order": 5,
+          "mediaId": "media.frydenlund98.stue",
+          "text": "Hvilken kode åbner beskeden?\nPå fjernsynet ses Tour de France og Lidl-Trek."
+        },
+        {
+          "id": "card.frydenlund98-den-groenne-transmission.6",
+          "order": 6,
+          "mediaId": "media.frydenlund98.stue",
+          "text": "Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje."
+        },
+        {
+          "id": "card.frydenlund98-den-groenne-transmission.7",
+          "order": 7,
+          "mediaId": "media.frydenlund98.stue",
+          "text": "Indtast årstallet som en kode på fire cifre."
+        }
+      ],
+      "thumbnailMediaId": "media.frydenlund98.stue"
     },
     {
       "id": "mission.frydenlund98.veras-hemmelige-snack",
@@ -485,22 +627,14 @@
       ],
       "fictionLabel": "Fiktiv gåde. Kaninen Vera er virkelig.",
       "heroMediaId": null,
-      "narrationMediaId": null,
+      "narrationMediaId": "media.narration.vera",
       "sourceIds": [
         "source.frydenlund98.vera"
       ],
       "steps": [
         {
-          "id": "step.vera.intro",
-          "order": 1,
-          "kind": "narrative",
-          "title": "Vera og den skjulte snack",
-          "body": "Kaninen Vera hygger sig i sit bur. Hun hopper rundt, snuser til græsset og graver små huller i jorden.\n\nI dag har hun gravet efter noget særligt. Det er sprødt, orange og gemmer sig normalt under jorden.\n\nKan du løse Veras gåde og finde navnet på hendes hemmelige snack?",
-          "continueLabel": "Løs gåden"
-        },
-        {
           "id": "step.vera.gaaden",
-          "order": 2,
+          "order": 1,
           "kind": "freeText",
           "title": "Hvad er jeg?",
           "question": "Jeg gemmer mig under jorden, men mit grønne hår kan ses. Jeg er lang og orange, og kaniner siges at holde af mig.",
@@ -568,7 +702,186 @@
       "chapterId": null,
       "nextChapterId": null,
       "placeMediaId": "media.vera.stedet",
-      "moodMediaId": "media.vera.stedet"
+      "moodMediaId": "media.vera.stedet",
+      "cards": [
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.1",
+          "order": 1,
+          "mediaId": "media.vera.stedet",
+          "text": "Kaninen Vera hygger sig i sit bur. Hun hopper rundt, snuser til græsset og graver små huller i jorden."
+        },
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.2",
+          "order": 2,
+          "mediaId": "media.vera.stedet",
+          "text": "I dag har hun gravet efter noget særligt. Det er sprødt, orange og gemmer sig normalt under jorden."
+        },
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.3",
+          "order": 3,
+          "mediaId": "media.vera.stedet",
+          "text": "Kan du løse Veras gåde og finde navnet på hendes hemmelige snack?"
+        },
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.4",
+          "order": 4,
+          "mediaId": "media.vera.stedet",
+          "text": "Jeg gemmer mig under jorden, men mit grønne hår kan ses."
+        },
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.5",
+          "order": 5,
+          "mediaId": "media.vera.stedet",
+          "text": "Jeg er lang og orange, og kaniner siges at holde af mig.\nSkriv svaret som ét ord."
+        }
+      ],
+      "thumbnailMediaId": "media.vera.stedet"
+    },
+    {
+      "id": "mission.broen.den-forsvundne-landevej",
+      "slug": "den-forsvundne-landevej",
+      "locationId": "loc.vejle-oest.tirsbaek-broen",
+      "title": "Den forsvundne landevej",
+      "shortTitle": "Landevejen",
+      "teaser": "En gammel bro gemmer stadig retningen på den forsvundne landevej mellem Vejle og Horsens.",
+      "status": "researchReady",
+      "difficulty": 3,
+      "estimatedMinutes": 10,
+      "basePoints": 100,
+      "tags": [
+        "orientering",
+        "historie",
+        "landskab"
+      ],
+      "fictionLabel": "Fiktiv mission baseret på broens dokumenterede historie som del af den gamle vej mellem Vejle og Horsens.",
+      "heroMediaId": null,
+      "narrationMediaId": "media.narration.broen",
+      "sourceIds": [
+        "source.vafo.tirsbaek-broen"
+      ],
+      "steps": [
+        {
+          "id": "step.broen.retningen",
+          "order": 1,
+          "kind": "singleChoice",
+          "title": "Broens retning",
+          "question": "Hvilken retning følger broens passage?",
+          "instruction": "Se langs broens længderetning — ikke stiens nuværende forløb. Budbringeren kom fra Vejle og skulle videre mod Horsens.",
+          "options": [
+            {
+              "id": "opt.broen.nordoest",
+              "label": "Nordøst"
+            },
+            {
+              "id": "opt.broen.sydoest",
+              "label": "Sydøst"
+            },
+            {
+              "id": "opt.broen.nordvest",
+              "label": "Nordvest"
+            },
+            {
+              "id": "opt.broen.sydvest",
+              "label": "Sydvest"
+            }
+          ],
+          "answerRule": {
+            "kind": "exact",
+            "canonicalAnswer": "FACIT-IKKE-FASTLAGT",
+            "acceptedAnswers": [
+              "FACIT-IKKE-FASTLAGT"
+            ],
+            "nearMissResponses": [],
+            "genericIncorrectFeedback": "Den moderne sti kan afvige fra den gamle vej. Brug selve broens længderetning."
+          },
+          "correctFeedback": "Rigtigt. Broen peger stadig den vej, de rejsende gik.",
+          "hintIds": [
+            "hint.broen.1",
+            "hint.broen.2",
+            "hint.broen.3"
+          ]
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint.broen.1",
+          "order": 1,
+          "penaltyPercent": 3,
+          "title": "Hvor",
+          "text": "Se langs broens længderetning. Det er den retning, de rejsende bevægede sig gennem landskabet."
+        },
+        {
+          "id": "hint.broen.2",
+          "order": 2,
+          "penaltyPercent": 4,
+          "title": "Hvordan",
+          "text": "Budbringeren kom fra Vejle og skulle videre mod Horsens. Hvilken vej peger broen i forhold til de to byer?"
+        },
+        {
+          "id": "hint.broen.3",
+          "order": 3,
+          "penaltyPercent": 5,
+          "title": "Næsten løsningen",
+          "text": "Vejle ligger sydvest for broen, og Horsens ligger nord for. Følg passagen den vej, rejsen gik."
+        }
+      ],
+      "completion": {
+        "headline": "Den gamle vej er fundet",
+        "subheadline": "Budbringeren kan fortsætte mod Horsens",
+        "messageLabel": "Landevejens besked",
+        "message": "Broen blev ikke bygget som et monument. Den var en del af hverdagen for mennesker, dyr og vogne på rejsen mellem Vejle og Horsens.",
+        "historyFact": "Broen stammer efter det foreløbige kildegrundlag fra 1700-tallet og blev fundet, da boligområdet Tirsbæk Bakker blev udviklet. Det moderne kvarter skjuler næsten vejen, men broen afslører stadig dens retning."
+      },
+      "storyId": null,
+      "chapterId": null,
+      "nextChapterId": null,
+      "placeMediaId": null,
+      "moodMediaId": "media.broen.stemning",
+      "cards": [
+        {
+          "id": "card.den-forsvundne-landevej.1",
+          "order": 1,
+          "mediaId": "media.broen.stemning",
+          "text": "Foran jer ligger en gammel bro.\nI dag er den en del af et fredeligt stisystem."
+        },
+        {
+          "id": "card.den-forsvundne-landevej.2",
+          "order": 2,
+          "mediaId": "media.broen.stemning",
+          "text": "Men for mere end 200 år siden førte vejen her videre mellem Vejle og Horsens."
+        },
+        {
+          "id": "card.den-forsvundne-landevej.3",
+          "order": 3,
+          "mediaId": "media.broen.stemning",
+          "text": "En budbringer red gennem landskabet med en vigtig besked. Da han nåede broen, brød et voldsomt uvejr løs."
+        },
+        {
+          "id": "card.den-forsvundne-landevej.4",
+          "order": 4,
+          "mediaId": "media.broen.stemning",
+          "text": "Regnen ødelagde hans kort, og den gamle landevej forsvandt i mørket."
+        },
+        {
+          "id": "card.den-forsvundne-landevej.5",
+          "order": 5,
+          "mediaId": "media.broen.stemning",
+          "text": "Kun broen husker stadig, hvilken vej han skulle fortsætte."
+        },
+        {
+          "id": "card.den-forsvundne-landevej.6",
+          "order": 6,
+          "mediaId": "media.broen.stemning",
+          "text": "Hvilken retning følger broens passage?\nSe langs broens længderetning — ikke stiens nuværende forløb."
+        },
+        {
+          "id": "card.den-forsvundne-landevej.7",
+          "order": 7,
+          "mediaId": "media.broen.stemning",
+          "text": "Budbringeren kom fra Vejle og skulle videre mod Horsens."
+        }
+      ],
+      "thumbnailMediaId": "media.broen.stemning"
     }
   ],
   "media": [
@@ -621,6 +934,84 @@
       "expiresAt": null,
       "mediaType": "image",
       "manipulation": "Bearbejdet for stemningens skyld: blåtime, tåge og lyssætning er forstærket, og detektivrekvisitterne i forgrunden er tilføjet. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+    },
+    {
+      "id": "media.narration.boelgen",
+      "filename": "narration-boelgen.m4a",
+      "altText": "Fortællerstemme, der læser introduktionen til Bølgen op.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "aiGenerated",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "expiresAt": null,
+      "mediaType": "audio",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+    },
+    {
+      "id": "media.narration.fjordenhus",
+      "filename": "narration-fjordenhus.m4a",
+      "altText": "Fortællerstemme, der læser introduktionen til Fjordenhus op.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "aiGenerated",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "expiresAt": null,
+      "mediaType": "audio",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+    },
+    {
+      "id": "media.narration.transmission",
+      "filename": "narration-transmission.m4a",
+      "altText": "Fortællerstemme, der læser introduktionen til Den grønne transmission op.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "aiGenerated",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "expiresAt": null,
+      "mediaType": "audio",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+    },
+    {
+      "id": "media.narration.vera",
+      "filename": "narration-vera.m4a",
+      "altText": "Fortællerstemme, der læser introduktionen til Veras hemmelige snack op.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "aiGenerated",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "expiresAt": null,
+      "mediaType": "audio",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+    },
+    {
+      "id": "media.narration.broen",
+      "filename": "narration-broen.m4a",
+      "altText": "Fortællerstemme, der læser introduktionen til Den forsvundne landevej op.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "aiGenerated",
+      "restrictions": "MÅ IKKE UDGIVES, før rettighederne er afklaret.",
+      "expiresAt": null,
+      "mediaType": "audio",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+    },
+    {
+      "id": "media.broen.stemning",
+      "filename": "broen.jpg",
+      "altText": "En tåget skovbund i skumringen. Store sten kanter et lavt vandløb, og en sti løber ind mellem træerne bagved.",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Intern test — ikke rettighedsafklaret til udgivelse",
+      "credit": "Byens Gåder",
+      "kind": "enhanced",
+      "restrictions": "MÅ IKKE UDGIVES. Billedet viser ikke broen og kan ikke bruges til at orientere spilleren på stedet.",
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Bearbejdet for stemningens skyld: tåge, mørke og lyssætning er forstærket. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
     }
   ],
   "sources": [
@@ -664,6 +1055,13 @@
       "title": "Kaninen Vera på Frydenlund 98",
       "publisher": "Byens Gåder",
       "url": "https://byensgaader.dk/kilder/frydenlund98-vera",
+      "kind": "other"
+    },
+    {
+      "id": "source.vafo.tirsbaek-broen",
+      "title": "Gammel bro fra 1700-tallet er fundet i nybyggerkvarter",
+      "publisher": "Vejle Amts Folkeblad",
+      "url": "https://vafo.dk/vejle/gammel-bro-fra-1700-tallet-er-fundet-i-nybyggerkvarter",
       "kind": "other"
     }
   ]

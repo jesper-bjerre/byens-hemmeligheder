@@ -31,6 +31,22 @@ enum LaunchArguments {
     /// `-BHEnforceReplayBlock` lader en UI-test køre release-reglen i en
     /// debugbygning. Uden den kunne spærringen kun efterprøves i hånden på en
     /// udgivelsesbygning — altså i praksis aldrig.
+    /// Om en opgave må startes uanset afstand.
+    ///
+    /// **I Debug: ja.** En quizmaster skal kunne åbne hvilken som helst opgave
+    /// uden først at simulere turen derhen. Gåsimuleringen er der stadig — den
+    /// er bare ikke længere en forudsætning for at komme i gang.
+    ///
+    /// **I Release: nej, ubetinget.** Forfatningens princip I siger, at stedet
+    /// *er* spillet. Se `#else`-grenen: værdien er en konstant, ikke et opslag
+    /// i `arguments`.
+    ///
+    /// `-BHEnforcePresenceGate` lader en UI-test køre release-reglen i en
+    /// debugbygning, så princip I stadig efterprøves maskinelt.
+    static var allowsStartingAnywhere: Bool {
+        !ProcessInfo.processInfo.arguments.contains("-BHEnforcePresenceGate")
+    }
+
     static var allowsMissionReplay: Bool {
         !ProcessInfo.processInfo.arguments.contains("-BHEnforceReplayBlock")
     }
@@ -77,6 +93,9 @@ enum LaunchArguments {
 
     /// En løst gåde spilles aldrig om i en udgivelsesbygning.
     static let allowsMissionReplay = false
+
+    /// Stedet er spillet. En opgave startes aldrig hjemmefra i en udgivelse.
+    static let allowsStartingAnywhere = false
 
     #endif
 }

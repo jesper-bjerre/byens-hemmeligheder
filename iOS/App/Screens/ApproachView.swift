@@ -67,6 +67,8 @@ struct ApproachView: View {
                         .foregroundStyle(BHColor.inkMuted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+
+                dwellCountdown
             }
         }
         .accessibilityElement(children: .combine)
@@ -85,6 +87,37 @@ struct ApproachView: View {
             .accessibilityHidden(true)
     }
 
+    /// Nedtællingen, mens gaten venter på, at spilleren står stille.
+    ///
+    /// Tallene fandtes hele tiden i ``PresenceState/dwelling(creditSeconds:requiredSeconds:)``
+    /// — der stod bare "Bliv stående et øjeblik". Et øjeblik er ikke en enhed,
+    /// og uden at kunne se, at der sker noget, ligner ventetiden en app, der har
+    /// hængt sig.
+    @ViewBuilder
+    private var dwellCountdown: some View {
+        if case .dwelling(let credit, let required) = engine.presence, required > 0 {
+            let remaining = max(0, Int((required - credit).rounded(.up)))
+            ZStack {
+                Circle()
+                    .stroke(BHColor.separator, lineWidth: 8)
+                Circle()
+                    .trim(from: 0, to: min(1, credit / required))
+                    .stroke(BHColor.accent, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(.linear(duration: 0.3), value: credit)
+                Text("\(remaining)")
+                    .font(BHFont.display)
+                    .foregroundStyle(BHColor.ink)
+                    .monospacedDigit()
+            }
+            .frame(width: 96, height: 96)
+            .frame(maxWidth: .infinity)
+            // Ringen er dekoration; tallet står allerede i statusteksten.
+            .accessibilityHidden(true)
+            .accessibilityIdentifier("approach.countdown")
+        }
+    }
+
     private var bearing: Double? {
         switch engine.presence {
         case .tooFar(_, let bearing), .approaching(_, let bearing): bearing
@@ -96,8 +129,8 @@ struct ApproachView: View {
         switch engine.presence {
         case .tooFar(let distance, _), .approaching(let distance, _):
             "Cirka \(max(1, Int(distance.rounded()))) meter tilbage"
-        case .dwelling:
-            "Bliv stående et øjeblik"
+        case .dwelling(let credit, let required):
+            "Bliv stående — \(max(0, Int((required - credit).rounded(.up)))) sekunder tilbage"
         case .verified:
             "Du står på stedet"
         default:

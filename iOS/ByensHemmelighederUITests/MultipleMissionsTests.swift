@@ -21,7 +21,7 @@ final class MultipleMissionsTests: FlowTestCase {
 
     /// Lukker det kort, der åbner sig selv ved ankomst.
     private func dismissArrivalCard(in app: XCUIApplication) {
-        let close = app.buttons["preview.close"]
+        let close = app.buttons["preview.dismiss"]
         if close.waitForExistence(timeout: 5) {
             close.tap()
         }

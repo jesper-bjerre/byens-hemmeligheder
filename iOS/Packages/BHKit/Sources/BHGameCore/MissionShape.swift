@@ -13,10 +13,12 @@ import Foundation
 ///
 /// Formen er derfor skrevet ned og efterprøves maskinelt. En opgave er:
 ///
-/// 1. ét fortællende trin, der sætter stemningen
+/// 1. en bunke kort — hvert et billede med lidt tekst, det første med
+///    introduktionen
 /// 2. ét spørgsmål med ét svar
 ///
-/// Intet andet. Det, der skiller opgaverne, er **data** — teksten, billederne,
+/// Intet andet. Det fortællende trin er væk: fortællingen er kort 1, og hele
+/// opgaven ligger nu på én side. Det, der skiller opgaverne, er **data** — teksten, billederne,
 /// svaret — aldrig strukturen og aldrig skærmbilledet.
 ///
 /// ## Hvorfor det betyder noget nu
@@ -38,24 +40,57 @@ public enum MissionShape {
     /// Antallet af hints. Uændret fra FR-017.
     public static let hintCount = 3
 
+    /// Hvor lang et korts tekst må være.
+    ///
+    /// Teksten ligger som overlay hen over billedets nederste kant. Overlayet
+    /// kan kun bære det, der er plads til — en længere tekst blev klippet,
+    /// først usynligt og siden afvist af tilgængelighedsauditten ved de store
+    /// skriftstørrelser.
+    ///
+    /// Grænsen er fundet ved måling, ikke ved skøn: 173 tegn klippede, og et
+    /// kort på under 110 bestod. Er en tekst for lang, er svaret at dele den
+    /// over flere kort — ikke at stryge ord.
+    public static let maximumCardTextLength = 110
+
+    /// Markerer et facit, der endnu ikke er fastlagt.
+    ///
+    /// Et opgavedokument kan være færdigt på alt andet end svaret: "Den
+    /// forsvundne landevej" venter på, at broens retning bliver målt i felten.
+    /// Opgaven skal kunne ligge i pakken med sin fortælling, sine hints og sin
+    /// stemme — men den må aldrig nå en spiller.
+    ///
+    /// Sentinellen er selv et gyldigt svar, så alle de øvrige invarianter
+    /// holder: kontrakten kræver mindst ét accepteret svar, og V-02 kræver, at
+    /// det kanoniske svar bedømmes korrekt af sin egen regel. Prisen er, at
+    /// "uløselig" ikke længere kan aflæses af en tom liste — derfor denne
+    /// konstant og reglen nedenfor.
+    public static let unsetFacit = "FACIT-IKKE-FASTLAGT"
+
     public enum Violation: Hashable, Sendable, CustomStringConvertible {
-        case noNarrativeStep
+        case noCards
+        /// Teksten er for lang til overlayet og vil blive klippet.
+        case cardTextTooLong(cardId: String, length: Int)
         case wrongStepCount(Int)
         case noChallengeStep
         case multipleChallengeSteps(Int)
         case unknownStepKind(String)
         case wrongChoiceCount(stepId: String, count: Int)
         case wrongHintCount(Int)
+        /// Opgaven kan spilles, men facit er ikke fastlagt. Så står spilleren
+        /// ved stedet uden nogen vej videre.
+        case playableWithoutAnswer
         /// Stemningsbilledet skal være mærket som AI-genereret, og
         /// stedbilledet må ikke være det.
         case misclassifiedMedia(mediaId: String, expected: String)
 
         public var description: String {
             switch self {
-            case .noNarrativeStep:
-                "mangler et fortællende trin"
+            case .noCards:
+                "har ingen kort — der skal mindst være ét med introduktionen"
+            case .cardTextTooLong(let cardId, let length):
+                "kortet '\(cardId)' har \(length) tegn — grænsen er \(maximumCardTextLength). Del teksten over flere kort."
             case .wrongStepCount(let count):
-                "har \(count) trin — formen er præcis 2: fortælling og spørgsmål"
+                "har \(count) trin — formen er præcis 1: spørgsmålet"
             case .noChallengeStep:
                 "har intet spørgsmål at svare på"
             case .multipleChallengeSteps(let count):
@@ -66,6 +101,8 @@ public enum MissionShape {
                 "trinnet '\(stepId)' har \(count) svarmuligheder — formen er \(choiceCount)"
             case .wrongHintCount(let count):
                 "har \(count) hints — formen er \(hintCount)"
+            case .playableWithoutAnswer:
+                "kan spilles, men facit er ikke fastlagt — den er uløselig"
             case .misclassifiedMedia(let mediaId, let expected):
                 "mediet '\(mediaId)' skulle være \(expected)"
             }
@@ -83,12 +120,16 @@ public enum MissionShape {
         var found: [Violation] = []
 
         let steps = mission.orderedSteps
-        if steps.count != 2 {
+        if steps.count != 1 {
             found.append(.wrongStepCount(steps.count))
         }
 
-        if !steps.contains(where: { if case .narrative = $0 { true } else { false } }) {
-            found.append(.noNarrativeStep)
+        if mission.orderedCards.isEmpty {
+            found.append(.noCards)
+        }
+
+        for card in mission.orderedCards where card.text.count > maximumCardTextLength {
+            found.append(.cardTextTooLong(cardId: card.id, length: card.text.count))
         }
 
         let challenges = steps.filter { $0.answerRule != nil }
@@ -109,6 +150,20 @@ public enum MissionShape {
 
         if mission.hints.count != hintCount {
             found.append(.wrongHintCount(mission.hints.count))
+        }
+
+        // En opgave uden facit må ikke kunne nå spilleren.
+        //
+        // "Den forsvundne landevej" er skrevet færdig på alt andet end svaret:
+        // opgavedokumentet siger, at den rigtige retning først kan fastlægges
+        // efter opmåling i felten. Den ligger derfor i pakken som
+        // ``MissionStatus/researchReady`` og vises ikke. Denne regel er det,
+        // der gør, at et uskyldigt statusskift ikke sender en uløselig opgave
+        // ud til en familie, der står ved en bro i regnvejr.
+        let isPlayable = mission.status.known == .fieldTestReady || mission.status.known == .publishReady
+        let accepted = mission.challengeStep?.answerRule?.acceptedAnswers ?? []
+        if isPlayable, accepted.isEmpty || accepted.contains(unsetFacit) {
+            found.append(.playableWithoutAnswer)
         }
 
         // Stedbilledet er et orienteringsmiddel. Er det AI-genereret, kan det

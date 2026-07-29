@@ -43,6 +43,8 @@ class FlowTestCase: XCTestCase {
     enum Vantage {
         static let boelgen = (latitude: 55.7089, longitude: 9.5481)
         static let fjordenhus = (latitude: 55.7069, longitude: 9.5518)
+        /// To opgaver deler denne adresse — derfor spredes markørerne her.
+        static let frydenlund98 = (latitude: 55.734897, longitude: 9.620270)
     }
 
     // MARK: - Skridt i gennemløbet
@@ -82,10 +84,10 @@ class FlowTestCase: XCTestCase {
         }
 
         pin.tap()
-        // Der ventes på lukkeknappen og ikke på "Start opgave": den sidste
-        // findes ikke på en løst opgave, og så ville hvert eneste tryk her
-        // koste tre sekunder og et overflødigt gentryk.
-        if !app.buttons["preview.close"].waitForExistence(timeout: 3) {
+        // Der ventes på "Tilbage til kortet" og ikke på "Start opgave": den
+        // sidste findes ikke på en løst opgave, og så ville hvert eneste tryk
+        // her koste tre sekunder og et overflødigt gentryk.
+        if !app.buttons["preview.dismiss"].waitForExistence(timeout: 3) {
             pin.tap()
         }
     }
@@ -97,41 +99,37 @@ class FlowTestCase: XCTestCase {
     /// gennemløbstestene læser som rejsen gør.
     func startMission(in app: XCUIApplication) {}
 
-    /// Venter på, at gaten verificerer og det første trin åbner.
+    /// Venter på, at gaten verificerer og opgavesiden åbner.
+    ///
+    /// Der ventes på hint-knappen. Den står på **hver** opgaveside, uanset om
+    /// der svares med kode, fritekst eller fire valgmuligheder — modsat
+    /// svarknappen, som ikke findes, når svaret er et valg. Ét kendemærke er
+    /// nok, når siden er den samme for alle opgaver.
     func waitForPresence(in app: XCUIApplication) {
-        let narrative = app.buttons["narrative.continue"]
+        let page = app.buttons["hints.open"]
         let start = app.buttons["approach.start"]
 
         let deadline = Date().addingTimeInterval(Self.presenceTimeout)
         while Date() < deadline {
-            if narrative.exists { return }
+            if page.exists { return }
             if start.exists {
                 start.tap()
                 return
             }
-            _ = narrative.waitForExistence(timeout: 2)
+            _ = page.waitForExistence(timeout: 2)
         }
         XCTFail("Positionen blev ikke bekræftet inden for \(Int(Self.presenceTimeout)) sekunder")
     }
 
-    /// Går videre fra den narrative intro.
+    /// Venter på, at opgavesiden er fremme.
     ///
-    /// **Ét tryk, aldrig to.** Et gentagelsesforsøg blev prøvet og forkastet:
-    /// når skærmen allerede var skiftet, landede andet tryk på det næste trin
-    /// og ramte en anden knap. Kuren var værre end sygdommen.
-    ///
-    /// Ventetiden på `isHittable` er den rigtige beskyttelse — knappen kan
-    /// findes, mens visningen stadig glider ind, og et tryk midt i en overgang
-    /// lander ingen steder.
+    /// Der var før en "Jeg er klar"-knap mellem fortællingen og spørgsmålet.
+    /// Den er væk: hele opgaven ligger på én side med kortene øverst og svaret
+    /// nederst. Metoden er bevaret, så gennemløbstestene stadig læser som
+    /// rejsen gør — men den trykker ikke længere på noget.
     func continueNarrative(in app: XCUIApplication) {
-        let button = app.buttons["narrative.continue"]
-        XCTAssertTrue(button.waitForExistence(timeout: Self.uiTimeout), "Den narrative intro mangler")
-
-        let deadline = Date().addingTimeInterval(5)
-        while !button.isHittable, Date() < deadline {
-            Thread.sleep(forTimeInterval: 0.2)
-        }
-        button.tap()
+        let cards = app.scrollViews.firstMatch
+        XCTAssertTrue(cards.waitForExistence(timeout: Self.uiTimeout), "Opgavesiden kom ikke frem")
     }
 
     func chooseOption(_ label: String, in app: XCUIApplication) {

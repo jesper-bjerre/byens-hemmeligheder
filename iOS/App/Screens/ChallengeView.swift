@@ -3,32 +3,38 @@ import BHDesignSystem
 import BHGameCore
 import SwiftUI
 
-/// Opgaveskærmen. **Én** skærm for alle opgaver.
+/// Opgaveskærmen. **Én** side for hele opgaven.
 ///
-/// ## Kun svarkontrollen skifter
+/// ## Kortene er siden
 ///
-/// Skærmen var før tre skærme i forklædning: `singleChoice`, `numericCode` og
-/// `freeText` byggede hver sit layout. Følgerne var ikke besluttet af nogen —
-/// en opgave med svarmuligheder viste slet intet billede, mens en kodeopgave
-/// viste tre bevis-kort. Nu tegnes hovedet og billedet ét sted, og kun det
-/// felt, man svarer i, afhænger af typen.
+/// Formen er lånt fra escape room-brætspil: gåden ligger i en bunke kort, man
+/// breder ud på bordet. Hvert kort er et billede med lidt tekst i bunden.
+/// Billedet er det primære og får hele bredden.
 ///
-/// Alt kommer fra kontrakten: spørgsmålet, afgrænsningen, svarmulighederne og
-/// feltets etiketter. Skal denne fil ændres for at tilføje en opgave, er formen
-/// brudt — se ``MissionShape``.
+/// Der var før to skærme — en fortællende intro med en "Jeg er klar"-knap og
+/// derefter spørgsmålet. Knappen er væk, fordi der ikke længere er noget at gå
+/// videre til: alt ligger på samme side, og fortællingen begynder med det
+/// samme.
 ///
-/// ## De to billeder
+/// ## Hvad der bevidst **ikke** står her
 ///
-/// Stedbilledet hører til her: det viser, hvor spilleren fysisk skal stå og
-/// kigge hen, mens svaret findes. Stemningsbilledet hører til introen og vises
-/// ikke igen — det bærer ingen information, og gentaget ville det bare skubbe
-/// spørgsmålet ned under skærmkanten.
+/// - **Opgavens titel.** Den står i navigationslinjen. To gange er én for meget.
+/// - **Fiktionsmærkatet.** Det hørte til den gamle introskærm, hvor teksten
+///   kunne forveksles med et historisk dokument. Kortene er billeder med
+///   billedtekst, og mærkatet stjal plads fra det, siden handler om.
+///
+/// ## Kun svarkontrollen afhænger af svartypen
+///
+/// Alt andet kommer fra kontrakten. Skal denne fil ændres for at tilføje en
+/// opgave, er formen brudt — se ``MissionShape``.
 struct ChallengeView: View {
     let mission: Mission
     let step: Step
 
     @Environment(MissionEngine.self) private var engine
     @Environment(Router.self) private var router
+    @Environment(AmbiencePlayer.self) private var ambience
+    @Environment(NarrationPlayer.self) private var narration
 
     /// Samme ord på svarknappen i alle trintyper.
     ///
@@ -50,64 +56,50 @@ struct ChallengeView: View {
     @State private var typedCode = ""
     @State private var typedText = ""
     @State private var selectedOptionId: String?
+    @State private var zoomedCard: MissionCard?
     @FocusState private var codeFieldFocused: Bool
     @FocusState private var textFieldFocused: Bool
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: BHSpacing.loose) {
-                if let prompt = step.prompt {
-                    header(prompt)
+            VStack(alignment: .leading, spacing: BHSpacing.regular) {
+                ForEach(mission.orderedCards) { card in
+                    MissionCardView(card: card) { zoomedCard = card }
                 }
 
-                // Det realistiske foto: hvor står jeg, og hvad kigger jeg på?
-                if let placeMediaId = mission.placeMediaId {
-                    MissionHeroImage(mediaId: placeMediaId)
+                // Svar og hint i bunden — efter kortene, som i spillet.
+                VStack(alignment: .leading, spacing: BHSpacing.snug) {
+                    answerControl
+                    feedback
+                    hintButton
                 }
-
-                answerControl
-
-                feedback
-                hintButton
+                .padding(.top, BHSpacing.snug)
             }
             .padding(BHSpacing.regular)
         }
         .background(BHColor.canvas)
         .navigationTitle(mission.shortTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .fullScreenCover(item: $zoomedCard) { card in
+            MissionCardZoomView(card: card) { zoomedCard = nil }
+        }
         .task {
             await engine.viewStep(step, in: mission)
         }
-    }
-
-    // MARK: - Spørgsmålet
-
-    /// Ét hoved for alle svartyper.
-    private func header(_ prompt: ChallengePrompt) -> some View {
-        VStack(alignment: .leading, spacing: BHSpacing.snug) {
-            if let eyebrow = prompt.eyebrow {
-                Text(eyebrow)
-                    .font(BHFont.eyebrow)
-                    .foregroundStyle(BHColor.accent)
-                    .accessibilityLabel(eyebrow.lowercased())
-            }
-            Text(prompt.title)
-                .font(BHFont.title)
-                .foregroundStyle(BHColor.ink)
-            if let question = prompt.question {
-                Text(question)
-                    .font(BHFont.heading)
-                    .foregroundStyle(BHColor.ink)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            // Afgrænsningen: hvad skal ignoreres (FR-009).
-            Text(prompt.instruction)
-                .font(BHFont.body)
-                .foregroundStyle(BHColor.inkMuted)
-                .fixedSize(horizontal: false, vertical: true)
+        // Fortællingen begynder med det samme. Den er en del af oplevelsen,
+        // ikke en valgmulighed — men den følger højttalerknappen i headeren,
+        // så spilleren har ét sted at slå al lyd fra.
+        .task(id: mission.id) {
+            await narration.speak(
+                engine.pack?.media(id: mission.narrationMediaId ?? ""),
+                forMission: mission.id,
+                isEnabled: ambience.isEnabled
+            )
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("challenge.header")
+        .onDisappear { narration.stop() }
+        .onChange(of: narration.isSpeaking) { _, speaking in
+            ambience.duck(speaking)
+        }
     }
 
     // MARK: - Svaret

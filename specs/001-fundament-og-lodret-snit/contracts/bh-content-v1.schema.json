@@ -410,6 +410,23 @@
           ],
           "description": "AI-genereret stemningsbillede. Må aldrig bære information, opgaven skal løses med."
         },
+        "thumbnailMediaId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Miniaturen på kortets opgaveoverlay. Udfyldes af quizmasteren."
+        },
+        "cards": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/missionCard"
+          },
+          "description": "Opgavens kort — billede og lidt tekst, som i et escape room-spil."
+        },
         "narrationMediaId": {
           "type": [
             "string",
@@ -960,6 +977,35 @@
             "municipal",
             "other"
           ]
+        }
+      }
+    },
+    "missionCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "order",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mediaId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Kortets billede. Billedet er det primære; teksten står i bunden."
+        },
+        "text": {
+          "type": "string",
+          "description": "Teksten i bunden af kortet. Det første kort bærer introduktionen."
         }
       }
     }

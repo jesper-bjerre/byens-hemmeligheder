@@ -31,15 +31,39 @@ struct MissionShapeTests {
         }
     }
 
-    @Test("Hver opgave har præcis ét fortællende trin og ét spørgsmål")
-    func everyMissionHasOneNarrativeAndOneChallenge() throws {
+    @Test("Hver opgave har kort og præcis ét spørgsmål")
+    func everyMissionHasCardsAndOneChallenge() throws {
         let pack = try ContractFixtures.contentPack()
 
         for mission in pack.missions {
-            let steps = mission.orderedSteps
-            #expect(steps.count == 2, "\(mission.id) har \(steps.count) trin")
-            #expect(steps.first?.kind == NarrativeStep.kind, "\(mission.id) begynder ikke med fortællingen")
+            #expect(mission.orderedSteps.count == 1, "\(mission.id) har \(mission.orderedSteps.count) trin")
             #expect(mission.challengeStep != nil, "\(mission.id) har intet spørgsmål")
+            #expect(!mission.orderedCards.isEmpty, "\(mission.id) har ingen kort")
+        }
+    }
+
+    /// Kort 1 bærer introduktionen og er derfor den længste tekst.
+    @Test("Første kort har introduktionen")
+    func theFirstCardCarriesTheIntroduction() throws {
+        let pack = try ContractFixtures.contentPack()
+
+        for mission in pack.missions {
+            let first = try #require(mission.orderedCards.first)
+            #expect(!first.text.isEmpty, "\(mission.id): første kort har ingen tekst")
+            #expect(first.order == 1, "\(mission.id): kortene begynder ikke ved 1")
+        }
+    }
+
+    /// Miniaturen må aldrig mangle — så ville opgavekortet på kortet stå tomt.
+    @Test("Hver opgave har en miniature at vise på kortet")
+    func everyMissionResolvesAThumbnail() throws {
+        let pack = try ContractFixtures.contentPack()
+
+        for mission in pack.missions {
+            #expect(
+                mission.resolvedThumbnailMediaId != nil,
+                "\(mission.id) har intet billede at vise på kortet"
+            )
         }
     }
 
@@ -68,6 +92,43 @@ struct MissionShapeTests {
         }
     }
 
+    // MARK: - Ufærdige opgaver må ikke nå spilleren
+
+    /// "Den forsvundne landevej" ligger i pakken uden facit. Det er tilladt —
+    /// men kun så længe den ikke kan spilles.
+    @Test("En opgave uden fastlagt facit er ikke spilbar")
+    func aMissionWithoutAFacitIsNotPlayable() throws {
+        let pack = try ContractFixtures.contentPack()
+
+        for mission in pack.missions {
+            let accepted = mission.challengeStep?.answerRule?.acceptedAnswers ?? []
+            guard accepted.contains(MissionShape.unsetFacit) else { continue }
+
+            #expect(
+                mission.status != .known(.fieldTestReady) && mission.status != .known(.publishReady),
+                "\(mission.id) kan spilles, men har intet facit"
+            )
+        }
+    }
+
+    /// Positiv kontrol: reglen skal faktisk fyre, hvis statussen skiftes.
+    ///
+    /// Uden den beviser testen ovenfor kun, at ingen opgave *tilfældigvis* står
+    /// forkert lige nu — ikke at noget ville stoppe den, der skiftede den.
+    @Test("Skiftes en opgave uden facit til felttestklar, fanges det")
+    func promotingAMissionWithoutAFacitIsCaught() throws {
+        let pack = try ContractFixtures.contentPack()
+        let unfinished = try #require(
+            pack.missions.first {
+                ($0.challengeStep?.answerRule?.acceptedAnswers ?? []).contains(MissionShape.unsetFacit)
+            },
+            "Ingen opgave i pakken mangler facit — testen dækker intet"
+        )
+
+        let promoted = unfinished.copy(status: .known(.fieldTestReady))
+        #expect(MissionShape.violations(of: promoted).contains(.playableWithoutAnswer))
+    }
+
     // MARK: - Positive kontroller
 
     /// Uden disse ville alt ovenfor også bestå, hvis validatoren returnerede
@@ -78,12 +139,12 @@ struct MissionShapeTests {
         let good = try #require(pack.missions.first)
         let extra = good.orderedSteps + [
             .narrative(
-                NarrativeStep(id: "step.ekstra", order: 3, title: "Ekstra", body: "…", continueLabel: "Videre")
+                NarrativeStep(id: "step.ekstra", order: 2, title: "Ekstra", body: "…", continueLabel: "Videre")
             )
         ]
 
         let violations = MissionShape.violations(of: good.copy(steps: extra))
-        #expect(violations.contains(.wrongStepCount(3)))
+        #expect(violations.contains(.wrongStepCount(2)))
     }
 
     @Test("Et valgspørgsmål med tre muligheder afvises")
@@ -109,9 +170,8 @@ struct MissionShapeTests {
 
         let pack = try ContractFixtures.contentPack()
         let good = try #require(pack.missions.first)
-        let narrative = try #require(good.orderedSteps.first)
 
-        let violations = MissionShape.violations(of: good.copy(steps: [narrative, .singleChoice(step)]))
+        let violations = MissionShape.violations(of: good.copy(steps: [.singleChoice(step)]))
         #expect(violations.contains(MissionShape.Violation.wrongChoiceCount(stepId: "step.tre", count: 3)))
     }
 
@@ -137,7 +197,11 @@ struct MissionShapeTests {
 private extension Mission {
     /// Kopi med enkelte felter ændret. `Mission` har mange felter, og testene
     /// skal kun variere ét ad gangen.
-    func copy(steps: [Step]? = nil, placeMediaId: String? = nil) -> Mission {
+    func copy(
+        steps: [Step]? = nil,
+        placeMediaId: String? = nil,
+        status: Tolerant<MissionStatus>? = nil
+    ) -> Mission {
         Mission(
             id: id,
             slug: slug,
@@ -145,7 +209,7 @@ private extension Mission {
             title: title,
             shortTitle: shortTitle,
             teaser: teaser,
-            status: status,
+            status: status ?? self.status,
             difficulty: difficulty,
             estimatedMinutes: estimatedMinutes,
             basePoints: basePoints,

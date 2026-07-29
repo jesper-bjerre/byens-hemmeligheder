@@ -106,6 +106,20 @@ final class MissionEngine {
     /// uden at være spærret, og de to må ikke smelte sammen.
     var blocksReplay: Bool { !LaunchArguments.allowsMissionReplay }
 
+    /// Om "Start opgave" må trykkes.
+    ///
+    /// Adskilt fra ``startability(for:)`` med vilje. Den første siger, hvad der
+    /// **er** sandt om afstanden — og bruges stadig af kortet til at afgøre,
+    /// hvornår spilleren er ankommet. Denne siger, hvad man **må**.
+    ///
+    /// I Debug må en quizmaster åbne enhver opgave. Blandede man de to, ville
+    /// hver eneste opgave melde sig som "ankommet", og kortet ville poppe op
+    /// uafbrudt.
+    func canStart(_ mission: Mission) -> Bool {
+        if blocksReplay && isCompleted(mission) { return false }
+        return LaunchArguments.allowsStartingAnywhere || startability(for: mission).canStart
+    }
+
     // MARK: - Session
 
     /// Starter en mission og **binder den til indholdsversionen** (FR-035).

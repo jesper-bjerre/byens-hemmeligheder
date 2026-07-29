@@ -11,6 +11,7 @@ struct ByensHemmelighederApp: App {
     @State private var engine: MissionEngine
     @State private var router = Router()
     @State private var ambience = AmbiencePlayer()
+    @State private var narration = NarrationPlayer()
 
     init() {
         let repository = ContentRepository(source: BundledContentPackSource(bundle: .main))
@@ -65,6 +66,7 @@ struct ByensHemmelighederApp: App {
                 .environment(engine)
                 .environment(router)
                 .environment(ambience)
+                .environment(narration)
                 .tint(BHColor.accent)
         }
     }

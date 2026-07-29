@@ -266,9 +266,16 @@ struct ContentConsistencyTests {
             if mission.status == .known(.publishReady) {
                 #expect(mayBePublishReady, "\(mission.id) er publishReady uden feltbesøg")
             }
+            // Ikke alle opgaver er nået lige langt. "Den forsvundne landevej"
+            // er researchklar: dens facit kan først fastlægges efter opmåling
+            // i felten, og indtil da må den ikke kunne spilles.
+            //
+            // Testen krævede før, at **hver** opgave var fieldTestReady. Det
+            // var en tilfældighed ved feature 001 gjort til en regel, og den
+            // ville have tvunget en ufærdig opgave op i status for at bestå.
             #expect(
-                mission.status == .known(.fieldTestReady),
-                "\(mission.id) forventes fieldTestReady i feature 001"
+                mission.status != .known(.publishReady),
+                "\(mission.id) er publiceringsklar, før felten er besøgt"
             )
             #expect(location.fieldVerified == false, "\(location.id) er ikke besøgt endnu")
         }
@@ -315,7 +322,7 @@ struct ContentConsistencyTests {
                 mission.orderedSteps.contains { $0.answerRule != nil },
                 "\(mission.id) har intet trin med et facit"
             )
-            #expect(mission.orderedSteps.first?.kind == "narrative", "\(mission.id) mangler intro")
+            #expect(!mission.orderedCards.isEmpty, "\(mission.id) mangler introkortet")
         }
     }
 }

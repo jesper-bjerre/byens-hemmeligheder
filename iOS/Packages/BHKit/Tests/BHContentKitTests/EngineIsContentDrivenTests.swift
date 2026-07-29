@@ -95,9 +95,11 @@ struct EngineIsContentDrivenTests {
         for mission in pack.missions {
             #expect(mission.hints.count == 3, "\(mission.id) har ikke tre hints")
             #expect(mission.basePoints > 0, "\(mission.id) har ingen grundpoint")
+            // Fortællingen er ikke længere et trin. Den er kort 1, og hele
+            // opgaven ligger på én side.
             #expect(
-                mission.orderedSteps.first?.kind == "narrative",
-                "\(mission.id) begynder ikke med en fortælling"
+                !mission.orderedCards.isEmpty,
+                "\(mission.id) har ingen kort at brede ud"
             )
             #expect(
                 mission.orderedSteps.contains { $0.answerRule != nil },
@@ -117,6 +119,7 @@ struct EngineIsContentDrivenTests {
         let kinds = Set(pack.missions.flatMap { $0.orderedSteps.map(\.kind) })
 
         #expect(!kinds.contains("unknown"))
-        #expect(kinds.contains("narrative"))
+        // Alle tre svartyper skal kunne afkodes af den app, der shipper.
+        #expect(kinds.isSubset(of: ["singleChoice", "numericCode", "freeText"]))
     }
 }

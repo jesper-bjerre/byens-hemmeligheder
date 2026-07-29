@@ -496,13 +496,18 @@ struct MissionPreviewCard: View {
     @Environment(MissionEngine.self) private var engine
 
     private var startability: MissionStartability { engine.startability(for: mission) }
+    /// Hvad spilleren **må** — ikke hvad der er sandt om afstanden.
+    private var canStart: Bool { engine.canStart(mission) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: BHSpacing.snug) {
-            HStack(alignment: .top) {
-                MissionSummary(mission: mission)
-                closeButton
-            }
+            // Ingen luk-knap i hjørnet. Den optog hele højre side af overlayet
+            // uden at bruge den til noget, og et kryds på 44×44 er i forvejen
+            // det sværeste mål på skærmen at ramme med en tommelfinger.
+            //
+            // Der lukkes i stedet med knappen nedenfor eller ved at trykke ved
+            // siden af kortet — to store mål frem for ét lille.
+            MissionSummary(mission: mission)
 
             // Princip I: stedet er spillet. Knappen er lukket hjemmefra.
             //
@@ -512,10 +517,10 @@ struct MissionPreviewCard: View {
             if !startability.isPermanent {
                 Button("Start opgave", action: onOpen)
                     .buttonStyle(.bhPrimary)
-                    .disabled(!startability.canStart)
-                    .opacity(startability.canStart ? 1 : 0.45)
+                    .disabled(!canStart)
+                    .opacity(canStart ? 1 : 0.45)
                     .accessibilityIdentifier("preview.open")
-                    .accessibilityHint(startability.canStart ? "" : startabilityNote ?? "")
+                    .accessibilityHint(canStart ? "" : startabilityNote ?? "")
             }
 
             if let note = startabilityNote {
@@ -526,6 +531,8 @@ struct MissionPreviewCard: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("preview.note")
             }
+
+            dismissButton
         }
         .padding(BHSpacing.regular)
         .background(
@@ -533,22 +540,28 @@ struct MissionPreviewCard: View {
                 .fill(BHColor.canvas)
                 .shadow(color: .black.opacity(0.18), radius: 16, y: -2)
         )
+        // Gør hele kortet til ét trykmål, så et tryk på en tom flade **i**
+        // kortet ikke falder igennem til kortets egen tryklytter og lukker det
+        // overlay, spilleren lige har åbnet.
+        .contentShape(RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous))
+        .onTapGesture {}
     }
 
-    private var closeButton: some View {
-        Button(action: onClose) {
-            Image(systemName: "xmark")
-                .font(BHFont.body)
-                .foregroundStyle(BHColor.inkMuted)
-                .frame(width: BHMetrics.minimumTapTarget, height: BHMetrics.minimumTapTarget)
-        }
-        .accessibilityLabel("Luk")
-        .accessibilityIdentifier("preview.close")
+    /// Vejen tilbage. Ordene siger, hvor man havner — ikke hvad knappen gør
+    /// ved vinduet.
+    private var dismissButton: some View {
+        Button("Tilbage til kortet", action: onClose)
+            .buttonStyle(.bhSecondary)
+            .accessibilityIdentifier("preview.dismiss")
     }
 
     /// Den lille tekst under knappen. `nil`, når opgaven kan startes.
     private var startabilityNote: String? {
         let place = engine.location(for: mission)?.name ?? "stedet"
+
+        // Må opgaven startes, er der intet at forklare — heller ikke når
+        // afstanden i sig selv ville have lukket knappen.
+        if canStart, !startability.isPermanent { return nil }
 
         switch startability {
         case .ready, .notGated:
@@ -575,49 +588,67 @@ struct MissionSummary: View {
     let mission: Mission
 
     @Environment(MissionEngine.self) private var engine
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Ved de store tilgængelighedsstørrelser lægges billedet over teksten.
+    ///
+    /// Side om side er det ønskede layout og bruger overlayets fulde bredde.
+    /// Men et billede med fast bredde efterlader stadig lige så lidt til
+    /// titlen, og ved AX-størrelserne brækker "Veras hemmelige snack" så i ét
+    /// ord pr. linje. Auditten har fanget netop dét på dette kort før.
+    ///
+    /// Derfor: side om side, indtil teksten bliver så stor, at det ikke længere
+    /// er til at læse — og så under hinanden.
+    private var stacksVertically: Bool { dynamicTypeSize.isAccessibilitySize }
 
     var body: some View {
         BHCard {
-            VStack(alignment: .leading, spacing: BHSpacing.tight) {
-                // Miniaturen fra designforslaget: et stående billede af stedet,
-                // så spilleren kan se, hvad hen skal lede efter, allerede fra
-                // kortet.
-                //
-                // Den ligger **over** teksten og ikke ved siden af. Designet
-                // viser dem side om side, men ved de store
-                // tilgængelighedsstørrelser klemmer en fast billedbredde
-                // titlen ud i én bogstav pr. linje — præcis den fejl,
-                // auditten allerede har fanget her én gang.
-                if let placeMediaId = mission.placeMediaId {
-                    MissionThumbnail(mediaId: placeMediaId)
+            if stacksVertically {
+                VStack(alignment: .leading, spacing: BHSpacing.snug) {
+                    thumbnail
+                    details
                 }
-
-                // Titlen får hele bredden. Stod status ved siden af, ville
-                // titlen blive klemt og klippet ved de store
-                // tilgængelighedsstørrelser — auditten fandt netop dét.
-                Text(mission.title)
-                    .font(BHFont.heading)
-                    .foregroundStyle(BHColor.ink)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Text(mission.teaser)
-                    .font(BHFont.body)
-                    .foregroundStyle(BHColor.inkMuted)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                // Én chip pr. linje — som i designforslaget.
-                //
-                // Et ombrydende layout blev prøvet og forkastet: det giver hver
-                // chip en fast størrelse, og så kan teksten ikke vokse med
-                // Dynamic Type. Tilgængelighedsauditten afviste det med rette.
-                VStack(alignment: .leading, spacing: BHSpacing.tight) { metadata }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                HStack(alignment: .top, spacing: BHSpacing.regular) {
+                    thumbnail
+                    details
+                }
             }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Self.accessibilityLabel(for: mission, engine: engine))
+        .accessibilityIdentifier("preview.summary")
+    }
+
+    @ViewBuilder
+    private var thumbnail: some View {
+        if let placeMediaId = mission.placeMediaId {
+            MissionThumbnail(mediaId: placeMediaId)
+        }
+    }
+
+    private var details: some View {
+        VStack(alignment: .leading, spacing: BHSpacing.tight) {
+            Text(mission.title)
+                .font(BHFont.heading)
+                .foregroundStyle(BHColor.ink)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(mission.teaser)
+                .font(BHFont.body)
+                .foregroundStyle(BHColor.inkMuted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Én chip pr. linje — som i designforslaget.
+            //
+            // Et ombrydende layout blev prøvet og forkastet: det giver hver
+            // chip en fast størrelse, og så kan teksten ikke vokse med
+            // Dynamic Type. Tilgængelighedsauditten afviste det med rette.
+            VStack(alignment: .leading, spacing: BHSpacing.tight) { metadata }
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     @ViewBuilder

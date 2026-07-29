@@ -27,6 +27,15 @@ import SwiftUI
 /// ændring af `project.pbxproj`.
 struct MissionHeroImage: View {
     let mediaId: String
+    /// Fylder hele bredden uden højdeloft. Bruges af opgavekortene, hvor
+    /// billedet **er** indholdet og ikke en illustration ved siden af tekst.
+    var fillsWidth = false
+    /// Uden mærkat og uden hjørneafrunding — den fuldskærmsvisning, hvor
+    /// spilleren kan zoome. Mærkaten står på kortet, man kom fra.
+    var isZoomable = false
+    /// Uden egen hjørneafrunding. Kortet runder hele stakken — billede og
+    /// tekstbjælke — så billedet må ikke runde sin nederste kant selv.
+    var isSquared = false
 
     @Environment(MissionEngine.self) private var engine
     @State private var image: Image?
@@ -39,7 +48,7 @@ struct MissionHeroImage: View {
                 VStack(alignment: .leading, spacing: BHSpacing.tight) {
                     imageOrPlaceholder(asset)
 
-                    if asset.kind == .known(.aiGenerated) {
+                    if asset.kind == .known(.aiGenerated), !isZoomable {
                         Label("AI-genereret billede", systemImage: "sparkles")
                             .font(BHFont.caption)
                             .foregroundStyle(BHColor.inkMuted)
@@ -64,8 +73,13 @@ struct MissionHeroImage: View {
             image
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: .infinity, maxHeight: 340)
-                .clipShape(RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous))
+                .frame(maxWidth: .infinity, maxHeight: fillsWidth ? nil : 340)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: (isZoomable || isSquared) ? 0 : BHRadius.card,
+                        style: .continuous
+                    )
+                )
                 .accessibilityLabel(asset.altText)
                 .accessibilityAddTraits(.isImage)
         } else {

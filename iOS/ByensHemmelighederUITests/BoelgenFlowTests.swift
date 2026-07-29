@@ -18,12 +18,17 @@ final class BoelgenFlowTests: FlowTestCase {
         tapMission(missionId, in: app)
         waitForPresence(in: app)
 
-        // Fiktionsmarkeringen står på den narrative intro (FR-007).
-        XCTAssertTrue(
+        // Fiktionsmarkeringen stod her før. Den er fjernet fra opgavesiden
+        // efter redaktionel beslutning: billedet skal have pladsen.
+        //
+        // Bemærk, at FR-007 og forfatningens princip III dermed ikke længere
+        // har noget udtryk i UI'et. `fictionLabel` står stadig i kontrakten og
+        // venter på et nyt sted at bo.
+        XCTAssertFalse(
             app.descendants(matching: .any)
                 .containing(NSPredicate(format: "label CONTAINS[c] %@", "Fiktiv mission")).firstMatch
-                .waitForExistence(timeout: Self.uiTimeout),
-            "Fiktionsmarkeringen mangler på introen"
+                .waitForExistence(timeout: 2),
+            "Fiktionsmarkeringen står stadig på opgavesiden"
         )
 
         continueNarrative(in: app)

@@ -171,9 +171,9 @@ struct DevLocationPanel: View {
                                     .foregroundStyle(BHColor.inkMuted)
                             }
 
-                            Button("Sæt mig 200 m væk") {
+                            Button("Sæt mig 20 m væk") {
                                 provider?.teleport(
-                                    to: ScriptedLocationProvider.offset(vantage, northMetres: 200)
+                                    to: ScriptedLocationProvider.offset(vantage, northMetres: 20)
                                 )
                             }
                             .buttonStyle(.bhSecondary)
