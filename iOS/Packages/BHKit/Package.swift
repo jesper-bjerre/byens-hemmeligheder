@@ -40,7 +40,7 @@ let package = Package(
         .target(
             name: "BHLocationKit",
             dependencies: ["BHContracts", "BHGameCore"],
-            swiftSettings: [.define("BH_DEV_TOOLS", .when(configuration: .debug))]
+            swiftSettings: [.define("BH_DEV_TOOLS")]
         ),
         .target(name: "BHDesignSystem"),
 
@@ -58,7 +58,7 @@ let package = Package(
         .testTarget(
             name: "BHLocationKitTests",
             dependencies: ["BHLocationKit"],
-            swiftSettings: [.define("BH_DEV_TOOLS", .when(configuration: .debug))]
+            swiftSettings: [.define("BH_DEV_TOOLS")]
         ),
     ]
 )

@@ -20,13 +20,76 @@ struct DevLocationPanel: View {
 
     @State private var pace: ScriptedLocationProvider.Pace = .walking
     @State private var poorSignal = false
+    @State private var confirmsReset = false
+    @State private var didReset = false
 
     private var provider: ScriptedLocationProvider? { engine.simulatedLocationProvider }
+
+    /// Nulstiller alt, spilleren har svaret på.
+    ///
+    /// Med bekræftelse, fordi handlingen er endelig: hændelsesloggen er hele
+    /// sandheden om progressionen, og der findes ingen anden kopi at fortryde
+    /// fra. Det er den slags, der skal koste ét ekstra tryk — modsat hint, hvor
+    /// bekræftelsen blev fjernet, fordi den intet beskyttede.
+    private var progressControls: some View {
+        BHCard {
+            VStack(alignment: .leading, spacing: BHSpacing.snug) {
+                Text("Progression")
+                    .font(BHFont.heading)
+                    .foregroundStyle(BHColor.ink)
+
+                Text("Sletter løste gåder, brugte hints og point, så de samme opgaver kan prøves forfra.")
+                    .font(BHFont.body)
+                    .foregroundStyle(BHColor.inkMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(summary)
+                    .font(BHFont.caption)
+                    .foregroundStyle(didReset ? BHColor.success : BHColor.inkMuted)
+                    .accessibilityIdentifier("admin.progress.summary")
+
+                Button("Nulstil alle svar") { confirmsReset = true }
+                    .buttonStyle(.bhSecondary)
+                    .accessibilityIdentifier("admin.reset")
+            }
+        }
+        .confirmationDialog(
+            "Nulstil alle svar?",
+            isPresented: $confirmsReset,
+            titleVisibility: .visible
+        ) {
+            Button("Nulstil", role: .destructive) {
+                Task {
+                    await engine.resetProgress()
+                    didReset = true
+                }
+            }
+            Button("Fortryd", role: .cancel) {}
+        } message: {
+            Text("Alle løste gåder, brugte hints og point slettes. Det kan ikke fortrydes.")
+        }
+    }
+
+    private var summary: String {
+        let solved = engine.playableMissions.filter(engine.isCompleted).count
+        let points = engine.playableMissions.filter(engine.isCompleted)
+            .reduce(0) { $0 + engine.points(for: $1) }
+        if didReset, solved == 0 { return "Nulstillet. Ingen løste gåder." }
+        return "\(solved) løste gåder, \(points) point."
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: BHSpacing.loose) {
+                    // Nulstillingen står **uden for** provider-betingelsen.
+                    //
+                    // På en fysisk enhed findes der ingen simuleret GPS, og
+                    // panelet viser derfor kun "utilgængelig". Men det er
+                    // netop på enheden — ude i felten, med rigtige testere —
+                    // at behovet for at prøve den samme opgave igen er størst.
+                    progressControls
+
                     if provider == nil {
                         unavailable
                     } else {

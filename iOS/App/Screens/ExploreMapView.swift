@@ -32,7 +32,17 @@ struct ExploreMapView: View {
 
     @State private var camera: MapCameraPosition = .region(Self.vejleHarbour)
     /// Følger kortet spilleren? Slås fra, når brugeren selv panorerer.
-    @State private var followsPlayer = true
+    /// Kortet er centreret én gang. Derefter bestemmer spilleren selv.
+    ///
+    /// Der stod før en `followsPlayer`, som fulgte positionen løbende. Den blev
+    /// kun slået fra ved et **træk** — ikke ved et zoom. Et knib overlevede
+    /// derfor kun til næste GPS-opdatering, hvorefter kortet sprang tilbage til
+    /// sit gamle udsnit. Det så ud som om appen kæmpede imod, og det var
+    /// umuligt at gennemskue for den, der bare ville se, hvor den næste opgave
+    /// lå.
+    ///
+    /// Nu centreres der én gang, når positionen første gang kendes. Herefter
+    /// flytter kortet sig kun, når spilleren trykker på "Centrér på mig".
     /// MapKits egen markering. Annotationens indhold kan ikke selv håndtere
     /// trykket — MapKit lægger sin egen wrapper om det og sluger det.
     @State private var hasCentredOnce = false
@@ -80,7 +90,8 @@ struct ExploreMapView: View {
                 }
             }
             .onChange(of: engine.currentLocation) { _, location in
-                if followsPlayer, let location { centre(on: location) }
+                // Kun første gang. Kortet må aldrig rykke sig under fingeren.
+                if !hasCentredOnce, let location { centre(on: location) }
                 announceArrivalIfNeeded()
             }
             .sheet(isPresented: $showsDevPanel) {
@@ -221,15 +232,6 @@ struct ExploreMapView: View {
                         handleTap(at: event.location, proxy: proxy)
                     }
             )
-            .onMapCameraChange(frequency: .onEnd) { context in
-                // Har brugeren flyttet kortet væk fra sig selv, skal det blive
-                // liggende. Et kort, der hopper tilbage, er ubrugeligt til at
-                // kigge efter den næste opgave.
-                if let location = engine.currentLocation,
-                   distanceMetres(from: context.region.center, to: location.coordinate) > 60 {
-                    followsPlayer = false
-                }
-            }
         }
     }
 
@@ -425,9 +427,26 @@ struct ExploreMapView: View {
     private static let fanRadiusMetres = 55.0
 
     /// To standpunkter regnes som samme sted inden for cirka en meter.
+    /// Om to opgaver har **nøjagtig** samme standpunkt.
+    ///
+    /// ## Hvorfor grænsen er en meter og ikke spredningsafstanden
+    ///
+    /// Den var kortvarigt sat til ``fanRadiusMetres``, så alt inden for 55 meter
+    /// talte som samme sted. Det var forkert på en måde, der er værd at huske:
+    /// Frydenlund 98 har to opmålte standpunkter 15 meter fra hinanden, de blev
+    /// derfor "spredt", og hver markør endte **55 meter fra sit rigtige
+    /// koordinat**. Kortet viste noget andet end virkeligheden — i en have, hvor
+    /// 55 meter er hele grunden og naboens med.
+    ///
+    /// Spredning er en nødløsning for markører, der ligger oven i hinanden og
+    /// derfor slet ikke kan rammes. To punkter med hver sit koordinat kan skilles
+    /// ad ved at zoome, og hit-testen vælger i forvejen den nærmeste. Der er
+    /// ingen grund til at flytte dem, og en god grund til at lade være: et kort,
+    /// der peger ved siden af, er værre end to markører, man skal zoome ind på.
     private static func isSameSpot(_ first: GeoPoint, _ second: GeoPoint) -> Bool {
-        abs(first.latitude - second.latitude) < 0.00001
-            && abs(first.longitude - second.longitude) < 0.00001
+        let a = CLLocation(latitude: first.latitude, longitude: first.longitude)
+        let b = CLLocation(latitude: second.latitude, longitude: second.longitude)
+        return a.distance(from: b) < 1
     }
 
     /// Uløste først, så en løst opgave aldrig dækker en, spilleren mangler.
@@ -445,9 +464,11 @@ struct ExploreMapView: View {
             mapActionButton("Vis hvor jeg er", systemImage: "location") {
                 router.presentedSheet = .permissionPrimer(missionId: "")
             }
-        } else if !followsPlayer {
+        } else {
+            // Altid tilgængelig. Det er den eneste hjælp, der er tilbage — og
+            // så skal den ikke først dukke op, når appen synes, man er faret
+            // vild.
             mapActionButton("Centrér på mig", systemImage: "location.fill") {
-                followsPlayer = true
                 if let location = engine.currentLocation { centre(on: location) }
             }
         }
@@ -490,15 +511,6 @@ struct ExploreMapView: View {
         }
     }
 
-    private func distanceMetres(
-        from first: CLLocationCoordinate2D,
-        to second: CLLocationCoordinate2D
-    ) -> Double {
-        GeoMath.distanceMetres(
-            from: GeoPoint(latitude: first.latitude, longitude: first.longitude),
-            to: GeoPoint(latitude: second.latitude, longitude: second.longitude)
-        )
-    }
 }
 
 // MARK: - Popup

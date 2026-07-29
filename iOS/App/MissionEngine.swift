@@ -268,6 +268,33 @@ final class MissionEngine {
     }
 
     #if BH_DEV_TOOLS
+    /// Sletter al progression: løste opgaver, brugte hints og point.
+    ///
+    /// ## Hvorfor det ikke bare er en test-genvej
+    ///
+    /// En løst gåde kan ikke spilles om (FR-052), og det er med vilje. Men en
+    /// tester skal kunne køre den samme opgave igen og igen i felten — og
+    /// modsat Debug, hvor genspilning er fri, gælder spærringen i den
+    /// TestFlight-bygning, testerne får.
+    ///
+    /// Nulstillingen rydder hændelsesloggen. Den er append-only og hele
+    /// sandheden om spillerens progression (ADR 0002), så når den er tom, er
+    /// alt væk — der findes ikke en anden kopi at komme i modstrid med.
+    ///
+    /// Sessionen ryddes også. Uden det ville motoren stå med en åben opgave,
+    /// hvis hints netop er blevet glemt.
+    func resetProgress() async {
+        try? await eventStore.removeAll()
+        session = nil
+        revealedHintIds = []
+        lastOutcome = nil
+        presence = .idle
+        gate = nil
+        if let pack {
+            playerState = StateProjection.fold((try? await eventStore.allEvents()) ?? [], pack: pack)
+        }
+    }
+
     /// Den simulerede kilde, hvis appen kører på den. `nil` betyder rigtig GPS.
     var simulatedLocationProvider: ScriptedLocationProvider? {
         locationProvider as? ScriptedLocationProvider

@@ -92,7 +92,10 @@ struct RootView: View {
             ambience.start()
             await engine.load()
             // Genoptag på samme trin efter fuld terminering (FR-036).
-            router.restore(validatingAgainst: Set(engine.playableMissions.map(\.id)))
+            router.restore(
+                validatingAgainst: Set(engine.playableMissions.map(\.id)),
+                stepIds: Set(engine.playableMissions.flatMap { $0.orderedSteps.map(\.id) })
+            )
             await resumeSessionIfNeeded()
         }
         .sheet(item: $router.presentedSheet) { sheet in

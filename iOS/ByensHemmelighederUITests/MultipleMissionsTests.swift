@@ -36,13 +36,15 @@ final class MultipleMissionsTests: FlowTestCase {
     func testTwoMissionsInARowWithoutRestarting() {
         let app = launchApp(atLatitude: frydenlund.latitude, longitude: frydenlund.longitude)
 
-        // MARK: Første opgave — fritekst
+        // MARK: Første opgave — multiple choice
         openMission(vera, in: app)
         waitForPresence(in: app)
         continueNarrative(in: app)
 
-        enterText("gulerod", in: app)
-        submitText(in: app)
+        // Vera var en fritekstgåde om en gulerod. Den er skrevet om til en
+        // logisk gåde med fire huller, og svaret vælges nu blandt fire
+        // muligheder.
+        chooseOption("Hul 3", in: app)
         assertReward(points: 50, in: app)
 
         app.buttons["reward.done"].tap()
@@ -70,8 +72,10 @@ final class MultipleMissionsTests: FlowTestCase {
         openMission(vera, in: app)
         waitForPresence(in: app)
         continueNarrative(in: app)
-        enterText("gulerod", in: app)
-        submitText(in: app)
+        // Vera var en fritekstgåde om en gulerod. Den er skrevet om til en
+        // logisk gåde med fire huller, og svaret vælges nu blandt fire
+        // muligheder.
+        chooseOption("Hul 3", in: app)
         assertReward(points: 50, in: app)
         app.buttons["reward.done"].tap()
 

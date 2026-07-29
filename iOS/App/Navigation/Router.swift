@@ -100,12 +100,33 @@ final class Router {
 
     /// Genskaber stien. Ruter, der peger på indhold, der ikke længere findes,
     /// kasseres frem for at give en tom skærm.
-    func restore(validatingAgainst missionIds: Set<String>) {
+    ///
+    /// ## Trinnet valideres, ikke kun opgaven
+    ///
+    /// Der blev før kun kontrolleret, at **opgaven** fandtes. Det var nok, så
+    /// længe indholdet lå stille — men opgaverne skrives om: Vera gik fra en
+    /// gulerodsgåde til fire huller, og trinnet skiftede id undervejs.
+    ///
+    /// En telefon, der stod midt i den gamle opgave, ville da genskabe en rute
+    /// til et trin, der ikke findes, og åbne på "Trinnet findes ikke". Det
+    /// ligner en app, der ikke starter. En simulator ser det aldrig, fordi den
+    /// nulstilles ved hver installation — en tester, der har haft appen i en
+    /// uge, ser det med det samme.
+    ///
+    /// - Parameter stepIds: alle kendte trin-id'er. Tom betyder, at trin ikke
+    ///   kontrolleres.
+    func restore(validatingAgainst missionIds: Set<String>, stepIds: Set<String> = []) {
         guard let data = defaults.data(forKey: Self.restorationKey),
               let restored = try? JSONDecoder().decode([Route].self, from: data)
         else { return }
 
-        let valid = restored.prefix { missionIds.contains($0.missionId) }
+        let valid = restored.prefix { route in
+            guard missionIds.contains(route.missionId) else { return false }
+            if case .step(_, let stepId) = route, !stepIds.isEmpty {
+                return stepIds.contains(stepId)
+            }
+            return true
+        }
         path = Array(valid)
     }
 

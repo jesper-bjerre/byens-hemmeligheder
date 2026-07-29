@@ -91,42 +91,6 @@
       "lastPhysicallyVerified": null
     },
     {
-      "id": "loc.vejle-oest.frydenlund98",
-      "areaId": "area.vejle-oest",
-      "name": "Frydenlund 98",
-      "address": "Frydenlund 98, 7120 Vejle",
-      "latitude": 55.734897,
-      "longitude": 9.62027,
-      "activationRadiusMetres": 45,
-      "maxAcceptableAccuracyMetres": 40,
-      "dwellSeconds": 5,
-      "accuracyProfile": "standard",
-      "vantagePoint": {
-        "latitude": 55.734897,
-        "longitude": 9.62027,
-        "bearingDegrees": 0,
-        "instruction": "Bliv på det offentligt tilgængelige standpunkt. Gå ikke ind på grunden, åbn ikke buret, og forsøg ikke at fodre eller kalde på kaninen."
-      },
-      "publicAccess": false,
-      "safety": {
-        "flags": [
-          "privateProperty"
-        ],
-        "notes": "Privat adresse. Testopgave — ikke til offentlig brug."
-      },
-      "accessibility": {
-        "surface": "Indendørs gulv",
-        "incline": "Fladt",
-        "steps": false,
-        "wheelchair": "unknown",
-        "stroller": "unknown",
-        "distanceFromAccessMetres": null,
-        "notes": "Testopgave på privat adresse. Tilgængelighed er ikke registreret."
-      },
-      "fieldVerified": false,
-      "lastPhysicallyVerified": null
-    },
-    {
       "id": "loc.vejle-oest.tirsbaek-broen",
       "areaId": "area.vejle-oest",
       "name": "Den gamle bro i Tirsbæk Bakker",
@@ -156,6 +120,78 @@
         "stroller": "unknown",
         "distanceFromAccessMetres": null,
         "notes": "Tilgængelighed skal registreres ved felttest."
+      },
+      "fieldVerified": false,
+      "lastPhysicallyVerified": null
+    },
+    {
+      "id": "loc.vejle-oest.frydenlund98-vera",
+      "areaId": "area.vejle-oest",
+      "name": "Frydenlund 98 – kaninburet",
+      "address": "Frydenlund 98, 7120 Vejle",
+      "latitude": 55.734797,
+      "longitude": 9.620308,
+      "activationRadiusMetres": 45,
+      "maxAcceptableAccuracyMetres": 40,
+      "dwellSeconds": 5,
+      "accuracyProfile": "standard",
+      "vantagePoint": {
+        "latitude": 55.734797,
+        "longitude": 9.620308,
+        "bearingDegrees": 0,
+        "instruction": "Bliv på det offentligt tilgængelige standpunkt. Gå ikke ind på grunden, åbn ikke buret, og forsøg ikke at fodre eller kalde på kaninen."
+      },
+      "publicAccess": false,
+      "safety": {
+        "flags": [
+          "privateProperty"
+        ],
+        "notes": "Privat adresse. Testopgave — ikke til offentlig brug."
+      },
+      "accessibility": {
+        "surface": "Indendørs gulv",
+        "incline": "Fladt",
+        "steps": false,
+        "wheelchair": "unknown",
+        "stroller": "unknown",
+        "distanceFromAccessMetres": null,
+        "notes": "Testopgave på privat adresse. Tilgængelighed er ikke registreret."
+      },
+      "fieldVerified": false,
+      "lastPhysicallyVerified": null
+    },
+    {
+      "id": "loc.vejle-oest.frydenlund98-stuen",
+      "areaId": "area.vejle-oest",
+      "name": "Frydenlund 98 – stuen",
+      "address": "Frydenlund 98, 7120 Vejle",
+      "latitude": 55.734901,
+      "longitude": 9.620155,
+      "activationRadiusMetres": 45,
+      "maxAcceptableAccuracyMetres": 40,
+      "dwellSeconds": 5,
+      "accuracyProfile": "standard",
+      "vantagePoint": {
+        "latitude": 55.734901,
+        "longitude": 9.620155,
+        "bearingDegrees": 0,
+        "instruction": "Bliv på det offentligt tilgængelige standpunkt. Gå ikke ind på grunden, åbn ikke buret, og forsøg ikke at fodre eller kalde på kaninen."
+      },
+      "publicAccess": false,
+      "safety": {
+        "flags": [
+          "privateProperty"
+        ],
+        "notes": "Privat adresse. Testopgave — ikke til offentlig brug."
+      },
+      "accessibility": {
+        "surface": "Indendørs gulv",
+        "incline": "Fladt",
+        "steps": false,
+        "wheelchair": "unknown",
+        "stroller": "unknown",
+        "distanceFromAccessMetres": null,
+        "notes": "Testopgave på privat adresse. Tilgængelighed er ikke registreret."
       },
       "fieldVerified": false,
       "lastPhysicallyVerified": null
@@ -467,7 +503,7 @@
     {
       "id": "mission.frydenlund98.den-groenne-transmission",
       "slug": "frydenlund98-den-groenne-transmission",
-      "locationId": "loc.vejle-oest.frydenlund98",
+      "locationId": "loc.vejle-oest.frydenlund98-stuen",
       "title": "Den grønne transmission",
       "shortTitle": "Den grønne transmission",
       "teaser": "Et fjernsyn står stadig tændt i det forladte værelse. Kun et fastfrosset øjeblik fra et cykelløb er tilbage.",
@@ -611,7 +647,7 @@
     {
       "id": "mission.frydenlund98.veras-hemmelige-snack",
       "slug": "frydenlund98-veras-hemmelige-snack",
-      "locationId": "loc.vejle-oest.frydenlund98",
+      "locationId": "loc.vejle-oest.frydenlund98-vera",
       "title": "Vera og de fire huller",
       "shortTitle": "Veras hul",
       "teaser": "I haven bor kaninen Vera. Fire kaniner har gravet hvert sit hul, men alle sporene er blevet blandet sammen. Kan I finde Veras hul?",
@@ -627,7 +663,7 @@
       ],
       "fictionLabel": "Fiktiv gåde. Kaninen Vera er virkelig.",
       "heroMediaId": null,
-      "narrationMediaId": null,
+      "narrationMediaId": "media.narration.vera",
       "sourceIds": [
         "source.frydenlund98.vera"
       ],
@@ -720,7 +756,7 @@
         {
           "id": "card.veras-hul.1",
           "order": 1,
-          "mediaId": "media.vera.kaninen",
+          "mediaId": "media.vera.stedet",
           "text": "I haven bor kaninen Vera. Men i nat er der sket noget mærkeligt."
         },
         {
@@ -768,7 +804,7 @@
         {
           "id": "card.veras-hul.9",
           "order": 9,
-          "mediaId": "media.vera.kaninen",
+          "mediaId": "media.vera.plakat",
           "text": "Hvilket hul bor Vera i?"
         }
       ],
@@ -1009,7 +1045,7 @@
     {
       "id": "media.narration.vera",
       "filename": "narration-vera.m4a",
-      "altText": "Fortællerstemme, der læser introduktionen til Veras hemmelige snack op.",
+      "altText": "Fortællerstemme, der læser introduktionen til Vera og de fire huller op.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -1096,6 +1132,19 @@
       "expiresAt": null,
       "mediaType": "image",
       "manipulation": "Bearbejdet for stemningens skyld: mørke, måneskin og tåge er forstærket. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+    },
+    {
+      "id": "media.vera.plakat",
+      "filename": "vera-plakat.jpg",
+      "altText": "En tegnet opslagstavle med titlen 'Vera og de fire huller'. Øverst sidder fire kaniner med navnene Vera, Plet, Sne og Skygge. Nedenunder ses fire huler nummereret 1 til 4, og nederst står spørgsmålet 'Hvilket hul bor Vera i?'",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "credit": "Byens Gåder",
+      "kind": "aiGenerated",
+      "restrictions": null,
+      "expiresAt": null,
+      "mediaType": "image",
+      "manipulation": "Tegnet gådebræt. Viser opgavens elementer, aldrig facit."
     }
   ],
   "sources": [
