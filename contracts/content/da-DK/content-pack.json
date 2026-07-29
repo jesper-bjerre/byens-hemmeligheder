@@ -612,12 +612,12 @@
       "id": "mission.frydenlund98.veras-hemmelige-snack",
       "slug": "frydenlund98-veras-hemmelige-snack",
       "locationId": "loc.vejle-oest.frydenlund98",
-      "title": "Veras hemmelige snack",
-      "shortTitle": "Veras snack",
-      "teaser": "Kaninen Vera har gravet efter noget særligt. Det er sprødt, orange og gemmer sig normalt under jorden.",
+      "title": "Vera og de fire huller",
+      "shortTitle": "Veras hul",
+      "teaser": "I haven bor kaninen Vera. Fire kaniner har gravet hvert sit hul, men alle sporene er blevet blandet sammen. Kan I finde Veras hul?",
       "status": "fieldTestReady",
-      "difficulty": 1,
-      "estimatedMinutes": 3,
+      "difficulty": 2,
+      "estimatedMinutes": 5,
       "basePoints": 50,
       "tags": [
         "test",
@@ -627,40 +627,53 @@
       ],
       "fictionLabel": "Fiktiv gåde. Kaninen Vera er virkelig.",
       "heroMediaId": null,
-      "narrationMediaId": "media.narration.vera",
+      "narrationMediaId": null,
       "sourceIds": [
         "source.frydenlund98.vera"
       ],
       "steps": [
         {
-          "id": "step.vera.gaaden",
+          "id": "step.vera.hullet",
           "order": 1,
-          "kind": "freeText",
-          "title": "Hvad er jeg?",
-          "question": "Jeg gemmer mig under jorden, men mit grønne hår kan ses. Jeg er lang og orange, og kaniner siges at holde af mig.",
-          "instruction": "Skriv svaret som ét ord.",
-          "placeholder": "Skriv dit svar",
+          "kind": "singleChoice",
+          "title": "Veras hul",
+          "question": "Hvilket hul bor Vera i?",
+          "instruction": "Brug alle fire spor. Der er kun én mulig løsning.",
+          "options": [
+            {
+              "id": "opt.vera.hul1",
+              "label": "Hul 1"
+            },
+            {
+              "id": "opt.vera.hul2",
+              "label": "Hul 2"
+            },
+            {
+              "id": "opt.vera.hul3",
+              "label": "Hul 3"
+            },
+            {
+              "id": "opt.vera.hul4",
+              "label": "Hul 4"
+            }
+          ],
           "answerRule": {
             "kind": "exact",
-            "canonicalAnswer": "gulerod",
+            "canonicalAnswer": "Hul 3",
             "acceptedAnswers": [
-              "gulerod",
-              "Gulerod",
-              "en gulerod",
-              "gulerødder"
+              "Hul 3",
+              "hul 3",
+              "3"
             ],
             "nearMissResponses": [
               {
-                "answer": "kartoffel",
-                "feedback": "Den vokser rigtignok under jorden, men Veras snack er lang og orange."
-              },
-              {
-                "answer": "græs",
-                "feedback": "Vera snuser til græsset, men hun har gravet efter noget andet — noget der gemmer sig nede i jorden."
+                "answer": "Hul 2",
+                "feedback": "Tæt på. Hvis Vera boede i hul 2, skulle Plet bo i hul 1 — og så er der ikke plads til Skygge til venstre for Plet."
               }
             ],
-            "genericIncorrectFeedback": "Det er ikke det, Vera leder efter. Tænk på noget orange, som vokser under jorden og ofte forbindes med kaniner."
+            "genericIncorrectFeedback": "Det hul passer ikke med alle sporene. Husk, at Plet bor lige til venstre for Vera, og at Skygge bor til venstre for Plet."
           },
+          "correctFeedback": "Rigtigt. Vera bor i hul 3.",
           "hintIds": [
             "hint.vera.1",
             "hint.vera.2",
@@ -673,30 +686,30 @@
           "id": "hint.vera.1",
           "order": 1,
           "penaltyPercent": 3,
-          "title": "Hvor vokser den?",
-          "text": "Veras snack vokser nede i jorden, mens noget grønt stikker op over jorden."
+          "title": "Start med det sikre",
+          "text": "Én kanin har allerede fået et bestemt hul. Placer Sne først."
         },
         {
           "id": "hint.vera.2",
           "order": 2,
           "penaltyPercent": 4,
-          "title": "Hvordan ser den ud?",
-          "text": "Den er normalt lang, sprød og orange."
+          "title": "Find parret",
+          "text": "Plet skal bo lige til venstre for Vera. De to står altså ved siden af hinanden."
         },
         {
           "id": "hint.vera.3",
           "order": 3,
           "penaltyPercent": 5,
-          "title": "Næsten svaret",
-          "text": "Det er en grøntsag, som begynder med g og ofte forbindes med kaniner."
+          "title": "Næsten løsningen",
+          "text": "Vera kan ikke bo i hul 1 eller hul 4. Undersøg, om hul 2 kan passe med Skygges spor."
         }
       ],
       "completion": {
-        "headline": "Du fandt Veras hemmelige snack!",
-        "subheadline": "Svaret er gulerod",
+        "headline": "I fandt Veras hul!",
+        "subheadline": "Vera bor i hul 3",
         "messageLabel": "Veras gåde",
-        "message": "Vera hopper videre gennem buret. Måske leder hun allerede efter det næste skjulte spor.",
-        "historyFact": "Gulerødder gemmer sig under jorden, mens det grønne løv stikker op. Det er roden, kaniner — og mennesker — spiser."
+        "message": "Skygge bor i hul 1, Plet i hul 2 og Sne i hul 4. Alle fire kaniner har nu fundet hjem.",
+        "historyFact": "Kaniner graver gange og huler under jorden. Et sammenhængende system af gange kaldes en grav, og der kan bo flere kaniner i den samme."
       },
       "storyId": null,
       "chapterId": null,
@@ -705,34 +718,58 @@
       "moodMediaId": "media.vera.stedet",
       "cards": [
         {
-          "id": "card.frydenlund98-veras-hemmelige-snack.1",
+          "id": "card.veras-hul.1",
           "order": 1,
           "mediaId": "media.vera.kaninen",
-          "text": "Kaninen Vera hygger sig i sit bur. Hun hopper rundt, snuser til græsset og graver små huller i jorden."
+          "text": "I haven bor kaninen Vera. Men i nat er der sket noget mærkeligt."
         },
         {
-          "id": "card.frydenlund98-veras-hemmelige-snack.2",
+          "id": "card.veras-hul.2",
           "order": 2,
           "mediaId": "media.vera.buret",
-          "text": "I dag har hun gravet efter noget særligt. Det er sprødt, orange og gemmer sig normalt under jorden."
+          "text": "Fire kaniner har gravet hvert sit hul, og nu er alle spor blandet sammen."
         },
         {
-          "id": "card.frydenlund98-veras-hemmelige-snack.3",
+          "id": "card.veras-hul.3",
           "order": 3,
-          "mediaId": "media.vera.kaninen",
-          "text": "Kan du løse Veras gåde og finde navnet på hendes hemmelige snack?"
-        },
-        {
-          "id": "card.frydenlund98-veras-hemmelige-snack.4",
-          "order": 4,
           "mediaId": "media.vera.buret",
-          "text": "Jeg gemmer mig under jorden, men mit grønne hår kan ses."
+          "text": "Hullerne er nummereret fra venstre: Hul 1, Hul 2, Hul 3 og Hul 4."
         },
         {
-          "id": "card.frydenlund98-veras-hemmelige-snack.5",
-          "order": 5,
+          "id": "card.veras-hul.4",
+          "order": 4,
           "mediaId": "media.vera.kaninen",
-          "text": "Jeg er lang og orange, og kaniner siges at holde af mig.\nSkriv svaret som ét ord."
+          "text": "Kaninerne hedder Vera, Plet, Sne og Skygge."
+        },
+        {
+          "id": "card.veras-hul.5",
+          "order": 5,
+          "mediaId": "media.vera.buret",
+          "text": "Spor 1: Vera bor hverken i hul 1 eller hul 4."
+        },
+        {
+          "id": "card.veras-hul.6",
+          "order": 6,
+          "mediaId": "media.vera.buret",
+          "text": "Spor 2: Plet bor i hullet lige til venstre for Vera."
+        },
+        {
+          "id": "card.veras-hul.7",
+          "order": 7,
+          "mediaId": "media.vera.buret",
+          "text": "Spor 3: Sne bor i hul 4."
+        },
+        {
+          "id": "card.veras-hul.8",
+          "order": 8,
+          "mediaId": "media.vera.buret",
+          "text": "Spor 4: Skygge bor til venstre for Plet."
+        },
+        {
+          "id": "card.veras-hul.9",
+          "order": 9,
+          "mediaId": "media.vera.kaninen",
+          "text": "Hvilket hul bor Vera i?"
         }
       ],
       "thumbnailMediaId": "media.vera.kaninen"
