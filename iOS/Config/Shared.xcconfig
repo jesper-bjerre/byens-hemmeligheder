@@ -13,4 +13,16 @@ CODE_SIGN_STYLE = Automatic
 
 // Inkluderingen er **valgfri** (`?`). Mangler filen — på en frisk klon eller i
 // CI — fejler bygningen ikke; den kan bare ikke signere til en enhed.
+// Hvor indholdet hentes fra. Tom værdi betyder bundlet indhold.
+//
+// Standardværdien står **før** inkluderingen med vilje. Xcconfig læser oppefra
+// og ned, så en tilordning efter `#include?` ville overskrive den, der lige er
+// læst fra Local.xcconfig — og resultatet var en app, der stille faldt tilbage
+// til bundlet indhold, selvom serveren kørte.
+BH_CONTENT_BASE_URL =
+
+// Sæt din egen i Local.xcconfig, fx:
+//   BH_CONTENT_BASE_URL = http:/$()/localhost:5199
+// Skråstregerne brydes med $(), fordi // ellers læses som en kommentar.
 #include? "Local.xcconfig"
+

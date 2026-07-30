@@ -51,6 +51,7 @@ _netrc
 azureauth.json
 gha-creds-*.json
 **/appsettings.*.local.json
+appsettings.local.json
 
 # Generiske hemmelighedsfiler
 secret.json
@@ -159,3 +160,17 @@ $RECYCLE.BIN/
 *.tmp
 tmp/
 .tmp/
+
+# --- ASP.NET-backend ---------------------------------------------------------
+# Lokale konfigurationer kan indeholde connection strings og nøgler til Azure.
+# Mønstrene står her, før den første fil oprettes — se CLAUDE.md afsnit 1.
+appsettings.*.local.json
+appsettings.Development.json
+appsettings.Production.json
+# `dotnet user-secrets` gemmer uden for repoet, men en fejlplaceret kopi fanges her.
+secrets.json
+*.user
+# Publicerings- og udgivelsesprofiler bærer ofte adgangskoder.
+*.pubxml
+*.pubxml.user
+PublishProfiles/

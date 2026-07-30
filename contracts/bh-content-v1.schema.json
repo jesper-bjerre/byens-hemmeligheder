@@ -904,6 +904,13 @@
           "type": "string",
           "minLength": 1
         },
+        "creditLine": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Kreditlinje vist på skærmen ved eksternt materiale, fx 'Foto: © Jeff Pachoud, AFP/Ritzau Scanpix'. Dækker attribution, ikke rettigheder — se licence og restrictions."
+        },
         "kind": {
           "enum": [
             "historical",

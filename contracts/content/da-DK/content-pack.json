@@ -159,42 +159,6 @@
       },
       "fieldVerified": false,
       "lastPhysicallyVerified": null
-    },
-    {
-      "id": "loc.vejle-oest.frydenlund98-stuen",
-      "areaId": "area.vejle-oest",
-      "name": "Frydenlund 98 – stuen",
-      "address": "Frydenlund 98, 7120 Vejle",
-      "latitude": 55.734901,
-      "longitude": 9.620155,
-      "activationRadiusMetres": 45,
-      "maxAcceptableAccuracyMetres": 40,
-      "dwellSeconds": 5,
-      "accuracyProfile": "standard",
-      "vantagePoint": {
-        "latitude": 55.734901,
-        "longitude": 9.620155,
-        "bearingDegrees": 0,
-        "instruction": "Bliv på det offentligt tilgængelige standpunkt. Gå ikke ind på grunden, åbn ikke buret, og forsøg ikke at fodre eller kalde på kaninen."
-      },
-      "publicAccess": false,
-      "safety": {
-        "flags": [
-          "privateProperty"
-        ],
-        "notes": "Privat adresse. Testopgave — ikke til offentlig brug."
-      },
-      "accessibility": {
-        "surface": "Indendørs gulv",
-        "incline": "Fladt",
-        "steps": false,
-        "wheelchair": "unknown",
-        "stroller": "unknown",
-        "distanceFromAccessMetres": null,
-        "notes": "Testopgave på privat adresse. Tilgængelighed er ikke registreret."
-      },
-      "fieldVerified": false,
-      "lastPhysicallyVerified": null
     }
   ],
   "missions": [
@@ -459,126 +423,6 @@
       "thumbnailMediaId": "media.fjordenhus.000"
     },
     {
-      "id": "mission.frydenlund98.den-groenne-transmission",
-      "slug": "frydenlund98-den-groenne-transmission",
-      "locationId": "loc.vejle-oest.frydenlund98-stuen",
-      "title": "Den grønne transmission",
-      "shortTitle": "Den grønne transmission",
-      "teaser": "Et fjernsyn står stadig tændt i det forladte værelse. Kun et fastfrosset øjeblik fra et cykelløb er tilbage.",
-      "status": "fieldTestReady",
-      "difficulty": 2,
-      "estimatedMinutes": 6,
-      "basePoints": 75,
-      "tags": [
-        "test",
-        "billedobservation",
-        "sport"
-      ],
-      "fictionLabel": "Fiktiv detektivsag. Sportsbegivenheden på fjernsynet er dokumenteret.",
-      "heroMediaId": null,
-      "sourceIds": [
-        "source.letour.foix-2026"
-      ],
-      "steps": [
-        {
-          "id": "step.frydenlund98.koden",
-          "order": 1,
-          "kind": "numericCode",
-          "title": "Find året",
-          "instruction": "På fjernsynet ses Tour de France og Lidl-Trek. Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje. Indtast årstallet som en kode på fire cifre.",
-          "length": 4,
-          "evidenceCards": [],
-          "answerRule": {
-            "kind": "digitsOnly",
-            "canonicalAnswer": "2026",
-            "acceptedAnswers": [
-              "2026",
-              "2 0 2 6",
-              "20-26"
-            ],
-            "nearMissResponses": [
-              {
-                "answer": "2025",
-                "feedback": "Du er tæt på nutiden, men dette var ikke året for Mads Pedersens første grønne førertrøje i Touren. Undersøg sportsarkivet igen."
-              },
-              {
-                "answer": "2024",
-                "feedback": "Det viste spor hører til et senere Tour de France. Find året for etapen til Foix, hvor han overtog grønt."
-              },
-              {
-                "answer": "2022",
-                "feedback": "Mads Pedersen vandt også en Tour-etape i 2022, men spørgsmålet handler om første gang, han bar den grønne førertrøje."
-              }
-            ],
-            "genericIncorrectFeedback": "Du har fundet kodeformatet, men ikke den rigtige begivenhed. Fokusér på Mads Pedersen, Lidl-Trek og den grønne trøje."
-          },
-          "hintIds": [
-            "hint.frydenlund98.1",
-            "hint.frydenlund98.2",
-            "hint.frydenlund98.3"
-          ],
-          "question": "Hvilken kode åbner beskeden?"
-        }
-      ],
-      "hints": [
-        {
-          "id": "hint.frydenlund98.1",
-          "order": 1,
-          "penaltyPercent": 3,
-          "title": "Hvor",
-          "text": "Det vigtigste spor findes på fjernsynet. Undersøg cykelløbet og holdet."
-        },
-        {
-          "id": "hint.frydenlund98.2",
-          "order": 2,
-          "penaltyPercent": 4,
-          "title": "Hvordan",
-          "text": "Den danske rytter er Mads Pedersen. Find året, hvor han for første gang overtog den grønne førertrøje i Tour de France."
-        },
-        {
-          "id": "hint.frydenlund98.3",
-          "order": 3,
-          "penaltyPercent": 5,
-          "title": "Næsten løsningen",
-          "text": "Det skete på 4. etape til Foix i Tour de France 2026. Brug løbsåret som den firecifrede kode."
-        }
-      ],
-      "completion": {
-        "headline": "Koden er korrekt",
-        "subheadline": "Sag 07 er lukket",
-        "messageLabel": "Den grønne transmission",
-        "message": "Den fastfrosne transmission var ikke tilfældig. Efterforskeren havde set præcis det øjeblik, sagen hang på.",
-        "historyFact": "I Tour de France 2026 vandt Mads Pedersen 4. etape til Foix og overtog den grønne førertrøje. Det var første gang, han bar grønt som leder af Tourens pointkonkurrence."
-      },
-      "storyId": null,
-      "chapterId": null,
-      "nextChapterId": null,
-      "placeMediaId": null,
-      "moodMediaId": "media.madsp.001",
-      "narrationMediaId": "media.narration.madsp",
-      "cards": [
-        {
-          "id": "card.frydenlund98-den-groenne-transmission.1",
-          "order": 1,
-          "mediaId": "media.madsp.001",
-          "text": "Et fjernsyn står stadig tændt i det forladte værelse.\n\nDen ukendte person har ikke efterladt et brev, et navn eller en dato.\n\nKun et fastfrosset øjeblik fra et cykelløb.\nEfterforskeren nåede at skrive én sætning:"
-        },
-        {
-          "id": "card.frydenlund98-den-groenne-transmission.2",
-          "order": 2,
-          "mediaId": "media.madsp.002",
-          "text": "“Find året, hvor den danske rytter for første gang bar grønt i Touren.”\nKoden består af fire cifre.\n\nHvilken kode åbner beskeden?\nPå fjernsynet ses Tour de France og Lidl-Trek."
-        },
-        {
-          "id": "card.frydenlund98-den-groenne-transmission.3",
-          "order": 3,
-          "mediaId": "media.madsp.003",
-          "text": "Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje.\n\nIndtast årstallet som en kode på fire cifre."
-        }
-      ],
-      "thumbnailMediaId": "media.madsp.000"
-    },
-    {
       "id": "mission.frydenlund98.veras-hemmelige-snack",
       "slug": "frydenlund98-veras-hemmelige-snack",
       "locationId": "loc.vejle-oest.frydenlund98-vera",
@@ -836,7 +680,7 @@
     {
       "id": "media.boelgen.000",
       "filename": "boelgen-000.jpg",
-      "altText": "Miniature til opgaven Bølgen – Den femte besked. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Bølgen ved Vejle Fjord: hvide, bølgeformede boligblokke langs vandet.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -844,12 +688,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.boelgen.001",
       "filename": "boelgen-001.jpg",
-      "altText": "Kortbillede 1 til opgaven Bølgen – Den femte besked. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Bølgen ved Vejle Fjord. De bølgeformede boligblokke står side om side langs vandet, hvor den glemte besked gemmer sig.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -857,12 +702,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.boelgen.002",
       "filename": "boelgen-002.jpg",
-      "altText": "Kortbillede 2 til opgaven Bølgen – Den femte besked. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Bølgen ved fjorden. Tre spor peger på koden: øjet, etagerne og byggepausen.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -870,12 +716,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.boelgen.003",
       "filename": "boelgen-003.jpg",
-      "altText": "Kortbillede 3 til opgaven Bølgen – Den femte besked. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Bølgens hvide bølgetoppe set fra siden — de toppe, spilleren skal tælle.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -883,7 +730,8 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.narration.boelgen",
@@ -896,12 +744,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
-      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.fjordenhus.000",
       "filename": "fjordenhus-000.jpg",
-      "altText": "Miniature til opgaven Fjordenhus – Vandets tromler. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Fjordenhus på Vejle Havn: husets buede murstenstårne står ude i vandet.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -909,12 +758,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.fjordenhus.001",
       "filename": "fjordenhus-001.jpg",
-      "altText": "Kortbillede 1 til opgaven Fjordenhus – Vandets tromler. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Fjordenhus set fra kajen. Huset skal læses som form, vand og højde — ikke gennem vinduerne.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -922,12 +772,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.fjordenhus.002",
       "filename": "fjordenhus-002.jpg",
-      "altText": "Kortbillede 2 til opgaven Fjordenhus – Vandets tromler. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Fjordenhus i nærbillede. Husets højde bærer det sidste ciffer i koden.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -935,12 +786,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.fjordenhus.003",
       "filename": "fjordenhus-003.jpg",
-      "altText": "Kortbillede 3 til opgaven Fjordenhus – Vandets tromler. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Fjordenhus' cylindriske hoveddele set som en samlet form, med fjordens vand omkring.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -948,7 +800,8 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.narration.fjordenhus",
@@ -961,77 +814,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
-      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
-    },
-    {
-      "id": "media.madsp.000",
-      "filename": "madsp-000.jpg",
-      "altText": "Miniature til opgaven Den grønne transmission. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
-      "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
-      "credit": "Byens Gåder",
-      "kind": "enhanced",
-      "restrictions": null,
-      "expiresAt": null,
-      "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
-    },
-    {
-      "id": "media.madsp.001",
-      "filename": "madsp-001.jpg",
-      "altText": "Kortbillede 1 til opgaven Den grønne transmission. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
-      "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
-      "credit": "Byens Gåder",
-      "kind": "enhanced",
-      "restrictions": null,
-      "expiresAt": null,
-      "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
-    },
-    {
-      "id": "media.madsp.002",
-      "filename": "madsp-002.jpg",
-      "altText": "Kortbillede 2 til opgaven Den grønne transmission. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
-      "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
-      "credit": "Byens Gåder",
-      "kind": "enhanced",
-      "restrictions": null,
-      "expiresAt": null,
-      "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
-    },
-    {
-      "id": "media.madsp.003",
-      "filename": "madsp-003.jpg",
-      "altText": "Kortbillede 3 til opgaven Den grønne transmission. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
-      "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
-      "credit": "Byens Gåder",
-      "kind": "enhanced",
-      "restrictions": null,
-      "expiresAt": null,
-      "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
-    },
-    {
-      "id": "media.narration.madsp",
-      "filename": "narration-madsp.m4a",
-      "altText": "Fortællerstemme, der læser introduktionen til Den grønne transmission op.",
-      "owner": "Jesper Hyldenbrandt Bjerre",
-      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
-      "credit": "Byens Gåder",
-      "kind": "aiGenerated",
-      "restrictions": null,
-      "expiresAt": null,
-      "mediaType": "audio",
-      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.vera.000",
       "filename": "vera-000.jpg",
-      "altText": "Miniature til opgaven Vera og de fire huller. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Kaninen Vera i haven ved Frydenlund 98.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -1039,12 +828,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.vera.001",
       "filename": "vera-001.jpg",
-      "altText": "Kortbillede 1 til opgaven Vera og de fire huller. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Haven ved Frydenlund 98 om natten, hvor fire kaniner har gravet hvert sit hul.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -1052,12 +842,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.vera.002",
       "filename": "vera-002.jpg",
-      "altText": "Kortbillede 2 til opgaven Vera og de fire huller. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Kaninerne Vera, Plet, Sne og Skygge, som hver bor i sit hul.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -1065,12 +856,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.vera.003",
       "filename": "vera-003.jpg",
-      "altText": "Kortbillede 3 til opgaven Vera og de fire huller. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Hullerne i haven, nummereret fra venstre mod højre.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -1078,12 +870,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.vera.004",
       "filename": "vera-004.jpg",
-      "altText": "Kortbillede 4 til opgaven Vera og de fire huller. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Opslagstavlen til gåden: de fire kaniner, de fire nummererede huller og spørgsmålet om, hvilket hul Vera bor i.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -1091,7 +884,8 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.narration.vera",
@@ -1104,12 +898,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
-      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.broen.000",
       "filename": "broen-000.jpg",
-      "altText": "Miniature til opgaven Den forsvundne landevej. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Den gamle bro i Tirsbæk Bakker, omgivet af skov.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -1117,12 +912,13 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.broen.001",
       "filename": "broen-001.jpg",
-      "altText": "Kortbillede 1 til opgaven Den forsvundne landevej. Alt-teksten mangler og skal skrives af den, der har valgt billedet (FR-038).",
+      "altText": "Den gamle bro i Tirsbæk Bakker. I dag en del af et stisystem, men engang en del af landevejen mellem Vejle og Horsens.",
       "owner": "Jesper Hyldenbrandt Bjerre",
       "licence": "Eget materiale — Byens Gåder ejer rettighederne",
       "credit": "Byens Gåder",
@@ -1130,7 +926,8 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "image",
-      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003)."
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "creditLine": null
     },
     {
       "id": "media.narration.broen",
@@ -1143,7 +940,8 @@
       "restrictions": null,
       "expiresAt": null,
       "mediaType": "audio",
-      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003)."
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003).",
+      "creditLine": null
     }
   ],
   "sources": [
@@ -1174,13 +972,6 @@
       "publisher": "VisitVejle",
       "url": "https://www.visitvejle.dk/vejle/planlaeg-ferien/fjordenhus-gdk1101859",
       "kind": "officialTourism"
-    },
-    {
-      "id": "source.letour.foix-2026",
-      "title": "Pedersen and Traeen: northern power rules Foix",
-      "publisher": "Tour de France",
-      "url": "https://www.letour.fr/en/news/2026/pedersen-and-traeen-northern-power-rules-foix/1337325",
-      "kind": "press"
     },
     {
       "id": "source.frydenlund98.vera",

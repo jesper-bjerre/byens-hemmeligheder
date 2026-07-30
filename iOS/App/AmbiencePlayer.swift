@@ -10,6 +10,11 @@ import Observation
 /// ikke i indholdspakken, selvom ADR 0004 flytter alt *indhold* til serveren.
 /// Musikken er præsentation på linje med farvepaletten.
 ///
+/// Filen lå indtil videre i `contracts/content/da-DK/media/` sammen med
+/// opgavernes medier. Det var forkert placeret: da indholdet flyttede til
+/// serveren, ville musikken være fulgt med og skulle hentes over netværket for
+/// at appen kunne spille sin egen baggrundslyd. Den ligger nu i `App/Resources/`.
+///
 /// ## Hvorfor den er dæmpet og kan slukkes
 ///
 /// Spilleren står udendørs, ofte nær trafik og vand, med GPS'en tændt. Tre ting
@@ -109,7 +114,7 @@ final class AmbiencePlayer {
         guard let url = Bundle.main.url(
             forResource: (Self.filename as NSString).deletingPathExtension,
             withExtension: (Self.filename as NSString).pathExtension,
-            subdirectory: "media"
+            subdirectory: nil
         ) else {
             lastFailure = "Filen '\(Self.filename)' findes ikke i bundlens media-mappe."
             return

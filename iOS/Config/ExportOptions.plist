@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- TestFlight og App Store deler samme kanal. -->
+    <key>method</key>
+    <string>app-store-connect</string>
+    <key>teamID</key>
+    <string>QHL89A7A8J</string>
+    <!-- Xcode henter eller opretter distributionsprofilen. Uden dette skal den
+         findes i nøgleringen i forvejen. -->
+    <key>signingStyle</key>
+    <string>automatic</string>
+    <!-- Bitcode er fjernet fra værktøjskæden; nøglen er kun med for at være
+         udtrykkelig om det. -->
+    <key>uploadSymbols</key>
+    <true/>
+    <!-- Ingen automatisk versionsstigning. Build-nummeret sættes bevidst, så
+         to uploads aldrig kan komme til at dele nummer. -->
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
+</dict>
+</plist>

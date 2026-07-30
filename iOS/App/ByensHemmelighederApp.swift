@@ -14,7 +14,7 @@ struct ByensHemmelighederApp: App {
     @State private var narration = NarrationPlayer()
 
     init() {
-        let repository = ContentRepository(source: BundledContentPackSource(bundle: .main))
+        let repository = ContentRepository(source: ContentEndpoint.makeContentPackSource())
         let eventStoreURL = (try? EventStore.defaultFileURL())
             ?? URL.temporaryDirectory.appending(path: "events-v1.jsonl")
 

@@ -20,6 +20,14 @@ public enum ContentPackResponse: Hashable, Sendable {
 public enum ContentPackError: Error, Hashable, Sendable {
     case resourceNotFound(name: String, locale: String)
     case decodingFailed(String)
+    /// Serveren kunne ikke nås. Typisk manglende netværk.
+    ///
+    /// Adskilt fra ``serverError(status:)``, fordi spilleren kan gøre noget ved
+    /// den ene og intet ved den anden. Forfatningens princip V kræver, at
+    /// appen siger tydeligt, hvad der mangler, og hvad man kan gøre.
+    case unreachable(String)
+    /// Serveren svarede, men med en fejl.
+    case serverError(status: Int)
 
     public var errorDescription: String {
         switch self {
@@ -27,6 +35,10 @@ public enum ContentPackError: Error, Hashable, Sendable {
             "Indholdspakken '\(name)' for '\(locale)' findes ikke i bundlen."
         case .decodingFailed(let detail):
             "Indholdspakken kunne ikke afkodes: \(detail)"
+        case .unreachable:
+            "Der er ingen forbindelse til Byens Gåder. Slå mobildata eller wi-fi til, og prøv igen."
+        case .serverError(let status):
+            "Byens Gåder svarer ikke lige nu (fejl \(status)). Prøv igen om lidt."
         }
     }
 }

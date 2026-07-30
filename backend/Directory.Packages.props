@@ -1,0 +1,23 @@
+<Project>
+  <!-- Central Package Management: versioner står ét sted, aldrig i den enkelte
+       .csproj. Microsofts anbefaling, og det eneste, der holder, når der bliver
+       flere projekter. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="FastEndpoints" Version="5.35.0" />
+    <PackageVersion Include="FastEndpoints.Swagger" Version="5.35.0" />
+    <!-- Azure. Læsevejen er statiske blobs; disse bruges af skrivevejen. -->
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.24.0" />
+    <PackageVersion Include="Azure.Data.Tables" Version="12.10.0" />
+    <!-- Managed identity i Azure, udviklerlogin lokalt. Ingen nøgler i kode. -->
+    <PackageVersion Include="Azure.Identity" Version="1.13.2" />
+  </ItemGroup>
+  <ItemGroup Label="Test">
+    <!-- xunit v3. FastEndpoints.Testing bygger på den, og xunit 2.x ved siden
+         af giver to `FactAttribute` og et build, der ikke kan oversættes. -->
+    <PackageVersion Include="xunit.v3" Version="1.1.0" />
+    <PackageVersion Include="FastEndpoints.Testing" Version="5.35.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,18 @@
+<Project>
+  <!-- Fælles indstillinger for alle projekter i backend/. Ét sted at rette. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- En advarsel, der må stå, bliver til støj. Derfor er de fejl. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Kører på både macOS og Windows. Ingen platformsspecifikke API'er. -->
+    <EnableWindowsTargeting>false</EnableWindowsTargeting>
+    <!-- xunit v3 kører på Microsoft.Testing.Platform, ikke på den gamle
+         VSTest-kører. Uden dette finder `dotnet test` ingen tests og siger
+         "No test is available" — uden at fejle. -->
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+</Project>

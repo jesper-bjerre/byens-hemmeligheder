@@ -13,8 +13,6 @@
 		BH000000000000000000001A /* BHPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000014 /* BHPersistence */; };
 		BH000000000000000000001B /* BHLocationKit in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000015 /* BHLocationKit */; };
 		BH000000000000000000001C /* BHDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000016 /* BHDesignSystem */; };
-		BH000000000000000000001E /* content-pack.json in Resources */ = {isa = PBXBuildFile; fileRef = BH000000000000000000001D /* content-pack.json */; };
-		BH000000000000000000002D /* media in Resources */ = {isa = PBXBuildFile; fileRef = BH000000000000000000002C /* media */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,10 +27,8 @@
 
 /* Begin PBXFileReference section */
 		BH0000000000000000000005 /* ByensHemmeligheder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ByensHemmeligheder.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BH000000000000000000001D /* content-pack.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "content-pack.json"; path = "../contracts/content/da-DK/content-pack.json"; sourceTree = "<group>"; };
 		BH0000000000000000000021 /* ByensHemmelighederUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ByensHemmelighederUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BH000000000000000000002B /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Shared.xcconfig; path = Config/Shared.xcconfig; sourceTree = "<group>"; };
-		BH000000000000000000002C /* media */ = {isa = PBXFileReference; lastKnownFileType = folder; name = media; path = "../contracts/content/da-DK/media"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -91,8 +87,6 @@
 				BH0000000000000000000009 /* App */,
 				BH0000000000000000000025 /* ByensHemmelighederUITests */,
 				BH000000000000000000002B /* Shared.xcconfig */,
-				BH000000000000000000001D /* content-pack.json */,
-				BH000000000000000000002C /* media */,
 				BH0000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -207,8 +201,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BH000000000000000000001E /* content-pack.json in Resources */,
-				BH000000000000000000002D /* media in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

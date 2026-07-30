@@ -35,6 +35,22 @@ public struct MediaAsset: Codable, Hashable, Sendable, Identifiable {
     /// Feltet er dokumentation til den næste redaktør, ikke til spilleren. Er
     /// noget rørt, skal det stå her.
     public let manipulation: String?
+    /// Kreditlinjen, som **vises på skærmen** ved siden af billedet.
+    ///
+    /// Til materiale, der ikke er vores eget: `"Foto: © Jeff Pachoud, AFP/Ritzau Scanpix"`.
+    /// Skrevet som den skal læses — appen tilføjer intet.
+    ///
+    /// ## Kredit er ikke det samme som tilladelse
+    ///
+    /// Feltet dækker **attribution**, ikke rettigheder. Et nyhedsmedie krediterer
+    /// et bureaufoto, fordi kreditten er et vilkår i den aftale, de allerede har
+    /// — ikke fordi kreditten i sig selv giver lov. Dansk ophavsret har ingen
+    /// "fair use", og et fotografi kopieret uden aftale bliver ikke lovligt af at
+    /// blive krediteret.
+    ///
+    /// ``licence`` og ``restrictions`` er derfor stadig dem, der afgør, om et
+    /// billede må udgives. Dette felt afgør kun, hvad der står under det.
+    public let creditLine: String?
 
     public init(
         id: String,
@@ -47,7 +63,8 @@ public struct MediaAsset: Codable, Hashable, Sendable, Identifiable {
         restrictions: String? = nil,
         expiresAt: String? = nil,
         mediaType: Tolerant<MediaType>? = nil,
-        manipulation: String? = nil
+        manipulation: String? = nil,
+        creditLine: String? = nil
     ) {
         self.id = id
         self.filename = filename
@@ -60,6 +77,7 @@ public struct MediaAsset: Codable, Hashable, Sendable, Identifiable {
         self.expiresAt = expiresAt
         self.mediaType = mediaType
         self.manipulation = manipulation
+        self.creditLine = creditLine
     }
 
     /// Behandler et udeladt felt som billede.

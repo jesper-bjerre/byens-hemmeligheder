@@ -46,7 +46,7 @@ final class NarrationPlayer: NSObject {
     /// skærm ikke starter forfra midt i en sætning.
     private var spokenMissionId: String?
 
-    init(source: any MediaSource = BundledMediaSource(bundle: .main)) {
+    init(source: any MediaSource = ContentEndpoint.makeMediaSource()) {
         self.source = source
         super.init()
     }

@@ -48,11 +48,24 @@ struct MissionHeroImage: View {
                 VStack(alignment: .leading, spacing: BHSpacing.tight) {
                     imageOrPlaceholder(asset)
 
-                    if asset.kind == .known(.aiGenerated), !isZoomable {
-                        Label("AI-genereret billede", systemImage: "sparkles")
-                            .font(BHFont.caption)
-                            .foregroundStyle(BHColor.inkMuted)
-                            .labelStyle(.bhLeadingIcon)
+                    if !isZoomable {
+                        if asset.kind == .known(.aiGenerated) {
+                            Label("AI-genereret billede", systemImage: "sparkles")
+                                .font(BHFont.caption)
+                                .foregroundStyle(BHColor.inkMuted)
+                                .labelStyle(.bhLeadingIcon)
+                        }
+                        // Kreditlinjen ved eksternt materiale. Står som den er
+                        // skrevet i indholdet — appen tilføjer intet, fordi
+                        // formen ofte er et vilkår i den aftale, billedet er
+                        // hentet under.
+                        if let credit = asset.creditLine, !credit.isEmpty {
+                            Text(credit)
+                                .font(BHFont.caption)
+                                .foregroundStyle(BHColor.inkMuted)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .accessibilityIdentifier("media.credit")
+                        }
                     }
                 }
             }
@@ -152,7 +165,7 @@ struct MissionThumbnail: View {
 /// en TestFlight-version, og til den tid er ændringen at sætte en anden
 /// ``MediaSource`` ind i ``shared``.
 actor ImageCache {
-    static let shared = ImageCache(source: BundledMediaSource(bundle: .main))
+    static let shared = ImageCache(source: ContentEndpoint.makeMediaSource())
 
     private let source: any MediaSource
     private var cached: [String: Image] = [:]

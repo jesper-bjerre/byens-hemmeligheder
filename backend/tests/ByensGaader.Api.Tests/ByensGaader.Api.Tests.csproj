@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>ByensGaader.Api.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <!-- xunit v3 kører testprojektet som sit eget program. -->
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="FastEndpoints.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/ByensGaader.Api/ByensGaader.Api.csproj" />
+  </ItemGroup>
+</Project>
