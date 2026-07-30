@@ -50,7 +50,21 @@ public enum MissionShape {
     /// Grænsen er fundet ved måling, ikke ved skøn: 173 tegn klippede, og et
     /// kort på under 110 bestod. Er en tekst for lang, er svaret at dele den
     /// over flere kort — ikke at stryge ord.
-    public static let maximumCardTextLength = 110
+    /// Hvor lang en tekst må være for at kunne bæres som overlay.
+    ///
+    /// Målt: 110 tegn bestod tilgængelighedsauditten, 135 blev klippet. Over
+    /// grænsen lægger kortet teksten i en bjælke under billedet i stedet — den
+    /// kan vokse frit. Grænsen afviser derfor intet indhold; den afgør kun,
+    /// hvordan kortet ser ud.
+    public static let maximumOverlayTextLength = 110
+
+    /// Ingen øvre grænse for et korts tekst.
+    ///
+    /// Der stod før 110 her, fordi overlayet klippede alt derover. Nu skifter
+    /// kortet selv til en bjælke, og et langt kort er et layoutvalg frem for
+    /// en fejl. Grænsen er sat højt for stadig at fange en tekst, der er så
+    /// lang, at kortet er blevet til en artikel.
+    public static let maximumCardTextLength = 600
 
     /// Markerer et facit, der endnu ikke er fastlagt.
     ///

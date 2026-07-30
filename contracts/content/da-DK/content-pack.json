@@ -311,37 +311,19 @@
           "id": "card.boelgen-den-femte-besked.1",
           "order": 1,
           "mediaId": "media.boelgen.001",
-          "text": "I 2009 stod kun begyndelsen af Bølgen færdig."
+          "text": "I 2009 stod kun begyndelsen af Bølgen færdig.\n\nEn glemt besked fortæller, at den først kan åbnes, når alle bølger er rejst ved fjorden."
         },
         {
           "id": "card.boelgen-den-femte-besked.2",
           "order": 2,
-          "mediaId": "media.boelgen.001",
-          "text": "En glemt besked fortæller, at den først kan åbnes, når alle bølger er rejst ved fjorden."
+          "mediaId": "media.boelgen.002",
+          "text": "Tre symboler viser vejen:\nØjet → Etagerne → Pausen\nFind de tre tal, og åbn beskeden.\n\nHvilken trecifret kode åbner beskeden?"
         },
         {
           "id": "card.boelgen-den-femte-besked.3",
           "order": 3,
-          "mediaId": "media.boelgen.002",
-          "text": "Tre symboler viser vejen:\nØjet → Etagerne → Pausen\nFind de tre tal, og åbn beskeden."
-        },
-        {
-          "id": "card.boelgen-den-femte-besked.4",
-          "order": 4,
-          "mediaId": "media.boelgen.002",
-          "text": "Hvilken trecifret kode åbner beskeden?"
-        },
-        {
-          "id": "card.boelgen-den-femte-besked.5",
-          "order": 5,
           "mediaId": "media.boelgen.003",
-          "text": "1. Tæl de store, hvide bølgetoppe. Kun de store — ikke vinduer, altaner eller master."
-        },
-        {
-          "id": "card.boelgen-den-femte-besked.6",
-          "order": 6,
-          "mediaId": "media.boelgen.003",
-          "text": "2. Hver bølge har ni etager.\n3. To bølger stod færdige, før byggeriet gik i stå i 2009."
+          "text": "1. Tæl de store, hvide bølgetoppe. Kun de store — ikke vinduer, altaner eller master.\n\n2. Hver bølge har ni etager.\n3. To bølger stod færdige, før byggeriet gik i stå i 2009."
         }
       ],
       "thumbnailMediaId": "media.boelgen.000"
@@ -459,43 +441,19 @@
           "id": "card.fjordenhus-vandets-tromler.1",
           "order": 1,
           "mediaId": "media.fjordenhus.001",
-          "text": "Fjorden har gemt en besked i huset."
+          "text": "Fjorden har gemt en besked i huset.\n\nMen huset skal ikke læses gennem vinduerne eller de mange åbninger. Det skal læses som tre enkle spor:\n\nForm. Vand. Højde.\nFørst det, der bærer huset.\nSå det, fjorden får lov at løbe igennem."
         },
         {
           "id": "card.fjordenhus-vandets-tromler.2",
           "order": 2,
-          "mediaId": "media.fjordenhus.001",
-          "text": "Men huset skal ikke læses gennem vinduerne eller de mange åbninger. Det skal læses som tre enkle spor:"
+          "mediaId": "media.fjordenhus.002",
+          "text": "Til sidst det sidste ciffer i husets højde.\nFind de tre tal, og åbn beskeden.\n\nHvilken trecifret kode åbner beskeden?"
         },
         {
           "id": "card.fjordenhus-vandets-tromler.3",
           "order": 3,
-          "mediaId": "media.fjordenhus.001",
-          "text": "Form. Vand. Højde.\nFørst det, der bærer huset.\nSå det, fjorden får lov at løbe igennem."
-        },
-        {
-          "id": "card.fjordenhus-vandets-tromler.4",
-          "order": 4,
-          "mediaId": "media.fjordenhus.002",
-          "text": "Til sidst det sidste ciffer i husets højde.\nFind de tre tal, og åbn beskeden."
-        },
-        {
-          "id": "card.fjordenhus-vandets-tromler.5",
-          "order": 5,
-          "mediaId": "media.fjordenhus.002",
-          "text": "Hvilken trecifret kode åbner beskeden?"
-        },
-        {
-          "id": "card.fjordenhus-vandets-tromler.6",
-          "order": 6,
           "mediaId": "media.fjordenhus.003",
-          "text": "1. Tæl husets store, cylindriske hoveddele. Se formen som helhed — ignorér vinduer, buer og gangbro."
-        },
-        {
-          "id": "card.fjordenhus-vandets-tromler.7",
-          "order": 7,
-          "mediaId": "media.fjordenhus.003",
-          "text": "2. Fjordens vand løber gennem to af husets rum.\n3. Huset er 28 meter højt. Brug det sidste ciffer."
+          "text": "1. Tæl husets store, cylindriske hoveddele. Se formen som helhed — ignorér vinduer, buer og gangbro.\n\n2. Fjordens vand løber gennem to af husets rum.\n3. Huset er 28 meter højt. Brug det sidste ciffer."
         }
       ],
       "thumbnailMediaId": "media.fjordenhus.000"
@@ -603,43 +561,19 @@
           "id": "card.frydenlund98-den-groenne-transmission.1",
           "order": 1,
           "mediaId": "media.madsp.001",
-          "text": "Et fjernsyn står stadig tændt i det forladte værelse."
+          "text": "Et fjernsyn står stadig tændt i det forladte værelse.\n\nDen ukendte person har ikke efterladt et brev, et navn eller en dato.\n\nKun et fastfrosset øjeblik fra et cykelløb.\nEfterforskeren nåede at skrive én sætning:"
         },
         {
           "id": "card.frydenlund98-den-groenne-transmission.2",
           "order": 2,
-          "mediaId": "media.madsp.001",
-          "text": "Den ukendte person har ikke efterladt et brev, et navn eller en dato."
+          "mediaId": "media.madsp.002",
+          "text": "“Find året, hvor den danske rytter for første gang bar grønt i Touren.”\nKoden består af fire cifre.\n\nHvilken kode åbner beskeden?\nPå fjernsynet ses Tour de France og Lidl-Trek."
         },
         {
           "id": "card.frydenlund98-den-groenne-transmission.3",
           "order": 3,
-          "mediaId": "media.madsp.001",
-          "text": "Kun et fastfrosset øjeblik fra et cykelløb.\nEfterforskeren nåede at skrive én sætning:"
-        },
-        {
-          "id": "card.frydenlund98-den-groenne-transmission.4",
-          "order": 4,
-          "mediaId": "media.madsp.002",
-          "text": "“Find året, hvor den danske rytter for første gang bar grønt i Touren.”\nKoden består af fire cifre."
-        },
-        {
-          "id": "card.frydenlund98-den-groenne-transmission.5",
-          "order": 5,
-          "mediaId": "media.madsp.002",
-          "text": "Hvilken kode åbner beskeden?\nPå fjernsynet ses Tour de France og Lidl-Trek."
-        },
-        {
-          "id": "card.frydenlund98-den-groenne-transmission.6",
-          "order": 6,
           "mediaId": "media.madsp.003",
-          "text": "Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje."
-        },
-        {
-          "id": "card.frydenlund98-den-groenne-transmission.7",
-          "order": 7,
-          "mediaId": "media.madsp.003",
-          "text": "Indtast årstallet som en kode på fire cifre."
+          "text": "Billedet stammer fra det Tour, hvor Mads Pedersen for første gang overtog den grønne førertrøje.\n\nIndtast årstallet som en kode på fire cifre."
         }
       ],
       "thumbnailMediaId": "media.madsp.000"
@@ -754,58 +688,28 @@
       "moodMediaId": "media.vera.001",
       "cards": [
         {
-          "id": "card.veras-hul.1",
+          "id": "card.frydenlund98-veras-hemmelige-snack.1",
           "order": 1,
           "mediaId": "media.vera.001",
-          "text": "I haven bor kaninen Vera. Men i nat er der sket noget mærkeligt."
+          "text": "I haven bor kaninen Vera. Men i nat er der sket noget mærkeligt.\n\nFire kaniner har gravet hvert sit hul, og nu er alle spor blandet sammen.\n\nHullerne er nummereret fra venstre: Hul 1, Hul 2, Hul 3 og Hul 4."
         },
         {
-          "id": "card.veras-hul.2",
+          "id": "card.frydenlund98-veras-hemmelige-snack.2",
           "order": 2,
-          "mediaId": "media.vera.001",
-          "text": "Fire kaniner har gravet hvert sit hul, og nu er alle spor blandet sammen."
+          "mediaId": "media.vera.002",
+          "text": "Kaninerne hedder Vera, Plet, Sne og Skygge.\n\nSpor 1: Vera bor hverken i hul 1 eller hul 4."
         },
         {
-          "id": "card.veras-hul.3",
+          "id": "card.frydenlund98-veras-hemmelige-snack.3",
           "order": 3,
-          "mediaId": "media.vera.001",
-          "text": "Hullerne er nummereret fra venstre: Hul 1, Hul 2, Hul 3 og Hul 4."
+          "mediaId": "media.vera.003",
+          "text": "Spor 2: Plet bor i hullet lige til venstre for Vera.\n\nSpor 3: Sne bor i hul 4."
         },
         {
-          "id": "card.veras-hul.4",
+          "id": "card.frydenlund98-veras-hemmelige-snack.4",
           "order": 4,
-          "mediaId": "media.vera.002",
-          "text": "Kaninerne hedder Vera, Plet, Sne og Skygge."
-        },
-        {
-          "id": "card.veras-hul.5",
-          "order": 5,
-          "mediaId": "media.vera.002",
-          "text": "Spor 1: Vera bor hverken i hul 1 eller hul 4."
-        },
-        {
-          "id": "card.veras-hul.6",
-          "order": 6,
-          "mediaId": "media.vera.003",
-          "text": "Spor 2: Plet bor i hullet lige til venstre for Vera."
-        },
-        {
-          "id": "card.veras-hul.7",
-          "order": 7,
-          "mediaId": "media.vera.003",
-          "text": "Spor 3: Sne bor i hul 4."
-        },
-        {
-          "id": "card.veras-hul.8",
-          "order": 8,
           "mediaId": "media.vera.004",
-          "text": "Spor 4: Skygge bor til venstre for Plet."
-        },
-        {
-          "id": "card.veras-hul.9",
-          "order": 9,
-          "mediaId": "media.vera.004",
-          "text": "Hvilket hul bor Vera i?"
+          "text": "Spor 4: Skygge bor til venstre for Plet.\n\nHvilket hul bor Vera i?"
         }
       ],
       "thumbnailMediaId": "media.vera.000"
@@ -922,31 +826,7 @@
           "id": "card.den-forsvundne-landevej.1",
           "order": 1,
           "mediaId": "media.broen.001",
-          "text": "Foran jer ligger en gammel bro. I dag er den en del af et fredeligt stisystem."
-        },
-        {
-          "id": "card.den-forsvundne-landevej.2",
-          "order": 2,
-          "mediaId": "media.broen.001",
-          "text": "For mere end 200 år siden førte vejen her videre mellem Vejle og Horsens."
-        },
-        {
-          "id": "card.den-forsvundne-landevej.3",
-          "order": 3,
-          "mediaId": "media.broen.001",
-          "text": "En budbringer red gennem landskabet med en vigtig besked."
-        },
-        {
-          "id": "card.den-forsvundne-landevej.4",
-          "order": 4,
-          "mediaId": "media.broen.001",
-          "text": "Da han nåede broen, brød et uvejr løs. Regnen ødelagde hans kort."
-        },
-        {
-          "id": "card.den-forsvundne-landevej.5",
-          "order": 5,
-          "mediaId": "media.broen.001",
-          "text": "Kun broen husker stadig, hvilken vej han skulle fortsætte."
+          "text": "Foran jer ligger en gammel bro. I dag er den en del af et fredeligt stisystem.\n\nFor mere end 200 år siden førte vejen her videre mellem Vejle og Horsens.\n\nEn budbringer red gennem landskabet med en vigtig besked.\n\nDa han nåede broen, brød et uvejr løs. Regnen ødelagde hans kort.\n\nKun broen husker stadig, hvilken vej han skulle fortsætte."
         }
       ],
       "thumbnailMediaId": "media.broen.000"

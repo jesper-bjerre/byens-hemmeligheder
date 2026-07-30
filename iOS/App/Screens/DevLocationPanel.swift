@@ -25,6 +25,53 @@ struct DevLocationPanel: View {
 
     private var provider: ScriptedLocationProvider? { engine.simulatedLocationProvider }
 
+    /// Slår simuleret position til og fra.
+    ///
+    /// Findes i **alle** bygninger, ikke kun i simulatoren. En quizmaster, der
+    /// retter en opgave, skal kunne prøve den igennem uden først at gå derhen —
+    /// og det er netop på telefonen, den slags rettelser sker.
+    ///
+    /// Slås den til, begynder manuskriptet dér, hvor telefonen sidst så en
+    /// rigtig position. Ellers ville kortet springe til et fast punkt i Vejle,
+    /// og man havde mistet sig selv.
+    @ViewBuilder
+    private var simulationToggle: some View {
+        if let locationSwitch = engine.locationSwitch {
+            BHCard {
+                VStack(alignment: .leading, spacing: BHSpacing.snug) {
+                    Text("Positionskilde")
+                        .font(BHFont.heading)
+                        .foregroundStyle(BHColor.ink)
+
+                    Text(locationSwitch.isSimulating
+                         ? "Simuleret. Brug knapperne nedenfor til at flytte dig."
+                         : "Telefonens rigtige GPS.")
+                        .font(BHFont.body)
+                        .foregroundStyle(BHColor.inkMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Button(locationSwitch.isSimulating
+                           ? "Brug rigtig GPS"
+                           : "Simulér min position") {
+                        locationSwitch.setSimulating(!locationSwitch.isSimulating)
+                    }
+                    .buttonStyle(.bhSecondary)
+                    .accessibilityIdentifier("admin.simulation.toggle")
+                }
+            }
+        }
+    }
+
+    /// Vist, når der køres på rigtig GPS: bevægelsesknapperne gør intet der.
+    private var realLocationNote: some View {
+        BHCard {
+            Text("Bevægelsesknapperne virker først, når positionen er simuleret.")
+                .font(BHFont.body)
+                .foregroundStyle(BHColor.inkMuted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
     /// Nulstiller alt, spilleren har svaret på.
     ///
     /// Med bekræftelse, fordi handlingen er endelig: hændelsesloggen er hele
@@ -88,10 +135,13 @@ struct DevLocationPanel: View {
                     // panelet viser derfor kun "utilgængelig". Men det er
                     // netop på enheden — ude i felten, med rigtige testere —
                     // at behovet for at prøve den samme opgave igen er størst.
+                    simulationToggle
                     progressControls
 
                     if provider == nil {
                         unavailable
+                    } else if engine.locationSwitch?.isSimulating == false {
+                        realLocationNote
                     } else {
                         status
                         audioStatus

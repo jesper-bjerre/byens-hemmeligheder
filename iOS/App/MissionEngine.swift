@@ -295,9 +295,18 @@ final class MissionEngine {
         }
     }
 
-    /// Den simulerede kilde, hvis appen kører på den. `nil` betyder rigtig GPS.
+    /// Den simulerede kilde. Findes altid, når appen kører på en
+    /// ``SwitchableLocationProvider`` — også når simuleringen er slået fra.
     var simulatedLocationProvider: ScriptedLocationProvider? {
-        locationProvider as? ScriptedLocationProvider
+        if let switchable = locationProvider as? SwitchableLocationProvider {
+            return switchable.scripted
+        }
+        return locationProvider as? ScriptedLocationProvider
+    }
+
+    /// Omskifteren, hvis appen kører på den.
+    var locationSwitch: SwitchableLocationProvider? {
+        locationProvider as? SwitchableLocationProvider
     }
     #endif
 

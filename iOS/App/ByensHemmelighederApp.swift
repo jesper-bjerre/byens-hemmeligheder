@@ -31,33 +31,44 @@ struct ByensHemmelighederApp: App {
         )
     }
 
-    /// I simulatoren styres positionen af udviklerpanelet; på en telefon kommer
-    /// den fra CoreLocation.
+    /// Positionskilden.
     ///
-    /// Skellet går ved simulatoren og ikke ved Debug, netop så en Debug-bygning
-    /// på en rigtig telefon stadig tester den rigtige GPS-vej. Koden findes
-    /// under ingen omstændigheder i en udgivelse (FR-051).
+    /// Altid en ``SwitchableLocationProvider``, så en quizmaster kan slå
+    /// simuleret position til hvor som helst — også på en telefon i felten.
+    /// Det var før kun muligt i simulatoren, og en quizmaster måtte derfor gå
+    /// hen til opgaven for at afprøve en rettelse.
+    ///
+    /// I simulatoren er simulering som udgangspunkt slået **til**, fordi der
+    /// ikke er nogen rigtig GPS at falde tilbage på. På en telefon er den slået
+    /// **fra**: den, der står ude ved en opgave, skal se den rigtige adfærd,
+    /// med mindre hen selv vælger andet.
+    ///
+    /// Launch-argumenter kan stadig kun styre den i Debug (FR-051) — dét er
+    /// input udefra og noget helt andet end en knap i appen.
     @MainActor
     private static func makeLocationProvider() -> any LocationProviding {
-        #if BH_DEV_TOOLS
+        #if DEBUG
         if let scripted = ScriptedLocationProvider.fromLaunchArguments() {
             return scripted
         }
+        #endif
+
         #if targetEnvironment(simulator)
-        // Start ved Frydenlund 98, hvor testopgaverne ligger, så et gennemløb
-        // kan afprøves med det samme uden at gå først. Opgaven **startes** ikke
-        // af sig selv — kun opgavekortet popper op, og trykket er stadig
-        // spillerens eget.
-        //
-        // Værdien spejler `loc.vejle-oest.frydenlund98` i indholdspakken. Den er
-        // dev-kode og læses derfor ikke fra pakken; flyttes standpunktet, må den
-        // rettes her.
-        return ScriptedLocationProvider(
-            start: GeoPoint(latitude: 55.734897, longitude: 9.620270)
+        let simulatorDefault = true
+        #else
+        let simulatorDefault = false
+        #endif
+
+        return SwitchableLocationProvider(
+            real: CoreLocationProvider(),
+            // Startpunktet gælder kun, indtil en rigtig position er set —
+            // derefter flyttes manuskriptet dertil, når simuleringen slås til.
+            // Værdien spejler Frydenlund 98 i indholdspakken.
+            scripted: ScriptedLocationProvider(
+                start: GeoPoint(latitude: 55.734897, longitude: 9.620270)
+            ),
+            defaultsToSimulation: simulatorDefault
         )
-        #endif
-        #endif
-        return CoreLocationProvider()
     }
 
     var body: some Scene {

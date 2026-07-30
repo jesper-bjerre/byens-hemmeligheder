@@ -1,5 +1,6 @@
 import BHContracts
 import BHDesignSystem
+import BHGameCore
 import SwiftUI
 
 /// Ét kort: et billede i fuld bredde med lidt tekst hen over bunden.
@@ -24,35 +25,35 @@ struct MissionCardView: View {
     let card: MissionCard
     let onZoom: () -> Void
 
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            if let mediaId = card.mediaId {
-                // Fuld bredde, højden følger billedforholdet.
-                //
-                // Der stod før en fast højde her. Sammen med `scaledToFit`
-                // betød det, at billedet blev passet ind i højden og endte
-                // **smallere** end skærmen — med luft i siderne, mens
-                // tekstoverlayet gik ud til kanten. Højden er ligegyldig:
-                // spilleren ruller.
-                MissionHeroImage(mediaId: mediaId, fillsWidth: true, isSquared: true)
-            }
+    /// Om teksten kan bæres som overlay hen over billedets bund.
+    ///
+    /// ## Hvorfor grænsen findes
+    ///
+    /// Overlayet ser bedst ud — billedet får hele pladsen, og kortet ligner et
+    /// kort fra et brætspil. Men et overlay kan ikke gøre kortet højere: teksten
+    /// får billedets højde foreslået og bliver klippet, hvis den fylder mere.
+    ///
+    /// Det er målt, ikke skønnet. En tekst på 110 tegn bestod
+    /// tilgængelighedsauditten som overlay; 135 blev klippet. Da opgavernes
+    /// tekster blev slået sammen, så det samme billede ikke vises flere gange,
+    /// kom flere kort over grænsen.
+    ///
+    /// Derfor: overlay, når teksten er kort nok, og en bjælke under billedet,
+    /// når den ikke er. Bjælken kan vokse frit og klipper aldrig.
+    private var fitsAsOverlay: Bool {
+        card.text.count <= MissionShape.maximumOverlayTextLength
+    }
 
-            if !card.text.isEmpty {
-                Text(card.text)
-                    .font(BHFont.body)
-                    .foregroundStyle(.white)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(BHSpacing.regular)
-                    .background(alignment: .bottom) {
-                        // En blød overgang. En hård kant ville ligne et sort
-                        // felt klistret på billedet.
-                        LinearGradient(
-                            colors: [.black.opacity(0), .black.opacity(0.6), .black.opacity(0.88)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    }
+    var body: some View {
+        VStack(spacing: 0) {
+            if fitsAsOverlay {
+                ZStack(alignment: .bottom) {
+                    image
+                    if !card.text.isEmpty { caption(overlaid: true) }
+                }
+            } else {
+                image
+                if !card.text.isEmpty { caption(overlaid: false) }
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous))
@@ -62,6 +63,35 @@ struct MissionCardView: View {
         .accessibilityHint("Tryk for at forstørre billedet")
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("card.\(card.id)")
+    }
+
+    @ViewBuilder
+    private var image: some View {
+        if let mediaId = card.mediaId {
+            MissionHeroImage(mediaId: mediaId, fillsWidth: true, isSquared: true)
+        }
+    }
+
+    private func caption(overlaid: Bool) -> some View {
+        Text(card.text)
+            .font(BHFont.body)
+            .foregroundStyle(.white)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(BHSpacing.regular)
+            .background(alignment: .bottom) {
+                if overlaid {
+                    // En blød overgang. En hård kant ville ligne et sort felt
+                    // klistret på billedet.
+                    LinearGradient(
+                        colors: [.black.opacity(0), .black.opacity(0.6), .black.opacity(0.88)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                } else {
+                    BHColor.brand
+                }
+            }
     }
 }
 
