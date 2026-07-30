@@ -166,9 +166,9 @@
       "id": "mission.boelgen.den-femte-besked",
       "slug": "boelgen-den-femte-besked",
       "locationId": "loc.vejle-havn.boelgen",
-      "title": "Bølgen – Den femte besked",
-      "shortTitle": "Den femte besked",
-      "teaser": "En glemt besked ved fjorden kunne først åbnes, når alle bølger stod færdige. Tre symboler viser vejen til koden.",
+      "title": "Bølgen – Den skjulte besked",
+      "shortTitle": "Den skjulte besked",
+      "teaser": "En glemt besked ved fjorden kunne først åbnes, når alle bølger stod færdige.",
       "status": "fieldTestReady",
       "difficulty": 3,
       "estimatedMinutes": 10,
@@ -190,7 +190,7 @@
           "id": "step.boelgen.koden",
           "order": 1,
           "kind": "numericCode",
-          "title": "Den femte besked",
+          "title": "Den skjulte besked",
           "instruction": "1. Tæl de store, hvide bølgetoppe. Kun de store — ikke vinduer, altaner eller master.\n2. Hver bølge har ni etager.\n3. To bølger stod færdige, før byggeriet gik i stå i 2009.",
           "length": 3,
           "evidenceCards": [],
@@ -205,11 +205,11 @@
             "nearMissResponses": [
               {
                 "answer": "529",
-                "feedback": "Du har sandsynligvis de rigtige tal, men rækkefølgen er forkert. Følg symbolerne fra venstre mod højre: Øjet → Etagerne → Pausen."
+                "feedback": "Du har sandsynligvis de rigtige tal, men rækkefølgen er forkert."
               },
               {
                 "answer": "952",
-                "feedback": "Begynd med det, du selv kan se ved fjorden. Øjet kommer før Etagerne og Pausen."
+                "feedback": "Begynd med det, du selv kan se ved fjorden."
               },
               {
                 "answer": "593",
@@ -247,7 +247,7 @@
           "order": 2,
           "penaltyPercent": 4,
           "title": "Hvordan",
-          "text": "Koden følger rækkefølgen: antal bølger i dag → etager i hver bølge → bølger før byggepausen."
+          "text": "Koden følger rækkefølgen: antal bølger i dag → etager i hver bølge."
         },
         {
           "id": "hint.boelgen.3",
@@ -259,9 +259,9 @@
       ],
       "completion": {
         "headline": "Beskeden er åben",
-        "subheadline": "Du samlede den femte besked",
-        "messageLabel": "Den femte besked",
-        "message": "Beskeden kunne først åbnes, når alle fem bølger var rejst ved fjorden. Nu står de der alle sammen – og du læste bygningen, som den skulle læses: med øjet, med etagerne og med pausen.",
+        "subheadline": "Du samlede den skjulte besked",
+        "messageLabel": "Den skjulte besked",
+        "message": "Beskeden kunne først åbnes, når alle fem bølger var rejst ved fjorden. Nu står de der alle sammen – og du læste bygningen, som den skulle læses.",
         "historyFact": "Fem toppe rejser sig ved fjorden. De spejler det bakkede landskab omkring Vejle og fortæller om byen mellem landskab og hav. De første to bølger stod færdige i 2009. Efter en lang pause blev de sidste tre bygget, og hele Bølgen stod færdig i 2018."
       },
       "storyId": null,
@@ -274,20 +274,20 @@
         {
           "id": "card.boelgen-den-femte-besked.1",
           "order": 1,
-          "mediaId": "media.boelgen.001",
+          "mediaId": "media.boelgen.003",
           "text": "I 2009 stod kun begyndelsen af Bølgen færdig.\n\nEn glemt besked fortæller, at den først kan åbnes, når alle bølger er rejst ved fjorden."
         },
         {
           "id": "card.boelgen-den-femte-besked.2",
           "order": 2,
-          "mediaId": "media.boelgen.002",
-          "text": "Tre symboler viser vejen:\nØjet → Etagerne → Pausen\nFind de tre tal, og åbn beskeden.\n\nHvilken trecifret kode åbner beskeden?"
+          "mediaId": "media.boelgen.001",
+          "text": "Tre symboler viser vejen:\nØjet → Etagerne → Pausen."
         },
         {
           "id": "card.boelgen-den-femte-besked.3",
           "order": 3,
-          "mediaId": "media.boelgen.003",
-          "text": "1. Tæl de store, hvide bølgetoppe. Kun de store — ikke vinduer, altaner eller master.\n\n2. Hver bølge har ni etager.\n3. To bølger stod færdige, før byggeriet gik i stå i 2009."
+          "mediaId": "media.boelgen.002",
+          "text": "Hvilken trecifret kode åbner beskeden?"
         }
       ],
       "thumbnailMediaId": "media.boelgen.000"
@@ -370,21 +370,21 @@
           "order": 1,
           "penaltyPercent": 3,
           "title": "Hvor",
-          "text": "Du skal ikke tælle vinduer eller åbninger. Se i stedet på de store, runde hovedformer, som huset er bygget af."
+          "text": "Du skal ikke tælle vinduer eller åbninger. Se i stedet på de store, runde hovedformer, som huset er bygget af (hovedcylindre)."
         },
         {
           "id": "hint.fjordenhus.2",
           "order": 2,
           "penaltyPercent": 4,
           "title": "Hvordan",
-          "text": "Det første tal er antallet af hovedcylindre. Det andet handler om vandet i stueetagen. Det tredje er sidste ciffer i bygningens højde."
+          "text": "Det andet ciffer handler om vandet i stueetagen. Antal vandgennemstrømmede rum."
         },
         {
           "id": "hint.fjordenhus.3",
           "order": 3,
           "penaltyPercent": 5,
           "title": "Næsten løsningen",
-          "text": "Du skal bruge fire hovedcylindre, to vandgennemstrømmede rum og sidste ciffer i 28. Sæt tallene i rækkefølgen form, vand og højde."
+          "text": "Det tredje er sidste ciffer er noget med højde at gøre."
         }
       ],
       "completion": {
@@ -405,19 +405,19 @@
           "id": "card.fjordenhus-vandets-tromler.1",
           "order": 1,
           "mediaId": "media.fjordenhus.001",
-          "text": "Fjorden har gemt en besked i huset.\n\nMen huset skal ikke læses gennem vinduerne eller de mange åbninger. Det skal læses som tre enkle spor:\n\nForm. Vand. Højde.\nFørst det, der bærer huset.\nSå det, fjorden får lov at løbe igennem."
+          "text": "Fjorden har gemt en besked i huset.\n\nMen huset skal ikke læses gennem vinduerne eller de mange åbninger. Det skal læses som tre enkle spor:\nForm. Vand. Højde."
         },
         {
           "id": "card.fjordenhus-vandets-tromler.2",
           "order": 2,
           "mediaId": "media.fjordenhus.002",
-          "text": "Til sidst det sidste ciffer i husets højde.\nFind de tre tal, og åbn beskeden.\n\nHvilken trecifret kode åbner beskeden?"
+          "text": "Find de tre tal, og åbn beskeden.\n\nHvilken trecifret kode åbner beskeden?"
         },
         {
           "id": "card.fjordenhus-vandets-tromler.3",
           "order": 3,
           "mediaId": "media.fjordenhus.003",
-          "text": "1. Tæl husets store, cylindriske hoveddele. Se formen som helhed — ignorér vinduer, buer og gangbro.\n\n2. Fjordens vand løber gennem to af husets rum.\n3. Huset er 28 meter højt. Brug det sidste ciffer."
+          "text": "Først det, der bærer huset.\n\nSå det, fjorden får lov at løbe igennem.\n\nTil sidst det sidste ciffer i husets højde."
         }
       ],
       "thumbnailMediaId": "media.fjordenhus.000"
@@ -426,9 +426,9 @@
       "id": "mission.frydenlund98.veras-hemmelige-snack",
       "slug": "frydenlund98-veras-hemmelige-snack",
       "locationId": "loc.vejle-oest.frydenlund98-vera",
-      "title": "Vera og de fire huller",
-      "shortTitle": "Veras hul",
-      "teaser": "I haven bor kaninen Vera. Fire kaniner har gravet hvert sit hul, men alle sporene er blevet blandet sammen. Kan I finde Veras hul?",
+      "title": "Vera's hul",
+      "shortTitle": "Vera's hul",
+      "teaser": "I haven bor kaninen Vera. Kan du finde Vera's hul?",
       "status": "fieldTestReady",
       "difficulty": 2,
       "estimatedMinutes": 5,
@@ -535,25 +535,25 @@
           "id": "card.frydenlund98-veras-hemmelige-snack.1",
           "order": 1,
           "mediaId": "media.vera.001",
-          "text": "I haven bor kaninen Vera. Men i nat er der sket noget mærkeligt.\n\nFire kaniner har gravet hvert sit hul, og nu er alle spor blandet sammen.\n\nHullerne er nummereret fra venstre: Hul 1, Hul 2, Hul 3 og Hul 4."
+          "text": "I haven bor kaninen Vera. Men i nat har 3 andre kaniner også gravet huller."
         },
         {
           "id": "card.frydenlund98-veras-hemmelige-snack.2",
           "order": 2,
-          "mediaId": "media.vera.002",
+          "mediaId": "media.vera.003",
           "text": "Kaninerne hedder Vera, Plet, Sne og Skygge.\n\nSpor 1: Vera bor hverken i hul 1 eller hul 4."
         },
         {
           "id": "card.frydenlund98-veras-hemmelige-snack.3",
           "order": 3,
-          "mediaId": "media.vera.003",
-          "text": "Spor 2: Plet bor i hullet lige til venstre for Vera.\n\nSpor 3: Sne bor i hul 4."
+          "mediaId": "media.vera.002",
+          "text": "Spor 2: Plet bor i hullet lige til venstre for Vera.\n\nSpor 3: Sne bor i hul 4.\n\nSpor 4: Skygge bor til venstre for Plet."
         },
         {
           "id": "card.frydenlund98-veras-hemmelige-snack.4",
           "order": 4,
           "mediaId": "media.vera.004",
-          "text": "Spor 4: Skygge bor til venstre for Plet.\n\nHvilket hul bor Vera i?"
+          "text": "Hvilket hul bor Vera i?"
         }
       ],
       "thumbnailMediaId": "media.vera.000"
@@ -564,7 +564,7 @@
       "locationId": "loc.vejle-oest.tirsbaek-broen",
       "title": "Den forsvundne landevej",
       "shortTitle": "Landevejen",
-      "teaser": "En gammel bro gemmer stadig retningen på den forsvundne landevej mellem Vejle og Horsens.",
+      "teaser": "En gammel bro gemmer på en hemmelighed.",
       "status": "fieldTestReady",
       "difficulty": 3,
       "estimatedMinutes": 10,
@@ -587,7 +587,7 @@
           "kind": "singleChoice",
           "title": "Budbringerens retning",
           "question": "Hvilken vej fortsatte budbringeren fra broen?",
-          "instruction": "Han kom fra Vejle og skulle til Horsens. Find de to byer på kortet, og se hvilken vej rejsen gik.",
+          "instruction": "Find de to byer på kortet, og se hvilken vej rejsen gik.",
           "options": [
             {
               "id": "opt.broen.nord",
@@ -636,21 +636,21 @@
           "order": 1,
           "penaltyPercent": 3,
           "title": "Hvor er byerne?",
-          "text": "Zoom ud på kortet. Vejle ligger ved fjorden, Horsens længere oppe ad landet."
+          "text": "Zoom ud på kortet."
         },
         {
           "id": "hint.broen.2",
           "order": 2,
           "penaltyPercent": 4,
           "title": "Hvilken vej gik rejsen?",
-          "text": "Budbringeren forlod Vejle. Han skulle altså væk fra fjorden, ikke tilbage mod den."
+          "text": "Budbringeren forlod Vejle."
         },
         {
           "id": "hint.broen.3",
           "order": 3,
           "penaltyPercent": 5,
           "title": "Næsten der",
-          "text": "Horsens ligger cirka 28 kilometer nord for Vejle."
+          "text": "Horsens ligger cirka 28 kilometer fra Vejle."
         }
       ],
       "completion": {
@@ -670,7 +670,7 @@
           "id": "card.den-forsvundne-landevej.1",
           "order": 1,
           "mediaId": "media.broen.001",
-          "text": "Foran jer ligger en gammel bro. I dag er den en del af et fredeligt stisystem.\n\nFor mere end 200 år siden førte vejen her videre mellem Vejle og Horsens.\n\nEn budbringer red gennem landskabet med en vigtig besked.\n\nDa han nåede broen, brød et uvejr løs. Regnen ødelagde hans kort.\n\nKun broen husker stadig, hvilken vej han skulle fortsætte."
+          "text": "Foran jer ligger en gammel bro. I dag er den en del af et fredeligt stisystem.\n\nFor mere end 200 år siden førte vejen her videre mellem Vejle og Horsens.\n\nEn budbringer kom fra Vejle. Han red gennem landskabet med en vigtig besked.\n\nDa han nåede broen, brød et uvejr løs. Regnen ødelagde hans kort.\n\nKun broen husker stadig, hvilken vej han skulle fortsætte."
         }
       ],
       "thumbnailMediaId": "media.broen.000"
@@ -980,6 +980,7 @@
       "url": "https://byensgaader.dk/kilder/frydenlund98-vera",
       "kind": "other"
     },
+
     {
       "id": "source.vafo.tirsbaek-broen",
       "title": "Gammel bro fra 1700-tallet er fundet i nybyggerkvarter",
