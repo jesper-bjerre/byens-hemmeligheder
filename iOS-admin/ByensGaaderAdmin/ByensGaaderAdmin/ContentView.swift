@@ -305,6 +305,7 @@ struct ContentView: View {
                 // Nye opgaver får deres endelige id her — indtil nu hed de
                 // `mission.ny-opgave-3`, fordi titlen var tom, da de blev oprettet.
                 document.finaliseNewMissionIds()
+                document.fillRequiredLabels()
                 let etag = try await client.save(document)
                 document.adopt(etag: etag)
                 DraftStore.clear()

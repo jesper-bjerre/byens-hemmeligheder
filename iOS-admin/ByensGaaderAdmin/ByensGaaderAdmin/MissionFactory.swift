@@ -94,6 +94,45 @@ extension PackDocument {
         + "vejen. Kig op fra telefonen, når I flytter jer. Stedet er ikke særskilt "
         + "sikkerhedsvurderet."
 
+    /// Udfylder de felter, kontrakten kræver, men ingen redigerer.
+    ///
+    /// Trinnets `title` vises aldrig for spilleren — kun som reservetekst for
+    /// skærmlæseren — og hintenes overskrifter er de samme for alle opgaver.
+    /// Begge dele er derfor taget ud af UI'et, og begge dele skal stadig stå i
+    /// pakken, ellers er den ugyldig.
+    ///
+    /// Kaldes lige før en gemning, sammen med ``finaliseNewMissionIds()``.
+    func fillRequiredLabels() {
+        for mission in objects(at: [.key("missions")]).indices {
+            let title = string(at: .mission(mission, .key("title")))
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            for step in objects(at: .mission(mission, .key("steps"))).indices {
+                let path: [JSONStep] = .mission(mission, .key("steps"), .index(step), .key("title"))
+                if string(at: path).isEmpty, !title.isEmpty {
+                    setValue(title, at: path)
+                }
+            }
+
+            for hint in objects(at: .mission(mission, .key("hints"))).indices {
+                let path: [JSONStep] = .mission(mission, .key("hints"), .index(hint), .key("title"))
+                guard string(at: path).isEmpty else { continue }
+                let order = integer(
+                    at: .mission(mission, .key("hints"), .index(hint), .key("order"))) ?? hint + 1
+                setValue(Self.hintTitle(order: order), at: path)
+            }
+        }
+    }
+
+    /// Hintenes overskrifter. Vises som "Hint 1 · Hvor".
+    static func hintTitle(order: Int) -> String {
+        switch order {
+        case 1: "Hvor"
+        case 2: "Hvordan"
+        default: "Næsten løsningen"
+        }
+    }
+
     /// Stammen i et foreløbigt id. Genkendes af ``finaliseNewMissionIds()``.
     static let placeholderSlug = "ny-opgave"
 
@@ -263,7 +302,9 @@ extension PackDocument {
             "id": "step.\(slug).opgaven",
             "order": 1,
             "kind": "freeText",
-            "title": "Spørgsmålet mangler",
+            // Vises aldrig for spilleren. Sættes af `fillRequiredLabels()`
+            // ud fra opgavens titel, når den er skrevet.
+            "title": "Opgaven",
             "question": "Hvad skal spilleren finde?",
             "placeholder": "Skriv svaret",
             "answerRule": [
@@ -282,7 +323,7 @@ extension PackDocument {
             "order": order,
             // 3, 4, 5 — samme trappe som de opgaver, der allerede findes.
             "penaltyPercent": order + 2,
-            "title": ["Hvor", "Hvordan", "Næsten løsningen"][order - 1],
+            "title": Self.hintTitle(order: order),
             "text": "Hintet mangler.",
         ]
     }

@@ -55,7 +55,10 @@ struct QuestionTab: View {
             }
 
             Section("Spørgsmålet") {
-                TextField("Overskrift", text: document.text(path + [.key("title")]))
+                // Ét felt. Trinnet har også en `title` i kontrakten, men den
+                // vises aldrig for spilleren — kun som reservetekst for
+                // skærmlæseren, hvis spørgsmålet mangler. Den skrives af sig
+                // selv ud fra opgavens titel.
                 TextField("Spørgsmål", text: document.text(path + [.key("question")]),
                           axis: .vertical)
                     .lineLimit(2...)
@@ -133,8 +136,7 @@ struct QuestionTab: View {
 
         return Group {
             Section("Facit") {
-                TextField("Det rigtige svar",
-                          text: document.text(rule + [.key("canonicalAnswer")]))
+                TextField("Det rigtige svar", text: canonicalAnswer(rule))
                     .autocorrectionDisabled()
 
                 Picker("Sammenligning",
@@ -154,6 +156,34 @@ struct QuestionTab: View {
                 placeholder: "fx 5 9 2",
                 lines: document.lines(rule + [.key("acceptedAnswers")]))
         }
+    }
+
+    /// Facit, der holder listen over accepterede svar i takt.
+    ///
+    /// Svarmotoren bedømmer **kun** mod `acceptedAnswers`. Står facit ikke på
+    /// listen, er den rigtige løsning forkert — og det opdages først, når en
+    /// familie står på stedet med det rigtige svar og får nej.
+    ///
+    /// Rettes facit fra 592 til 593, erstattes 592 på listen. Blev den stående,
+    /// ville det gamle, forkerte svar blive ved med at tælle som rigtigt.
+    private func canonicalAnswer(_ rule: [JSONStep]) -> Binding<String> {
+        let accepted = rule + [.key("acceptedAnswers")]
+        return Binding(
+            get: { document.string(at: rule + [.key("canonicalAnswer")]) },
+            set: { new in
+                let previous = document.string(at: rule + [.key("canonicalAnswer")])
+                document.setValue(new, at: rule + [.key("canonicalAnswer")])
+
+                var answers = document.strings(at: accepted)
+                if let position = answers.firstIndex(of: previous) {
+                    answers[position] = new
+                } else if !answers.contains(new) {
+                    answers.append(new)
+                }
+                // Et halvskrevet facit efterlader ikke en tom streng på listen.
+                document.setValue(answers.filter { !$0.isEmpty }, at: accepted)
+            }
+        )
     }
 
     /// Registrerede fejlsvar med hver sin vejledning.

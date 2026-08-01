@@ -35,7 +35,9 @@ struct HintsTab: View {
         let path = hintsPath + [.index(position)]
 
         Section {
-            TextField("Overskrift", text: document.text(path + [.key("title")]))
+            // Kun ét felt. Overskriften vises for spilleren som "Hint 1 · Hvor",
+            // men den er den samme for alle opgaver — så den skrives af sig
+            // selv efter hintets nummer og er ikke noget, nogen skal opfinde.
             TextField("Hint", text: document.text(path + [.key("text")]), axis: .vertical)
                 .lineLimit(3...)
 
@@ -44,7 +46,7 @@ struct HintsTab: View {
                 value: document.integer(path + [.key("penaltyPercent")], default: 0),
                 in: 0...100)
         } header: {
-            Text("Hint \(position + 1)")
+            Text("Hint \(position + 1) · \(document.string(at: path + [.key("title")]))")
         } footer: {
             Text(Self.purpose(position))
         }

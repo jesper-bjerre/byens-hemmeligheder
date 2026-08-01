@@ -333,6 +333,59 @@ struct PackDocumentTests {
             .key("postalCode"))) == "7120")
     }
 
+    // MARK: - Felter, ingen redigerer
+
+    /// Svarmotoren bedømmer kun mod `acceptedAnswers`. Står facit ikke på
+    /// listen, er den rigtige løsning forkert — og det opdages først, når en
+    /// familie står på stedet med det rigtige svar og får nej.
+    @Test("Facit står altid blandt de accepterede svar")
+    func theCanonicalAnswerIsAlwaysAccepted() throws {
+        let document = try ContractFixtures.document()
+        let rule: [JSONStep] = .mission(0, .key("steps"), .index(0), .key("answerRule"))
+
+        // Sådan gør bindingen i Spørgsmål-fanebladet.
+        func setFacit(_ new: String) {
+            let previous = document.string(at: rule + [.key("canonicalAnswer")])
+            document.setValue(new, at: rule + [.key("canonicalAnswer")])
+            var answers = document.strings(at: rule + [.key("acceptedAnswers")])
+            if let position = answers.firstIndex(of: previous) {
+                answers[position] = new
+            } else if !answers.contains(new) {
+                answers.append(new)
+            }
+            document.setValue(answers.filter { !$0.isEmpty }, at: rule + [.key("acceptedAnswers")])
+        }
+
+        setFacit("777")
+        #expect(document.strings(at: rule + [.key("acceptedAnswers")]).contains("777"))
+
+        // Og det gamle facit må ikke blive stående som accepteret.
+        setFacit("778")
+        let answers = document.strings(at: rule + [.key("acceptedAnswers")])
+        #expect(answers.contains("778"))
+        #expect(!answers.contains("777"), "det gamle facit tæller stadig som rigtigt")
+    }
+
+    /// Trinnets titel og hintenes overskrifter er ude af UI'et, men kontrakten
+    /// kræver dem. Uden dette gemmes en ugyldig pakke.
+    @Test("De felter, ingen redigerer, udfyldes ved gemning")
+    func hiddenRequiredLabelsAreFilled() throws {
+        let document = try ContractFixtures.document()
+        let created = document.createMission()
+        document.setValue("Prøvetitel uden dubletter", at: .mission(created.index, .key("title")))
+        document.setValue("", at: .mission(created.index, .key("steps"), .index(0), .key("title")))
+        document.setValue("", at: .mission(created.index, .key("hints"), .index(0), .key("title")))
+
+        document.finaliseNewMissionIds()
+        document.fillRequiredLabels()
+
+        let index = created.index
+        #expect(document.string(at: .mission(index, .key("steps"), .index(0), .key("title")))
+            == "Prøvetitel uden dubletter")
+        #expect(document.string(at: .mission(index, .key("hints"), .index(0), .key("title")))
+            == "Hvor")
+    }
+
     // MARK: - Sletning
 
     @Test("En slettet opgave tager sit sted med, når ingen anden bruger det")
