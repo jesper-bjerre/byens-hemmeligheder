@@ -28,23 +28,27 @@ struct MissionEditorView: View {
 
     var body: some View {
         TabView {
-            // Illustrationerne frem for SF Symbols på de fire faneblade, der
-            // har en. Spørgsmål har ingen egen tegning og beholder sit symbol —
-            // et lånt ikon, der betyder noget andet, er værre end intet.
-            Tab("Opgaven", image: "Icon-Task") {
+            // SF Symbols og ikke grafikpakkens illustrationer.
+            //
+            // Illustrationerne er 512 px detaljerede tegninger. En fanebladslinje
+            // giver dem 25 punkter, og grafikpakkens egen README siger det
+            // samme: standardnavigation hører til i SF Symbols. De bruges i
+            // stedet, hvor der er plads — tomme skærme, fortællingen og
+            // billedpladsen på et kort.
+            Tab("Opgaven", systemImage: "doc.text") {
                 MissionTab(document: document, index: mission.index, isAdvanced: isAdvanced)
             }
-            Tab("Stedet", image: "Icon-Map") {
+            Tab("Stedet", systemImage: "mappin.and.ellipse") {
                 PlaceTab(
                     document: document, missionIndex: mission.index, isAdvanced: isAdvanced)
             }
-            Tab("Kort", image: "Icon-Photo") {
+            Tab("Kort", systemImage: "rectangle.stack") {
                 CardsTab(document: document, missionIndex: mission.index)
             }
             Tab("Spørgsmål", systemImage: "questionmark.circle") {
                 QuestionTab(document: document, index: mission.index, isAdvanced: isAdvanced)
             }
-            Tab("Hints", image: "Icon-Hint") {
+            Tab("Hints", systemImage: "lightbulb") {
                 HintsTab(document: document, index: mission.index)
             }
         }
