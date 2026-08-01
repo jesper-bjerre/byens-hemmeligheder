@@ -1,0 +1,38 @@
+name: Backend — byg og test
+
+# Kører på hver ændring i backenden eller i kontrakten. Kontrakten er med,
+# fordi testene læser den pakke, der faktisk shipper — en rettelse i indholdet
+# kan gøre backendens tests røde uden at en eneste .cs-fil er rørt.
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**', 'contracts/**', '.github/workflows/backend-ci.yml']
+  pull_request:
+    paths: ['backend/**', 'contracts/**', '.github/workflows/backend-ci.yml']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Gendan
+        run: dotnet restore
+        working-directory: backend
+
+      # `TreatWarningsAsErrors` står i Directory.Build.props, så en advarsel
+      # fælder bygningen her — det er meningen.
+      - name: Byg
+        run: dotnet build --no-restore --configuration Release
+        working-directory: backend
+
+      # Blob-kontrakttestene springer over uden BH_TEST_BLOB_URI. De kræver en
+      # Azure-konto, og en test, der kræver et abonnement, hører ikke til i en
+      # pull request fra en fremmed.
+      - name: Test
+        run: dotnet test --no-build --configuration Release
+        working-directory: backend

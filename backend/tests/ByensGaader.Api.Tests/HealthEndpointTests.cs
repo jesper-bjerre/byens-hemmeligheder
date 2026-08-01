@@ -57,6 +57,8 @@ public sealed class App : AppFixture<Program>
     }
 
     /// <summary>Går op fra testbinæren, indtil repoets indholdsmappe findes.</summary>
+    internal static string FindContentRootForTests() => FindContentRoot();
+
     private static string FindContentRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
@@ -71,5 +73,55 @@ public sealed class App : AppFixture<Program>
         }
         throw new DirectoryNotFoundException(
             "Fandt ikke 'contracts/content' over testbinæren. Er repoet flyttet?");
+    }
+}
+
+/// <summary>
+/// Som <see cref="App"/>, men med en **kopi** af indholdet i en midlertidig
+/// mappe.
+///
+/// Skrivetestene ville ellers rette i repoets egen indholdspakke. En test, der
+/// kan ødelægge det indhold, appen lever af, er værre end ingen test.
+/// </summary>
+/// <remarks>
+/// Ikke <c>sealed</c>, og den bruges aldrig direkte. FastEndpoints deler én
+/// instans pr. fixture-**type**, og den rives ned, når den første testklasse,
+/// der brugte den, er færdig. Delte to klasser typen, kunne den enes oprydning
+/// slette den andens mappe midt i en kørsel — det gjorde
+/// <c>Listen_viser_det_der_er_lagt_op</c> flaky.
+///
+/// Hver skrivende testklasse arver derfor sin egen type:
+/// <see cref="PackApp"/>, <see cref="MediaApp"/>, <see cref="AuditApp"/>.
+/// </remarks>
+public class WritableApp : AppFixture<Program>
+{
+    private string _root = string.Empty;
+
+    protected override ValueTask PreSetupAsync()
+    {
+        _root = Path.Combine(Path.GetTempPath(), "byensgaader-test-" + Guid.NewGuid().ToString("N"));
+        var locale = Path.Combine(_root, "da-DK");
+        Directory.CreateDirectory(locale);
+
+        var source = App.FindContentRootForTests();
+        File.Copy(
+            Path.Combine(source, "da-DK", "content-pack.json"),
+            Path.Combine(locale, "content-pack.json"));
+
+        return ValueTask.CompletedTask;
+    }
+
+    protected override void ConfigureApp(IWebHostBuilder builder)
+    {
+        builder.UseSetting("ContentStore:RootPath", _root);
+    }
+
+    protected override ValueTask TearDownAsync()
+    {
+        if (Directory.Exists(_root))
+        {
+            Directory.Delete(_root, recursive: true);
+        }
+        return ValueTask.CompletedTask;
     }
 }
