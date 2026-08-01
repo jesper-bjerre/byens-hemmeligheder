@@ -155,6 +155,7 @@ struct MediaUploadSheet: View {
                     }
                 }
             }
+            .dismissableKeyboard()
             .navigationTitle("Nyt billede")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

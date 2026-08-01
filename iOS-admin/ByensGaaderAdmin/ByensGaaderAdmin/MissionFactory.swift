@@ -61,9 +61,7 @@ extension PackDocument {
     ///
     /// Teksten er den samme for alle opgaver indtil videre. Skal en enkelt
     /// opgave sige noget andet, hører det til i en redigering af pakken.
-    static let standardFictionLabel =
-        "Fortællingen omkring gåden er opdigtet. Stedet, formerne og årstallene "
-        + "er virkelige, og det er dem, svaret hviler på."
+    static let standardFictionLabel = "Opgavens historie er opdigtet."
 
     /// Det, spilleren får at se, når gåden er løst.
     ///

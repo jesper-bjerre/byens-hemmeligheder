@@ -110,6 +110,31 @@ struct PackDocumentTests {
         #expect(document.objects(at: cards).count == before)
     }
 
+    /// Pilene i Detaljer bruger `move(fromOffsets:toOffset:)`, og `toOffset`
+    /// tælles i listen **før** flytningen — et skridt ned er to pladser frem.
+    /// Den regel er nem at tage fejl af, og en ombytning, der springer over,
+    /// opdages først, når en spiller læser detaljerne i forkert rækkefølge.
+    @Test("Op og ned flytter præcis én plads")
+    func arrowsMoveExactlyOneStep() throws {
+        let document = try ContractFixtures.document()
+        let cards: [JSONStep] = .mission(0, .key("cards"))
+
+        func ids() -> [String] {
+            document.objects(at: cards).compactMap { $0["id"] as? String }
+        }
+
+        let start = ids()
+        try #require(start.count >= 3, "opgaven skal have mindst tre detaljer")
+
+        // Ned fra plads 0.
+        document.move(fromOffsets: IndexSet(integer: 0), toOffset: 2, in: cards)
+        #expect(ids() == [start[1], start[0], start[2]] + start.dropFirst(3))
+
+        // Op igen fra plads 1.
+        document.move(fromOffsets: IndexSet(integer: 1), toOffset: 0, in: cards)
+        #expect(ids() == start, "op efter ned skal give det, man startede med")
+    }
+
     // MARK: - Medier
 
     /// Medier overskrives aldrig — serveren svarer `409` på et kendt filnavn,

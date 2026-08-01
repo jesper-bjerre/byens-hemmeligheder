@@ -43,6 +43,7 @@ struct MissionEditorView: View {
                 HintsTab(document: document, index: mission.index)
             }
         }
+        .dismissableKeyboard()
         .navigationTitle(document.string(at: .mission(mission.index, .key("title"))))
         .navigationBarTitleDisplayMode(.inline)
         // Ingen Gem-knap. Der gemmes, når editoren forlades — en knap, man kan
@@ -190,6 +191,7 @@ struct NewSourceSheet: View {
                     ForEach(Self.kinds, id: \.self) { Text(Self.kindName($0)).tag($0) }
                 }
             }
+            .dismissableKeyboard()
             .navigationTitle("Ny kilde")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
