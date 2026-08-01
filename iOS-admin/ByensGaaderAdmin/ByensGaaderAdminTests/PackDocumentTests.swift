@@ -235,6 +235,45 @@ struct PackDocumentTests {
             == "card.kaninens-hul.1")
     }
 
+    /// En opgave, der siger "mangler" til spilleren, er ikke en halvfærdig
+    /// opgave — den er en fejl, der er sluppet ud.
+    @Test("En ny opgave bærer ingen pladsholdere i det, spilleren ser")
+    func newMissionsCarryNoPlaceholders() throws {
+        let document = try ContractFixtures.document()
+        let created = document.createMission(named: "Kaninens hul")
+        document.finaliseNewMissionIds()
+
+        let index = created.index
+        let synlige = [
+            document.string(at: .mission(index, .key("fictionLabel"))),
+            document.string(at: .mission(index, .key("completion"), .key("headline"))),
+            document.string(at: .mission(index, .key("completion"), .key("message"))),
+            document.string(at: .mission(index, .key("completion"), .key("historyFact"))),
+        ]
+        for tekst in synlige {
+            #expect(!tekst.isEmpty)
+            #expect(!tekst.lowercased().contains("mangler"), "'\(tekst)' siger mangler")
+        }
+
+        let sted = try #require(document.locationIndex(forMissionAt: index))
+        #expect(document.string(at: .location(sted, .key("name"))) == "Kaninens hul")
+        #expect(!document.string(at: .location(sted, .key("address"))).contains("mangler"))
+        #expect(!document.string(
+            at: .location(sted, .key("safety"), .key("notes"))).contains("ikke vurderet"))
+    }
+
+    /// Sikkerhedsteksten må ikke påstå, at stedet er gennemgået. Den lover
+    /// ellers noget, ingen har kontrolleret (forfatningens princip IV).
+    @Test("Sikkerhedsteksten er forholdsregler og ikke en vurdering")
+    func safetyNotesDoNotClaimAnAssessment() throws {
+        let document = try ContractFixtures.document()
+        let created = document.createMission(named: "Prøve")
+        let sted = try #require(document.locationIndex(forMissionAt: created.index))
+        let noter = document.string(at: .location(sted, .key("safety"), .key("notes")))
+
+        #expect(noter.contains("ikke særskilt sikkerhedsvurderet"))
+    }
+
     @Test("En ny opgave er komplet og kommer med i hierarkiet")
     func newMissionIsComplete() throws {
         let document = try ContractFixtures.document()

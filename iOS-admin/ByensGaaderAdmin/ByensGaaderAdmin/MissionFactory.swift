@@ -36,7 +36,8 @@ extension PackDocument {
         let locationId = "loc.\(slug)"
         let code = postalCode.isEmpty ? (lastUsedPostalCode ?? "") : postalCode
 
-        append(newLocation(id: locationId, postalCode: code), to: [.key("locations")])
+        append(newLocation(id: locationId, postalCode: code, name: title),
+               to: [.key("locations")])
         append(newMission(slug: slug, locationId: locationId, title: title), to: [.key("missions")])
 
         let index = objects(at: [.key("missions")]).count - 1
@@ -49,6 +50,51 @@ extension PackDocument {
             postalCode: code
         )
     }
+
+    // MARK: - Standardtekster
+
+    /// Hvad der er digtet, og hvad der er virkeligt.
+    ///
+    /// Kontrakten kræver feltet, og forfatningens princip III kræver, at
+    /// spilleren kan se, hvad der er opfundet. Rammen om en opgave er fiktion —
+    /// stedet, formerne og årstallene er det ikke, og facit hviler på dem.
+    ///
+    /// Teksten er den samme for alle opgaver indtil videre. Skal en enkelt
+    /// opgave sige noget andet, hører det til i en redigering af pakken.
+    static let standardFictionLabel =
+        "Fortællingen omkring gåden er opdigtet. Stedet, formerne og årstallene "
+        + "er virkelige, og det er dem, svaret hviler på."
+
+    /// Det, spilleren får at se, når gåden er løst.
+    ///
+    /// Generisk med vilje. En opgave, der siger "Belønningsteksten mangler",
+    /// er værre end en, der siger noget rigtigt om alle opgaver.
+    static var standardCompletion: [String: Any] {
+        [
+            "headline": "Gåden er løst",
+            "subheadline": "Du fandt svaret dér, hvor det står",
+            "messageLabel": "Det, du fandt",
+            "message":
+                "Svaret lå på stedet hele tiden — i en form, et tal eller en retning, "
+                + "der har været der længe før jer, og som bliver stående, når I går "
+                + "videre.",
+            "historyFact":
+                "Hvert sted i byen bærer spor af dem, der byggede det. Kig op næste "
+                + "gang I går forbi.",
+        ]
+    }
+
+    /// Sikkerhed, der gælder alle steder.
+    ///
+    /// Formuleret som almindelige forholdsregler og **ikke** som en vurdering
+    /// af det enkelte sted. Forfatningens princip IV sætter sikkerhed over
+    /// spilværdi, og en tekst, der påstod at stedet var gennemgået, ville være
+    /// værre end ingen tekst: den ville love noget, ingen havde kontrolleret.
+    static let standardSafetyNotes =
+        "Bliv på offentligt tilgængelige arealer, og gå ikke ind på privat grund. "
+        + "Hold øje med trafik og cyklister, og stil jer et sted, hvor I ikke er i "
+        + "vejen. Kig op fra telefonen, når I flytter jer. Stedet er ikke særskilt "
+        + "sikkerhedsvurderet."
 
     /// Stammen i et foreløbigt id. Genkendes af ``finaliseNewMissionIds()``.
     static let placeholderSlug = "ny-opgave"
@@ -76,7 +122,22 @@ extension PackDocument {
             else { continue }
 
             rename(missionAt: index, to: uniqueSlug(base: title.packSlug))
+            nameThePlace(afterMissionAt: index, title: title)
         }
+    }
+
+    /// Stedet hedder det samme som opgaven, indtil nogen siger andet.
+    ///
+    /// Navnet vises for spilleren under "Sted". Uden dette ville hver ny opgave
+    /// stå som "Nyt sted", og feltet kan ikke rettes i appen.
+    static let placeholderPlaceName = "Nyt sted"
+
+    private func nameThePlace(afterMissionAt index: Int, title: String) {
+        guard let position = locationIndex(forMissionAt: index),
+              string(at: .location(position, .key("name"))) == Self.placeholderPlaceName
+        else { return }
+        setValue(title.trimmingCharacters(in: .whitespacesAndNewlines),
+                 at: .location(position, .key("name")))
     }
 
     /// Skriver et foreløbigt id om — og alt, der peger på det.
@@ -121,12 +182,21 @@ extension PackDocument {
 
     // MARK: - Skabelonerne
 
-    private func newLocation(id: String, postalCode: String) -> [String: Any] {
-        [
+    private func newLocation(id: String, postalCode: String, name: String) -> [String: Any] {
+        // Navn og adresse kan ikke rettes i appen længere. De må derfor sige
+        // noget, der er sandt fra starten: byen kender vi af postnummeret, og
+        // navnet får stedet af opgavens titel, når den bliver gemt.
+        let by = Postnumre.city(postalCode)
+        return [
             "id": id,
             "postalCode": postalCode,
-            "name": "Nyt sted",
-            "address": "Adresse mangler",
+            // Har opgaven allerede en titel, hedder stedet det samme med det
+            // samme. Er den tom — og det er den i appen — sættes navnet af
+            // `finaliseNewMissionIds()`, når titlen er skrevet.
+            "name": name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? Self.placeholderPlaceName
+                : name.trimmingCharacters(in: .whitespacesAndNewlines),
+            "address": by ?? "Danmark",
             // Koordinaterne står som null og ikke som 0,0. Nul er et sted i
             // Atlanterhavet, og en opgave, der peger derhen, ser udfyldt ud.
             "latitude": NSNull(),
@@ -138,7 +208,7 @@ extension PackDocument {
             "publicAccess": true,
             "safety": [
                 "flags": [],
-                "notes": "Sikkerheden er ikke vurderet endnu. Skriv, hvad der skal passes på.",
+                "notes": Self.standardSafetyNotes,
             ],
             "accessibility": [
                 "surface": "Ikke opmålt",
@@ -167,7 +237,7 @@ extension PackDocument {
             "estimatedMinutes": 15,
             "basePoints": 100,
             "tags": [],
-            "fictionLabel": "Fiktionsmarkeringen mangler.",
+            "fictionLabel": Self.standardFictionLabel,
             "heroMediaId": NSNull(),
             "thumbnailMediaId": NSNull(),
             "placeMediaId": NSNull(),
@@ -179,13 +249,7 @@ extension PackDocument {
             "sourceIds": [],
             "steps": [newStep(slug: slug)],
             "hints": (1...3).map { newHint(slug: slug, order: $0) },
-            "completion": [
-                "headline": "Løst",
-                "subheadline": "Belønningsteksten mangler.",
-                "messageLabel": "Beskeden",
-                "message": "Beskeden mangler.",
-                "historyFact": "Den historiske forklaring mangler.",
-            ],
+            "completion": Self.standardCompletion,
             "cards": [],
             "storyId": NSNull(),
             "chapterId": NSNull(),
