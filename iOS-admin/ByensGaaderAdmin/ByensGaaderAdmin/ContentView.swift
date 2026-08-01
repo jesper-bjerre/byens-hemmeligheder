@@ -212,6 +212,11 @@ struct ContentView: View {
                 }
                 Divider()
 
+                // Værten står der altid. Vælgeren viser navnet, men ikke
+                // adressen, og "Drift" siger ikke i sig selv, om man retter i
+                // det, quizmasterne arbejder i.
+                Label(client.host, systemImage: "server.rack")
+
                 if AdminConfiguration.canChooseBackend {
                     Picker("Server", selection: Binding(
                         get: { AdminConfiguration.backend },
@@ -221,10 +226,6 @@ struct ContentView: View {
                             Text(backend.name).tag(backend)
                         }
                     }
-                } else {
-                    // Hvilket indhold retter jeg i. Uden det kan man rette i
-                    // det forkerte uden at opdage det.
-                    Label(client.host, systemImage: "server.rack")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")

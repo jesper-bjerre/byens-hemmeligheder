@@ -103,6 +103,19 @@ struct MissionTab: View {
                     value: document.integer(.mission(index, .key("basePoints")), default: 100),
                     in: 1...1000, step: 10)
             }
+
+            Section {
+                TextField("Fiktionsmarkering",
+                          text: document.text(.mission(index, .key("fictionLabel"))),
+                          axis: .vertical)
+                    .lineLimit(2...)
+            } header: {
+                Text("Hvad er digtet")
+            } footer: {
+                Text("Spilleren skal kunne se, hvad der er opfundet, og hvad der er "
+                     + "dokumenteret. Rammen om gåden er fiktion; stedet, formerne og "
+                     + "årstallene er det ikke — og det er dem, facit hviler på.")
+            }
         }
     }
 
