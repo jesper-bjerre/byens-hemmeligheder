@@ -92,7 +92,7 @@ struct EngineIsContentDrivenTests {
         let pack = try ContractFixtures.contentPack()
         #expect(pack.missions.count >= 2)
 
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             #expect(mission.hints.count == 3, "\(mission.id) har ikke tre hints")
             #expect(mission.basePoints > 0, "\(mission.id) har ingen grundpoint")
             // Fortællingen er ikke længere et trin. Den er kort 1, og hele

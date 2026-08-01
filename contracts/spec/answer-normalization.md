@@ -72,3 +72,31 @@ den kan shippe (V-03, FR-044).
 
 `malformed` tæller **ikke** som fejlforsøg (FR-014). "Koden er tre cifre" er
 ikke et forkert svar, det er et ufærdigt.
+
+## Facit er det første accepterede svar
+
+Svarmotoren bedømmer **kun** mod `acceptedAnswers`. `canonicalAnswer` lægges
+ikke til automatisk, og den vises ingen steder for spilleren — den er en
+erklæring om, hvad det rigtige svar *er*, ikke en del af bedømmelsen.
+
+Derfor kræver kontrakten, at facit også står i `acceptedAnswers`. Gør det
+ikke det, er den rigtige løsning forkert, og det opdages først, når en familie
+står på stedet med det rigtige svar og får nej.
+
+### V-02 er svækket for indhold skrevet i quizmasterappen
+
+Selvkonsistenstestens **V-02** hævder, at `evaluate(canonicalAnswer) ==
+.correct` for hver svarregel. Den fandtes for at fange en forfatter, der
+rettede facit uden at rette listen.
+
+Siden feature 002 skriver quizmasterappen `canonicalAnswer` af det første
+accepterede svar ved hver gemning. For indhold skrevet dér kan uoverens-
+stemmelsen ikke længere opstå — og V-02 er dermed sand pr. konstruktion og
+beviser intet om den vej.
+
+Det er en bevidst byttehandel: fejlen forhindres ved kilden i stedet for at
+blive fanget bagefter. Men vagten er svagere, og det står her, så ingen
+senere læser V-02 som en garanti, den ikke længere giver.
+
+V-02 holder stadig for indhold, der rettes i hånden eller af et andet
+værktøj — og det er stadig værd at køre.

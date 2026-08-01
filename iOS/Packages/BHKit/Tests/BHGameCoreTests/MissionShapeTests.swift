@@ -22,7 +22,7 @@ struct MissionShapeTests {
         let pack = try ContractFixtures.contentPack()
         let media = Dictionary(uniqueKeysWithValues: pack.media.map { ($0.id, $0) })
 
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             let violations = MissionShape.violations(of: mission, media: media)
             #expect(
                 violations.isEmpty,
@@ -35,7 +35,7 @@ struct MissionShapeTests {
     func everyMissionHasCardsAndOneChallenge() throws {
         let pack = try ContractFixtures.contentPack()
 
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             #expect(mission.orderedSteps.count == 1, "\(mission.id) har \(mission.orderedSteps.count) trin")
             #expect(mission.challengeStep != nil, "\(mission.id) har intet spørgsmål")
             #expect(!mission.orderedCards.isEmpty, "\(mission.id) har ingen kort")
@@ -47,7 +47,7 @@ struct MissionShapeTests {
     func theFirstCardCarriesTheIntroduction() throws {
         let pack = try ContractFixtures.contentPack()
 
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             let first = try #require(mission.orderedCards.first)
             #expect(!first.text.isEmpty, "\(mission.id): første kort har ingen tekst")
             #expect(first.order == 1, "\(mission.id): kortene begynder ikke ved 1")
@@ -59,7 +59,7 @@ struct MissionShapeTests {
     func everyMissionResolvesAThumbnail() throws {
         let pack = try ContractFixtures.contentPack()
 
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             #expect(
                 mission.resolvedThumbnailMediaId != nil,
                 "\(mission.id) har intet billede at vise på kortet"
@@ -73,7 +73,7 @@ struct MissionShapeTests {
         let pack = try ContractFixtures.contentPack()
         let allowed = [SingleChoiceStep.kind, NumericCodeStep.kind, FreeTextStep.kind]
 
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             let challenge = try #require(mission.challengeStep)
             #expect(allowed.contains(challenge.kind), "\(mission.id) svarer med '\(challenge.kind)'")
         }
@@ -84,7 +84,7 @@ struct MissionShapeTests {
     func everyChallengeHasAPrompt() throws {
         let pack = try ContractFixtures.contentPack()
 
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             let challenge = try #require(mission.challengeStep)
             let prompt = try #require(challenge.prompt, "\(mission.id) har intet spørgsmålshoved")
             #expect(!prompt.title.isEmpty, "\(mission.id) mangler titel")
@@ -99,7 +99,7 @@ struct MissionShapeTests {
     func aMissionWithoutAFacitIsNotPlayable() throws {
         let pack = try ContractFixtures.contentPack()
 
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             let accepted = mission.challengeStep?.answerRule?.acceptedAnswers ?? []
             guard accepted.contains(MissionShape.unsetFacit) else { continue }
 

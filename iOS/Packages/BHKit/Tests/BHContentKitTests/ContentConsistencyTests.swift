@@ -326,7 +326,7 @@ struct ContentConsistencyTests {
 
     @Test("Hver mission har mindst ét trin, der bedømmes")
     func everyMissionCanBeSolved() {
-        for mission in pack.missions {
+        for mission in pack.missions where mission.isPlayable {
             #expect(
                 mission.orderedSteps.contains { $0.answerRule != nil },
                 "\(mission.id) har intet trin med et facit"

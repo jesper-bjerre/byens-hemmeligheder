@@ -40,12 +40,7 @@ public actor ContentRepository {
     /// `draft` og `paused` filtreres fra — en pauset opgave må ikke kunne
     /// startes, heller ikke fra et gammelt kortudsnit (forfatningens princip IV).
     public func playableMissions() async throws -> [Mission] {
-        try await pack().missions.filter { mission in
-            switch mission.status.known {
-            case .fieldTestReady, .publishReady: true
-            case .draft, .researchReady, .paused, nil: false
-            }
-        }
+        try await pack().missions.filter(\.isPlayable)
     }
 
     public func mission(id: String) async throws -> Mission? {

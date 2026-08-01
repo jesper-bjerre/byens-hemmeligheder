@@ -100,11 +100,17 @@ public struct AnswerEvaluator: Sendable {
         //    betydende i en kode og må aldrig gå tabt i en talkonvertering.
         //
         //    Bemærk: **kun** `acceptedAnswers` konsulteres. `canonicalAnswer`
-        //    lægges bevidst ikke til automatisk. Gjorde den det, ville V-02
-        //    ("hvert facit bedømmes korrekt af sin egen regel") være sand pr.
+        //    lægges bevidst ikke til her. Gjorde den det, ville V-02 ("hvert
+        //    facit bedømmes korrekt af sin egen regel") være sand pr.
         //    konstruktion og aldrig kunne fange en forfatter, der retter facit
         //    uden at rette reglen. Kontrakten kræver derfor, at facit også står
         //    i `acceptedAnswers` — og selvkonsistenstesten håndhæver det.
+        //
+        //    Siden feature 002 skriver quizmasterappen facit af det første
+        //    accepterede svar ved hver gemning, så uoverensstemmelsen ikke kan
+        //    opstå dér. V-02 beviser derfor ikke længere noget om indhold
+        //    skrevet i appen — kun om indhold, der rettes i hånden. Se
+        //    `contracts/spec/answer-normalization.md`.
         let accepted = rule.acceptedAnswers
             .map { DanishTextNormalizer.normalize($0, options: options) }
         if accepted.contains(candidate) {

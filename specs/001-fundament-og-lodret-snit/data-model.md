@@ -127,7 +127,7 @@ ikke skal huske dem. Felter: `id`, `symbol`, `label`, `title`, `description`,
 | Felt | Type | Krav | Note |
 |---|---|---|---|
 | `kind` | enum | ✅ | `exact` \| `digitsOnly` |
-| `canonicalAnswer` | string | ✅ | **Altid string.** Foranstillede nuller er betydende (R-006) |
+| `canonicalAnswer` | string | ✅ | **Altid string.** Foranstillede nuller er betydende (R-006). Skrives af det første `acceptedAnswers` og redigeres ikke i quizmasterappen (002) |
 | `acceptedAnswers` | string[] | ✅ | Bølgen: `["592", "5 9 2", "5-9-2"]` |
 | `nearMissResponses` | NearMiss[] | ✅ | `{answer, feedback}`. Bølgen har fem registrerede |
 
@@ -220,7 +220,7 @@ Håndhæves af skema plus selvkonsistenstest. Hver regel svarer til et krav.
 | # | Regel | Krav |
 |---|---|---|
 | V-01 | Obligatoriske felter findes: facit, 3 hints, `safety`, `accessibility`, `sourceIds`, samt `owner`/`licence`/`credit` på hvert medie | FR-042 |
-| V-02 | `evaluate(canonicalAnswer) == .correct` for hver svarregel | FR-043 |
+| V-02 | `evaluate(canonicalAnswer) == .correct` for hver svarregel. Svækket for indhold skrevet i quizmasterappen — se `contracts/spec/answer-normalization.md` | FR-043 |
 | V-03 | Ingen `nearMissResponses.answer` evaluerer til `.correct` | FR-044 |
 | V-04 | Hintfradrag summer til præcis 12 % | FR-045 |
 | V-05 | Alle id-referencer resolver: `locationId`, `heroMediaId`, `sourceIds`, `hintIds`, `evidenceCards` | FR-046 |

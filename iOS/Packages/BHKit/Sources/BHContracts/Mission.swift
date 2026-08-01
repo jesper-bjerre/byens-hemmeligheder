@@ -150,6 +150,22 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
     public func hint(id: String) -> Hint? { hints.first { $0.id == id } }
 }
 
+extension Mission {
+    /// Sandt, når spilleren må se opgaven.
+    ///
+    /// Findes her og ikke kun i `ContentRepository`, fordi
+    /// selvkonsistenstestene skal stille de samme krav som spillet: en kladde
+    /// under arbejde er ikke en fejl, den er en kladde. Da pakken blev
+    /// håndredigeret, var enhver ufærdig opgave en fejl — nu opretter
+    /// quizmasterne dem løbende i det indhold, der er i drift.
+    public var isPlayable: Bool {
+        switch status.known {
+        case .fieldTestReady, .publishReady: true
+        case .draft, .researchReady, .paused, nil: false
+        }
+    }
+}
+
 public enum MissionStatus: String, TolerantEnum {
     case draft
     case researchReady
