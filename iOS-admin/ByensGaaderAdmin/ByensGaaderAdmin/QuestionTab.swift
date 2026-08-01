@@ -67,12 +67,6 @@ struct QuestionTab: View {
                     TextField("Vejledende tekst i feltet",
                               text: document.text(path + [.key("placeholder")]))
                 }
-                if kind == "numericCode" {
-                    Stepper(
-                        "Antal cifre: \(document.integer(at: path + [.key("length")]) ?? 3)",
-                        value: document.integer(path + [.key("length")], default: 3),
-                        in: 1...12)
-                }
             }
 
             if kind == "singleChoice" {

@@ -114,6 +114,21 @@ extension PackDocument {
                 }
             }
 
+            // Miniaturen på kortet tages af den første detalje.
+            //
+            // Spillerappen falder tilbage til stedbilledet og derefter
+            // stemningsbilledet, men ingen af dem sættes i appen — så et kort
+            // uden miniature står tomt på kortet, og quizmasteren har ingen
+            // knap at trykke på for at rette det.
+            let thumbnail: [JSONStep] = .mission(mission, .key("thumbnailMediaId"))
+            if string(at: thumbnail).isEmpty,
+               let first = objects(at: .mission(mission, .key("cards")))
+                   .sorted(by: { ($0["order"] as? Int ?? 0) < ($1["order"] as? Int ?? 0) })
+                   .compactMap({ $0["mediaId"] as? String })
+                   .first {
+                setValue(first, at: thumbnail)
+            }
+
             // Facit skrives af det første accepterede svar.
             //
             // Feltet findes i kontrakten, men spillerappen bruger det ikke:
@@ -140,6 +155,43 @@ extension PackDocument {
                 let kind = string(at: .mission(mission, .key("steps"), .index(step), .key("kind")))
                 setValue(kind == "numericCode" ? "digitsOnly" : "exact",
                          at: rule + [.key("kind")])
+
+                // Antallet af cifre tælles af svaret. Stod der 3, mens facit
+                // var "7", ville spilleren aldrig kunne indsende noget: en for
+                // kort kode bedømmes som ufærdig og ikke som forkert, og
+                // feltet ville bare stå og vente.
+                if kind == "numericCode", let facit = answers.first {
+                    let cifre = facit.filter(\.isNumber).count
+                    if cifre > 0 {
+                        setValue(cifre,
+                                 at: .mission(mission, .key("steps"), .index(step), .key("length")))
+                    }
+                }
+            }
+
+            // Tomme tekstfelter, kontrakten kræver indhold i.
+            //
+            // En kladde under arbejde er normal, men pakken skal være gyldig
+            // hele tiden — også mens nogen skriver på den. Skemaet kræver
+            // mindst ét tegn i spørgsmålet, i hvert hint og i hver
+            // billedbeskrivelse, og en ugyldig pakke rammer alle klienter, ikke
+            // kun den opgave, der er ufærdig.
+            //
+            // Teksterne siger, hvad der mangler, frem for at skjule det.
+            for step in objects(at: .mission(mission, .key("steps"))).indices {
+                let path: [JSONStep] = .mission(
+                    mission, .key("steps"), .index(step), .key("question"))
+                if value(at: path) != nil, string(at: path).trimmed.isEmpty {
+                    setValue("Spørgsmålet er ikke skrevet endnu.", at: path)
+                }
+            }
+
+            for hint in objects(at: .mission(mission, .key("hints"))).indices {
+                let path: [JSONStep] = .mission(
+                    mission, .key("hints"), .index(hint), .key("text"))
+                if string(at: path).trimmed.isEmpty {
+                    setValue("Hintet er ikke skrevet endnu.", at: path)
+                }
             }
 
             for hint in objects(at: .mission(mission, .key("hints"))).indices {
@@ -148,6 +200,20 @@ extension PackDocument {
                 let order = integer(
                     at: .mission(mission, .key("hints"), .index(hint), .key("order"))) ?? hint + 1
                 setValue(Self.hintTitle(order: order), at: path)
+            }
+        }
+    }
+
+    /// Billedbeskrivelser, der er blevet tømt.
+    ///
+    /// Skrives ved oplægningen, men kan rettes bagefter — og et tomt felt gør
+    /// pakken ugyldig. Teksten læses højt for den, der ikke kan se billedet, så
+    /// den må sige, at den mangler, frem for ingenting.
+    func fillEmptyMediaDescriptions() {
+        for index in objects(at: [.key("media")]).indices {
+            let path: [JSONStep] = [.key("media"), .index(index), .key("altText")]
+            if string(at: path).trimmed.isEmpty {
+                setValue("Beskrivelsen er ikke skrevet endnu.", at: path)
             }
         }
     }

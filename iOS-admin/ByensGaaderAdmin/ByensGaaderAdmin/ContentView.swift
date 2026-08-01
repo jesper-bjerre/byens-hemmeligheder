@@ -306,6 +306,7 @@ struct ContentView: View {
                 // `mission.ny-opgave-3`, fordi titlen var tom, da de blev oprettet.
                 document.finaliseNewMissionIds()
                 document.fillRequiredLabels()
+                document.fillEmptyMediaDescriptions()
                 let etag = try await client.save(document)
                 document.adopt(etag: etag)
                 DraftStore.clear()
