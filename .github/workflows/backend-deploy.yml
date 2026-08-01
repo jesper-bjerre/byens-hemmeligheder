@@ -56,6 +56,37 @@ jobs:
         run: zip -r "${{ runner.temp }}/app.zip" .
         working-directory: ${{ runner.temp }}/publish
 
+      # `azure/login` svarer det samme på en tom secret som på en forkert:
+      # "Not all values are present". Den besked sender én på jagt efter en
+      # tillidsrelation, der er helt i orden. Her står der i stedet hvilken
+      # af de tre der mangler — uden at afsløre nogen af dem.
+      - name: Kontrollér at de tre secrets findes
+        env:
+          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          mangler=0
+          for navn in CLIENT_ID TENANT_ID SUBSCRIPTION_ID; do
+            vaerdi="${!navn}"
+            if [ -z "$vaerdi" ]; then
+              echo "::error::AZURE_$navn er tom eller findes ikke."
+              mangler=1
+            elif ! printf '%s' "$vaerdi" | grep -qE '^[0-9a-fA-F-]{36}$'; then
+              # Et GUID er 36 tegn. Er den kortere, er der typisk kopieret
+              # med et mellemrum eller et linjeskift.
+              echo "::error::AZURE_$navn ligner ikke et GUID (${#vaerdi} tegn)."
+              mangler=1
+            else
+              echo "AZURE_$navn: ✓ 36 tegn"
+            fi
+          done
+
+          if [ "$mangler" = "1" ]; then
+            echo "::error::Ret dem under Settings → Environments → produktion → Environment secrets."
+            exit 1
+          fi
+
       - name: Log ind i Azure
         uses: azure/login@v2
         with:
