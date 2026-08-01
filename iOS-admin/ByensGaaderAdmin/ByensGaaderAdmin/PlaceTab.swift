@@ -1,4 +1,5 @@
 import CoreLocation
+import MapKit
 import SwiftUI
 
 /// Faneblad 2: stedet.
@@ -25,6 +26,10 @@ struct PlaceTab: View {
     /// den følger af postnummeret og slås op i ``Postnumre``.
     @State private var region = ""
 
+    /// Sat, når den automatiske aflæsning på en ny opgave er forsøgt. Ellers
+    /// ville den gå i gang igen, hver gang fanebladet vises.
+    @State private var hasRequestedInitialFix = false
+
     private var locationIndex: Int? { document.locationIndex(forMissionAt: missionIndex) }
 
     var body: some View {
@@ -47,6 +52,18 @@ struct PlaceTab: View {
             }
         }
         .onAppear(perform: adoptRegionOfCurrentPlace)
+    }
+
+    /// Har opgaven intet koordinat, er quizmasteren næsten altid på stedet.
+    ///
+    /// Knappen findes stadig, men den blev glemt: en ny opgave blev gemt uden
+    /// position, og så skulle nogen tilbage til stedet for at hente den. Der
+    /// spørges kun, når feltet er tomt — en opgave med et koordinat, nogen har
+    /// målt, må aldrig blive overskrevet af, at telefonen kom forbi.
+    private var needsInitialFix: Bool {
+        guard let index = locationIndex else { return false }
+        return document.number(at: .location(index, .key("latitude"))) == nil
+            && document.number(at: .location(index, .key("longitude"))) == nil
     }
 
     /// Filteret begynder der, hvor opgaven allerede står.
@@ -166,15 +183,59 @@ struct PlaceTab: View {
                     .multilineTextAlignment(.trailing)
             }
 
-            CurrentPositionButton { coordinate, accuracy in
+            CurrentPositionButton(
+                automatically: needsInitialFix && !hasRequestedInitialFix
+            ) { coordinate, accuracy in
                 document.setValue(coordinate.latitude, at: .location(index, .key("latitude")))
                 document.setValue(coordinate.longitude, at: .location(index, .key("longitude")))
                 lastAccuracy = accuracy
+                hasRequestedInitialFix = true
             }
+
+            startPointMap(index)
         } header: {
             Text("Startsted")
         } footer: {
             accuracyNote(index)
+        }
+    }
+
+    /// Kortet med det valgte startsted.
+    ///
+    /// To tal er ikke til at kontrollere. Et kort er: står markøren i fjorden
+    /// eller på den forkerte side af vejen, ses det med det samme — og en
+    /// tastefejl i sjette decimal flytter markøren en meter, mens et ombyttet
+    /// fortegn flytter den til Sydatlanten.
+    @ViewBuilder
+    private func startPointMap(_ index: Int) -> some View {
+        if let latitude = document.number(at: .location(index, .key("latitude"))),
+           let longitude = document.number(at: .location(index, .key("longitude"))) {
+            let point = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+
+            Map(initialPosition: .region(MKCoordinateRegion(
+                center: point,
+                latitudinalMeters: 300,
+                longitudinalMeters: 300
+            ))) {
+                Marker("Startsted", systemImage: "flag.fill", coordinate: point)
+                    .tint(.orange)
+
+                // Cirklen er den, spillerens telefon skal være inden for.
+                if let radius = document.number(
+                    at: .location(index, .key("activationRadiusMetres"))) {
+                    MapCircle(center: point, radius: radius)
+                        .foregroundStyle(.orange.opacity(0.15))
+                        .stroke(.orange, lineWidth: 1)
+                }
+            }
+            .frame(height: 220)
+            .listRowInsets(EdgeInsets())
+            // Kortet skifter, når koordinatet gør. Uden dette står det på det
+            // første, det fik at vide.
+            .id("\(latitude),\(longitude)")
+        } else {
+            Label("Intet startsted endnu", systemImage: "mappin.slash")
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -357,6 +418,9 @@ struct PlaceTab: View {
 /// samme position, og ingen af dem kan se, hvem der bad om den.
 struct CurrentPositionButton: View {
     var title = "Brug min position"
+    /// Aflæser med det samme, når visningen kommer frem. Bruges på en ny
+    /// opgave, hvor der endnu ikke er noget koordinat at overskrive.
+    var automatically = false
     let onFix: (CLLocationCoordinate2D, CLLocationAccuracy) -> Void
 
     @State private var gps = LocationProvider()
@@ -381,6 +445,9 @@ struct CurrentPositionButton: View {
         .onChange(of: gps.fixCount) { _, _ in
             guard let coordinate = gps.coordinate else { return }
             onFix(coordinate, gps.accuracyMetres ?? -1)
+        }
+        .onAppear {
+            if automatically { gps.requestOnce() }
         }
 
         if let failure = gps.failure {

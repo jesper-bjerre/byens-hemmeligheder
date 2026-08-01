@@ -21,10 +21,18 @@ extension PackDocument {
     /// - Parameter postalCode: postnummeret, den nye opgave lægges under. Er
     ///   det tomt, arves det fra den senest oprettede opgave — quizmasteren
     ///   opretter som regel flere i samme by på én gang.
+    /// Titlen er tom med vilje. En forudfyldt "Ny opgave" skal slettes, før
+    /// quizmasteren kan skrive sin egen — og det er første ting, hen gør ved
+    /// hver eneste opgave.
+    ///
+    /// Til gengæld skal id'et være unikt fra første øjeblik, og det kan ikke
+    /// udledes af en tom titel. Opgaven får derfor et foreløbigt id, som
+    /// ``finaliseNewMissionIds()`` skriver om til titlens, første gang den
+    /// gemmes.
     func createMission(
-        named title: String = "Ny opgave", postalCode: String = ""
+        named title: String = "", postalCode: String = ""
     ) -> MissionSummary {
-        let slug = uniqueSlug(base: title.packSlug)
+        let slug = uniqueSlug(base: title.isEmpty ? Self.placeholderSlug : title.packSlug)
         let locationId = "loc.\(slug)"
         let code = postalCode.isEmpty ? (lastUsedPostalCode ?? "") : postalCode
 
@@ -40,6 +48,71 @@ extension PackDocument {
             cardCount: 0,
             postalCode: code
         )
+    }
+
+    /// Stammen i et foreløbigt id. Genkendes af ``finaliseNewMissionIds()``.
+    static let placeholderSlug = "ny-opgave"
+
+    /// Giver de opgaver, der aldrig er gemt, id'er der følger deres titel.
+    ///
+    /// Kaldes lige før en gemning. Indtil da hedder en ny opgave
+    /// `mission.ny-opgave-3`, og det ville stå sådan for altid — også i
+    /// revisionssporet og i filnavnene på dens billeder.
+    ///
+    /// Det er sikkert at omdøbe her, netop fordi opgaven aldrig har været på
+    /// serveren: intet uden for den peger på den, og alt inden i den er noget,
+    /// appen selv har skrevet.
+    func finaliseNewMissionIds() {
+        let saved = Set(
+            ((base["missions"] as? [[String: Any]]) ?? []).compactMap { $0["id"] as? String })
+
+        for index in objects(at: [.key("missions")]).indices.reversed() {
+            let id = string(at: .mission(index, .key("id")))
+            let title = string(at: .mission(index, .key("title")))
+
+            guard !saved.contains(id),
+                  id.hasPrefix("mission.\(Self.placeholderSlug)"),
+                  !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else { continue }
+
+            rename(missionAt: index, to: uniqueSlug(base: title.packSlug))
+        }
+    }
+
+    /// Skriver et foreløbigt id om — og alt, der peger på det.
+    private func rename(missionAt index: Int, to slug: String) {
+        let oldLocationId = string(at: .mission(index, .key("locationId")))
+        let locationId = "loc.\(slug)"
+
+        if let position = objects(at: [.key("locations")])
+            .firstIndex(where: { $0["id"] as? String == oldLocationId }) {
+            setValue(locationId, at: .location(position, .key("id")))
+        }
+
+        setValue("mission.\(slug)", at: .mission(index, .key("id")))
+        setValue(slug, at: .mission(index, .key("slug")))
+        setValue(locationId, at: .mission(index, .key("locationId")))
+
+        // Hints først: trinnet peger på dem, og rækkefølgen skal holde.
+        var hintIds: [String] = []
+        for hint in objects(at: .mission(index, .key("hints"))).indices {
+            let order = integer(at: .mission(index, .key("hints"), .index(hint), .key("order"))) ?? hint + 1
+            let hintId = "hint.\(slug).\(order)"
+            setValue(hintId, at: .mission(index, .key("hints"), .index(hint), .key("id")))
+            hintIds.append(hintId)
+        }
+
+        for step in objects(at: .mission(index, .key("steps"))).indices {
+            setValue("step.\(slug).opgaven",
+                     at: .mission(index, .key("steps"), .index(step), .key("id")))
+            setValue(hintIds, at: .mission(index, .key("steps"), .index(step), .key("hintIds")))
+        }
+
+        for card in objects(at: .mission(index, .key("cards"))).indices {
+            let order = integer(at: .mission(index, .key("cards"), .index(card), .key("order"))) ?? card + 1
+            setValue("card.\(slug).\(order)",
+                     at: .mission(index, .key("cards"), .index(card), .key("id")))
+        }
     }
 
     private var lastUsedPostalCode: String? {

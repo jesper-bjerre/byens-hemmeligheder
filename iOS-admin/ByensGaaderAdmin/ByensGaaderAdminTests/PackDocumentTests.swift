@@ -156,6 +156,85 @@ struct PackDocumentTests {
 
     // MARK: - Ny opgave
 
+    /// Titlen er tom, fordi en forudfyldt "Ny opgave" skal slettes, før
+    /// quizmasteren kan skrive sin egen — hver eneste gang.
+    @Test("En ny opgave har ingen titel og et foreløbigt id")
+    func newMissionStartsWithoutATitle() throws {
+        let document = try ContractFixtures.document()
+        let created = document.createMission()
+
+        #expect(document.string(at: .mission(created.index, .key("title"))).isEmpty)
+        #expect(created.id.hasPrefix("mission.ny-opgave"))
+    }
+
+    /// Uden dette ville en opgave hedde `mission.ny-opgave-3` for altid — også
+    /// i revisionssporet og i filnavnene på dens billeder.
+    @Test("Ved gemning får en ny opgave titlens id — og alt inden i den følger med")
+    func idsFollowTheTitleOnFirstSave() throws {
+        let document = try ContractFixtures.document()
+        let created = document.createMission()
+        document.setValue("Bølgen på Åen", at: .mission(created.index, .key("title")))
+
+        document.finaliseNewMissionIds()
+        let index = created.index
+
+        #expect(document.string(at: .mission(index, .key("id"))) == "mission.boelgen-paa-aaen")
+        #expect(document.string(at: .mission(index, .key("slug"))) == "boelgen-paa-aaen")
+
+        let locationId = document.string(at: .mission(index, .key("locationId")))
+        #expect(locationId == "loc.boelgen-paa-aaen")
+        #expect(document.locationIndex(forMissionAt: index) != nil, "stedet skal stadig kunne findes")
+
+        let hintIds = document.objects(at: .mission(index, .key("hints")))
+            .compactMap { $0["id"] as? String }
+        #expect(hintIds == ["hint.boelgen-paa-aaen.1", "hint.boelgen-paa-aaen.2", "hint.boelgen-paa-aaen.3"])
+
+        // Trinnet peger på hintene. Peger det på de gamle, kan spilleren ikke
+        // åbne et eneste hint.
+        let stepHintIds = document.strings(
+            at: .mission(index, .key("steps"), .index(0), .key("hintIds")))
+        #expect(stepHintIds == hintIds)
+        #expect(document.string(at: .mission(index, .key("steps"), .index(0), .key("id")))
+            == "step.boelgen-paa-aaen.opgaven")
+    }
+
+    @Test("En opgave uden titel omdøbes ikke")
+    func untitledMissionsKeepTheirProvisionalId() throws {
+        let document = try ContractFixtures.document()
+        let created = document.createMission()
+
+        document.finaliseNewMissionIds()
+
+        #expect(document.string(at: .mission(created.index, .key("id"))) == created.id)
+    }
+
+    /// Den vigtigste grænse. En opgave, der ligger på serveren, må aldrig
+    /// skifte id — alt, der peger på den, ville pege i luften.
+    @Test("En gemt opgave omdøbes aldrig, uanset hvad titlen bliver")
+    func savedMissionsAreNeverRenamed() throws {
+        let document = try ContractFixtures.document()
+        let originalId = document.string(at: .mission(0, .key("id")))
+
+        document.setValue("En helt anden titel", at: .mission(0, .key("title")))
+        document.finaliseNewMissionIds()
+
+        #expect(document.string(at: .mission(0, .key("id"))) == originalId)
+    }
+
+    @Test("Detaljernes id'er følger også med")
+    func cardIdsFollowTheRename() throws {
+        let document = try ContractFixtures.document()
+        let created = document.createMission()
+        document.setValue("Kaninens hul", at: .mission(created.index, .key("title")))
+        document.append(["id": "card.gammel.1", "order": 1, "text": "x"],
+                        to: .mission(created.index, .key("cards")))
+
+        document.finaliseNewMissionIds()
+
+        #expect(document.string(at: .mission(created.index, .key("cards"), .index(0), .key("id")))
+            == "card.kaninens-hul.1")
+    }
+
     @Test("En ny opgave er komplet og kommer med i hierarkiet")
     func newMissionIsComplete() throws {
         let document = try ContractFixtures.document()

@@ -42,7 +42,7 @@ struct MissionEditorView: View {
                 PlaceTab(
                     document: document, missionIndex: mission.index, isAdvanced: isAdvanced)
             }
-            Tab("Kort", systemImage: "rectangle.stack") {
+            Tab("Detaljer", systemImage: "rectangle.stack") {
                 CardsTab(document: document, missionIndex: mission.index)
             }
             Tab("Spørgsmål", systemImage: "questionmark.circle") {
@@ -68,7 +68,11 @@ struct MissionEditorView: View {
                 }
             }
             ToolbarItem(placement: .confirmationAction) {
+                // Uden titel kan opgaven hverken findes på forsiden eller få et
+                // id, der siger noget. Den er ikke halvfærdig — den er unavngiven.
                 Button("Gem", action: onSave)
+                    .disabled(document.string(at: .mission(mission.index, .key("title")))
+                        .trimmed.isEmpty)
             }
         }
     }

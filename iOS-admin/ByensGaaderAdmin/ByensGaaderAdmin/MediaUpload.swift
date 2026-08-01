@@ -87,13 +87,6 @@ struct MediaUploadSheet: View {
     @State private var showsCamera = false
 
     @State private var altText = ""
-    @State private var owner = ""
-    @State private var licence = ""
-    @State private var credit = ""
-    @State private var creditLine = ""
-    @State private var kind = "contemporary"
-    @State private var manipulation = ""
-
     @State private var isUploading = false
     @State private var failure: String?
 
@@ -103,12 +96,14 @@ struct MediaUploadSheet: View {
     private var filename: String { String(format: "%@-%03d.jpg", stem, number) }
     private var mediaId: String { String(format: "media.%@.%03d", stem, number) }
 
-    private var isComplete: Bool {
-        image != nil
-            && !altText.trimmed.isEmpty
-            && !owner.trimmed.isEmpty
-            && !licence.trimmed.isEmpty
-            && !credit.trimmed.isEmpty
+    /// Hvad der mangler, sagt i klartekst.
+    ///
+    /// En grå knap uden begrundelse er ikke en spærring, det er en gåde — og
+    /// quizmasteren står i felten og kan ikke se, om det er en fejl i appen.
+    private var missing: String? {
+        if image == nil { return "Vælg et billede." }
+        if altText.trimmed.isEmpty { return "Skriv en beskrivelse af billedet." }
+        return nil
     }
 
     var body: some View {
@@ -134,38 +129,24 @@ struct MediaUploadSheet: View {
                         Label("Vælg fra biblioteket", systemImage: "photo.on.rectangle")
                     }
 
-                    LabeledContent("Filnavn", value: filename)
-                        .font(.footnote)
                 }
 
                 Section {
-                    TextField("Alternativ tekst", text: $altText, axis: .vertical)
+                    TextField("Hvad ser man på billedet", text: $altText, axis: .vertical)
+                        .lineLimit(2...)
                 } header: {
                     Text("Beskrivelse")
                 } footer: {
-                    Text("Skriv den selv. Teksten læses højt for den, der ikke kan se billedet, "
-                         + "og et genereret forsøg beskriver som regel noget andet end motivet.")
+                    Text("Skriv den selv. Teksten læses højt for den, der ikke kan se "
+                         + "billedet, og et genereret forsøg beskriver som regel noget "
+                         + "andet end motivet.")
                 }
 
-                Section("Rettigheder") {
-                    TextField("Ejer", text: $owner)
-                    TextField("Licens", text: $licence)
-                    TextField("Kredit", text: $credit)
-                    TextField("Kreditlinje på skærmen (valgfri)", text: $creditLine)
-                }
-
-                Section {
-                    Picker("Slags", selection: $kind) {
-                        ForEach(Vocabulary.mediaKinds, id: \.self) {
-                            Text(Vocabulary.mediaKindName($0)).tag($0)
-                        }
+                if let missing {
+                    Section {
+                        Label(missing, systemImage: "exclamationmark.circle")
+                            .foregroundStyle(.secondary)
                     }
-                    if kind == "aiGenerated" || kind == "enhanced" {
-                        TextField("Hvad er ændret", text: $manipulation, axis: .vertical)
-                    }
-                } footer: {
-                    Text("Et AI-genereret billede må aldrig stå som et ægte historisk "
-                         + "fotografi. Skriv hvad der er lavet om.")
                 }
 
                 if let failure {
@@ -182,7 +163,7 @@ struct MediaUploadSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Læg op", action: upload)
-                        .disabled(!isComplete || isUploading)
+                        .disabled(missing != nil || isUploading)
                 }
             }
             .fullScreenCover(isPresented: $showsCamera) {
@@ -221,24 +202,28 @@ struct MediaUploadSheet: View {
             do {
                 try await client.upload(data, filename: name, contentType: "image/jpeg")
 
-                var asset: [String: Any] = [
+                document.addMediaAsset([
                     "id": id,
                     "filename": name,
                     "altText": altText.trimmed,
-                    "owner": owner.trimmed,
-                    "licence": licence.trimmed,
-                    "credit": credit.trimmed,
-                    "creditLine": creditLine.trimmed.isEmpty ? NSNull() : creditLine.trimmed,
-                    "kind": kind,
+                    // Rettighedskæden udfyldes af sig selv, fordi svaret er
+                    // kendt: quizmasteren tog billedet med sin egen telefon
+                    // for et par sekunder siden. Felterne er stadig i pakken —
+                    // kontrakten kræver dem, og forfatningens princip IV sætter
+                    // rettigheder over spilværdi. Men det er ikke et spørgsmål,
+                    // der skal stilles fem gange pr. opgave.
+                    "owner": AdminConfiguration.quizmaster,
+                    "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+                    "credit": "Byens Gåder",
+                    "creditLine": NSNull(),
+                    // Et nutidigt foto. Hverken historisk, bearbejdet eller
+                    // AI-genereret — og derfor er der intet at spørge om.
+                    "kind": "contemporary",
                     "mediaType": "image",
+                    "manipulation": NSNull(),
                     "restrictions": NSNull(),
                     "expiresAt": NSNull(),
-                ]
-                if !manipulation.trimmed.isEmpty {
-                    asset["manipulation"] = manipulation.trimmed
-                }
-
-                document.addMediaAsset(asset)
+                ])
                 onUploaded(id)
                 dismiss()
             } catch {

@@ -145,9 +145,6 @@ struct NarrationUploadSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var altText = ""
-    @State private var owner = ""
-    @State private var licence = ""
-    @State private var credit = ""
     @State private var kind = "aiGenerated"
     @State private var manipulation =
         "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at "
@@ -169,9 +166,9 @@ struct NarrationUploadSheet: View {
     private var filename: String { String(format: "%@-%03d.m4a", stem, number) }
     private var mediaId: String { String(format: "media.narration.%@.%03d", slug, number) }
 
-    private var isComplete: Bool {
-        !altText.trimmed.isEmpty && !owner.trimmed.isEmpty
-            && !licence.trimmed.isEmpty && !credit.trimmed.isEmpty
+    /// Hvad der mangler, sagt i klartekst frem for som en grå knap.
+    private var missing: String? {
+        altText.trimmed.isEmpty ? "Skriv, hvad der høres i fortællingen." : nil
     }
 
     var body: some View {
@@ -195,12 +192,6 @@ struct NarrationUploadSheet: View {
                          + "fortællingen, får.")
                 }
 
-                Section("Rettigheder") {
-                    TextField("Ejer", text: $owner)
-                    TextField("Licens", text: $licence)
-                    TextField("Kredit", text: $credit)
-                }
-
                 Section {
                     Picker("Slags", selection: $kind) {
                         ForEach(Self.kinds, id: \.self) {
@@ -210,6 +201,13 @@ struct NarrationUploadSheet: View {
                     TextField("Hvordan er den lavet", text: $manipulation, axis: .vertical)
                 } footer: {
                     Text("En syntetisk stemme må aldrig stå som en ægte optagelse.")
+                }
+
+                if let missing {
+                    Section {
+                        Label(missing, systemImage: "exclamationmark.circle")
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 if let failure {
@@ -223,7 +221,7 @@ struct NarrationUploadSheet: View {
                     Button("Fortryd") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Læg op", action: upload).disabled(!isComplete || isUploading)
+                    Button("Læg op", action: upload).disabled(missing != nil || isUploading)
                 }
             }
             .overlay { if isUploading { ProgressView().controlSize(.large) } }
@@ -248,9 +246,13 @@ struct NarrationUploadSheet: View {
                     "id": id,
                     "filename": name,
                     "altText": altText.trimmed,
-                    "owner": owner.trimmed,
-                    "licence": licence.trimmed,
-                    "credit": credit.trimmed,
+                    // Som for billeder: svaret er kendt, og spørgsmålet hører
+                    // ikke hjemme i felten. "Slags" bliver derimod stående — en
+                    // syntetisk stemme må aldrig stå som en ægte optagelse
+                    // (forfatningens princip III).
+                    "owner": AdminConfiguration.quizmaster,
+                    "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+                    "credit": "Byens Gåder",
                     "creditLine": NSNull(),
                     "kind": kind,
                     "mediaType": "audio",

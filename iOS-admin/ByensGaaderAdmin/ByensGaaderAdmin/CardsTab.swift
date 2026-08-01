@@ -1,6 +1,10 @@
 import SwiftUI
 
-/// Faneblad 3: kortene — billede og lidt tekst, som i et escape room (FR-108).
+/// Faneblad 3: opgavens detaljer — billede og lidt tekst, som i et escape room
+/// (FR-108).
+///
+/// Hedder `cards` i kontrakten, men "kort" betyder map på dansk, og fanebladet
+/// stod ved siden af "Stedet". To ord for to helt forskellige ting.
 struct CardsTab: View {
     let document: PackDocument
     let missionIndex: Int
@@ -42,11 +46,11 @@ struct CardsTab: View {
                 Button {
                     addCard()
                 } label: {
-                    Label("Tilføj kort", systemImage: "plus.circle")
+                    Label("Tilføj detalje", systemImage: "plus.circle")
                 }
             } footer: {
-                Text("Det første kort bærer introduktionen. Træk i kanten for at bytte om, "
-                     + "og stryg til venstre for at fjerne et.")
+                Text("Den første detalje bærer introduktionen. Træk i kanten for at bytte "
+                     + "om, og stryg til venstre for at fjerne en.")
             }
         }
         .environment(\.editMode, .constant(.active))
@@ -73,7 +77,7 @@ struct CardsTab: View {
         let mediaId = cards[position]["mediaId"] as? String
         let filename = document.filename(forMediaId: mediaId)
 
-        Section("Kort \(position + 1)") {
+        Section("Detalje \(position + 1)") {
             Button {
                 uploadingInto = position
             } label: {

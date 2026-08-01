@@ -183,7 +183,7 @@ struct ContentView: View {
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(mission.title)
-                Text("\(Vocabulary.statusName(mission.status)) · \(mission.cardCount) kort")
+                Text("\(Vocabulary.statusName(mission.status)) · \(mission.cardCount) detaljer")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -301,6 +301,9 @@ struct ContentView: View {
         isBusy = true
         Task {
             do {
+                // Nye opgaver får deres endelige id her — indtil nu hed de
+                // `mission.ny-opgave-3`, fordi titlen var tom, da de blev oprettet.
+                document.finaliseNewMissionIds()
                 let etag = try await client.save(document)
                 document.adopt(etag: etag)
                 DraftStore.clear()
@@ -376,7 +379,7 @@ struct ContentView: View {
         guard let document else { return }
         newMission = document.createMission()
         drafts.schedule(document)
-        status = "Ny opgave oprettet. Udfyld stedet, og gem."
+        status = "Giv opgaven en titel — så kan den gemmes."
     }
 }
 
