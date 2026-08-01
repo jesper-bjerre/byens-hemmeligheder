@@ -133,57 +133,26 @@ struct QuestionTab: View {
 
     private func answerRule(_ path: [JSONStep]) -> some View {
         let rule = path + [.key("answerRule")]
+        let answers = document.strings(at: rule + [.key("acceptedAnswers")])
 
         return Group {
-            Section("Facit") {
-                TextField("Det rigtige svar", text: canonicalAnswer(rule))
-                    .autocorrectionDisabled()
-
-                Picker("Sammenligning",
-                       selection: document.choice(rule + [.key("kind")], fallback: "exact")) {
-                    ForEach(Vocabulary.answerKinds, id: \.self) {
-                        Text(Vocabulary.answerKindName($0)).tag($0)
-                    }
-                }
-            }
-
-            // Der var tidligere et felt her til svaret, når intet passer. De
-            // fire, der blev skrevet, sagde alle det samme med hver sine ord,
-            // og et felt, der skal udfyldes hver gang uden at bære noget nyt,
-            // bliver udfyldt skødesløst. Teksten står nu ét sted i koden.
             EditableLines(
-                title: "Accepterede svar",
-                placeholder: "fx 5 9 2",
+                title: "Svar",
+                placeholder: "fx 592",
                 lines: document.lines(rule + [.key("acceptedAnswers")]))
-        }
-    }
 
-    /// Facit, der holder listen over accepterede svar i takt.
-    ///
-    /// Svarmotoren bedømmer **kun** mod `acceptedAnswers`. Står facit ikke på
-    /// listen, er den rigtige løsning forkert — og det opdages først, når en
-    /// familie står på stedet med det rigtige svar og får nej.
-    ///
-    /// Rettes facit fra 592 til 593, erstattes 592 på listen. Blev den stående,
-    /// ville det gamle, forkerte svar blive ved med at tælle som rigtigt.
-    private func canonicalAnswer(_ rule: [JSONStep]) -> Binding<String> {
-        let accepted = rule + [.key("acceptedAnswers")]
-        return Binding(
-            get: { document.string(at: rule + [.key("canonicalAnswer")]) },
-            set: { new in
-                let previous = document.string(at: rule + [.key("canonicalAnswer")])
-                document.setValue(new, at: rule + [.key("canonicalAnswer")])
-
-                var answers = document.strings(at: accepted)
-                if let position = answers.firstIndex(of: previous) {
-                    answers[position] = new
-                } else if !answers.contains(new) {
-                    answers.append(new)
+            Section {
+                if answers.filter({ !$0.trimmed.isEmpty }).isEmpty {
+                    Label("Opgaven kan ikke løses uden mindst ét svar.",
+                          systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(.orange)
                 }
-                // Et halvskrevet facit efterlader ikke en tom streng på listen.
-                document.setValue(answers.filter { !$0.isEmpty }, at: accepted)
+            } footer: {
+                Text("Det første er facit. Skriv derunder de former, spilleren kan finde "
+                     + "på at bruge — 5 9 2, 5-9-2, \"en gulerod\". Alle former tæller "
+                     + "som rigtige.")
             }
-        )
+        }
     }
 
     /// Registrerede fejlsvar med hver sin vejledning.

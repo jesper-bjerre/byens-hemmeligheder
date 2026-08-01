@@ -114,6 +114,34 @@ extension PackDocument {
                 }
             }
 
+            // Facit skrives af det første accepterede svar.
+            //
+            // Feltet findes i kontrakten, men spillerappen bruger det ikke:
+            // svarmotoren bedømmer kun mod `acceptedAnswers`, og facit vises
+            // ingen steder. To felter, hvor det ene skal være en kopi af en
+            // linje i det andet, er to steder at tage fejl.
+            for step in objects(at: .mission(mission, .key("steps"))).indices {
+                let rule: [JSONStep] = .mission(
+                    mission, .key("steps"), .index(step), .key("answerRule"))
+                guard value(at: rule) is [String: Any] else { continue }
+
+                let answers = strings(at: rule + [.key("acceptedAnswers")])
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+
+                setValue(answers, at: rule + [.key("acceptedAnswers")])
+                if let facit = answers.first {
+                    setValue(facit, at: rule + [.key("canonicalAnswer")])
+                }
+
+                // Cifferkoder sammenlignes som cifre; ellers ville "0592" og
+                // "592" være det samme svar. Følger af svartypen og er derfor
+                // ikke noget, nogen skal vælge.
+                let kind = string(at: .mission(mission, .key("steps"), .index(step), .key("kind")))
+                setValue(kind == "numericCode" ? "digitsOnly" : "exact",
+                         at: rule + [.key("kind")])
+            }
+
             for hint in objects(at: .mission(mission, .key("hints"))).indices {
                 let path: [JSONStep] = .mission(mission, .key("hints"), .index(hint), .key("title"))
                 guard string(at: path).isEmpty else { continue }

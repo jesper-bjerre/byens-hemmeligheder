@@ -335,35 +335,48 @@ struct PackDocumentTests {
 
     // MARK: - Felter, ingen redigerer
 
-    /// Svarmotoren bedømmer kun mod `acceptedAnswers`. Står facit ikke på
-    /// listen, er den rigtige løsning forkert — og det opdages først, når en
-    /// familie står på stedet med det rigtige svar og får nej.
-    @Test("Facit står altid blandt de accepterede svar")
-    func theCanonicalAnswerIsAlwaysAccepted() throws {
+    /// Svarmotoren bedømmer **kun** mod `acceptedAnswers`. Facit er derfor
+    /// ikke noget, nogen skriver — det er det første accepterede svar, og
+    /// bindeleddet skrives ved gemning.
+    @Test("Facit skrives af det første accepterede svar")
+    func theCanonicalAnswerFollowsTheList() throws {
         let document = try ContractFixtures.document()
         let rule: [JSONStep] = .mission(0, .key("steps"), .index(0), .key("answerRule"))
 
-        // Sådan gør bindingen i Spørgsmål-fanebladet.
-        func setFacit(_ new: String) {
-            let previous = document.string(at: rule + [.key("canonicalAnswer")])
-            document.setValue(new, at: rule + [.key("canonicalAnswer")])
-            var answers = document.strings(at: rule + [.key("acceptedAnswers")])
-            if let position = answers.firstIndex(of: previous) {
-                answers[position] = new
-            } else if !answers.contains(new) {
-                answers.append(new)
-            }
-            document.setValue(answers.filter { !$0.isEmpty }, at: rule + [.key("acceptedAnswers")])
-        }
+        document.setValue(["777", "7 7 7", "7-7-7"], at: rule + [.key("acceptedAnswers")])
+        document.fillRequiredLabels()
 
-        setFacit("777")
-        #expect(document.strings(at: rule + [.key("acceptedAnswers")]).contains("777"))
+        #expect(document.string(at: rule + [.key("canonicalAnswer")]) == "777")
+    }
 
-        // Og det gamle facit må ikke blive stående som accepteret.
-        setFacit("778")
-        let answers = document.strings(at: rule + [.key("acceptedAnswers")])
-        #expect(answers.contains("778"))
-        #expect(!answers.contains("777"), "det gamle facit tæller stadig som rigtigt")
+    /// En tom linje i listen ville blive til et accepteret svar, ingen kan
+    /// skrive — eller til et tomt facit, som skemaet afviser.
+    @Test("Tomme linjer i svarlisten ryddes ved gemning")
+    func blankAnswersAreDropped() throws {
+        let document = try ContractFixtures.document()
+        let rule: [JSONStep] = .mission(0, .key("steps"), .index(0), .key("answerRule"))
+
+        document.setValue(["  ", "592", "", "5 9 2"], at: rule + [.key("acceptedAnswers")])
+        document.fillRequiredLabels()
+
+        #expect(document.strings(at: rule + [.key("acceptedAnswers")]) == ["592", "5 9 2"])
+        #expect(document.string(at: rule + [.key("canonicalAnswer")]) == "592")
+    }
+
+    /// Foranstillede nuller er betydende i en kode. Uden `digitsOnly` ville
+    /// "0592" og "592" være det samme svar.
+    @Test("Sammenligningen følger svartypen")
+    func comparisonFollowsTheStepKind() throws {
+        let document = try ContractFixtures.document()
+        let step: [JSONStep] = .mission(0, .key("steps"), .index(0))
+
+        document.setValue("numericCode", at: step + [.key("kind")])
+        document.fillRequiredLabels()
+        #expect(document.string(at: step + [.key("answerRule"), .key("kind")]) == "digitsOnly")
+
+        document.setValue("freeText", at: step + [.key("kind")])
+        document.fillRequiredLabels()
+        #expect(document.string(at: step + [.key("answerRule"), .key("kind")]) == "exact")
     }
 
     /// Trinnets titel og hintenes overskrifter er ude af UI'et, men kontrakten
