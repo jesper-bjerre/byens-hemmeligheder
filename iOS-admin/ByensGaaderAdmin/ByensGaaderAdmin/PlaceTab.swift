@@ -10,11 +10,6 @@ import SwiftUI
 struct PlaceTab: View {
     let document: PackDocument
     let missionIndex: Int
-    /// Standardvisningen svarer på to spørgsmål: hvor på listen hører opgaven
-    /// til, og hvor står man. Alt andet — stedets navn og adresse,
-    /// positionsgatens tal, sikkerhed, tilgængelighed og feltbesøg — ligger
-    /// under Avanceret.
-    let isAdvanced: Bool
 
     /// Usikkerheden på den seneste aflæsning. Bruges kun til at advare og
     /// skrives aldrig i pakken — den hører til telefonen, ikke til stedet.
@@ -79,13 +74,6 @@ struct PlaceTab: View {
         Form {
             area(index)
             position(index)
-            if isAdvanced {
-                place(index)
-                gate(index)
-                safety(index)
-                accessibility(index)
-                fieldVisit(index)
-            }
         }
     }
 

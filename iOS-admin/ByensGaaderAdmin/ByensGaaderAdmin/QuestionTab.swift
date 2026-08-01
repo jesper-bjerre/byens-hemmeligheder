@@ -12,9 +12,6 @@ import SwiftUI
 struct QuestionTab: View {
     let document: PackDocument
     let index: Int
-    /// Registrerede fejlsvar og belønningsteksten er finpudsning. De skrives
-    /// sjældent samtidig med spørgsmålet og fylder mere end de bruges.
-    let isAdvanced: Bool
 
     private var stepsPath: [JSONStep] { .mission(index, .key("steps")) }
     private var steps: [[String: Any]] { document.objects(at: stepsPath) }
@@ -80,10 +77,6 @@ struct QuestionTab: View {
             }
 
             answerRule(path)
-            if isAdvanced {
-                nearMisses(path)
-                completion
-            }
         }
     }
 

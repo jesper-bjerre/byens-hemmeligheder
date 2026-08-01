@@ -210,6 +210,12 @@ final class PackDocument {
         return objects(at: [.key("media")]).first { $0["id"] as? String == id }
     }
 
+    /// Pladsen i `media`, så beskrivelsen kan rettes gennem en binding.
+    func mediaAssetIndex(id: String?) -> Int? {
+        guard let id else { return nil }
+        return objects(at: [.key("media")]).firstIndex { $0["id"] as? String == id }
+    }
+
     func filename(forMediaId id: String?) -> String? {
         mediaAsset(id: id)?["filename"] as? String
     }

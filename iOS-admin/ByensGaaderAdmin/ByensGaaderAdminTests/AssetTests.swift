@@ -14,7 +14,7 @@ struct AssetTests {
     /// Hvert navn, appen slår op. Tilføjes et `Image(...)` i koden, hører navnet
     /// hjemme her — ellers beviser testen ikke det, den påstår.
     static let referenced = [
-        "Icon-Photo", "Icon-GPS", "Icon-Route", "Icon-Publish", "Icon-Audio",
+        "Icon-Photo", "Icon-GPS", "Icon-Route", "Icon-Publish",
         "EmptyState-NoTasks", "EmptyState-ChooseLocation", "EmptyState-ReadyForTest",
     ]
 
@@ -33,7 +33,7 @@ struct AssetTests {
 
     /// Illustrationerne skal kunne bære en tab-bar på 3× uden at blive grødede.
     @Test("Ikonerne er store nok til at skaleres ned", arguments: [
-        "Icon-Photo", "Icon-GPS", "Icon-Route", "Icon-Publish", "Icon-Audio",
+        "Icon-Photo", "Icon-GPS", "Icon-Route", "Icon-Publish",
     ])
     func iconsAreBigEnough(_ name: String) throws {
         let image = try #require(UIImage(named: name))

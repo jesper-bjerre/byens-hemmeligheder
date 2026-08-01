@@ -111,6 +111,19 @@ struct CardsTab: View {
             TextField("Tekst", text: document.text(cardsPath + [.index(position), .key("text")]),
                       axis: .vertical)
                 .lineLimit(3...)
+
+            // Beskrivelsen skrives ved oplægningen, men blev derefter usynlig —
+            // og et felt, man ikke kan se igen, ser ud til ikke at være gemt.
+            // Den læses højt for den, der ikke kan se billedet, så den skal
+            // også kunne rettes.
+            if let mediaId, let index = document.mediaAssetIndex(id: mediaId) {
+                TextField(
+                    "Beskrivelse af billedet",
+                    text: document.text([.key("media"), .index(index), .key("altText")]),
+                    axis: .vertical)
+                    .font(.footnote)
+                    .lineLimit(2...)
+            }
         }
     }
 
