@@ -4,19 +4,16 @@
       "5"
     ],
     "canonicalAnswer" : "5",
-    "genericIncorrectFeedback" : "Tæl toppene igen.",
     "kind" : "exact",
     "nearMissResponses" : [
 
     ]
   },
-  "correctFeedback" : "Rigtigt.",
   "eyebrow" : "SPOR 1 AF 3",
   "hintIds" : [
     "hint.boelgen.1"
   ],
   "id" : "step.boelgen.oejet",
-  "instruction" : "Tæl kun de store hvide toppe.",
   "kind" : "singleChoice",
   "options" : [
     {

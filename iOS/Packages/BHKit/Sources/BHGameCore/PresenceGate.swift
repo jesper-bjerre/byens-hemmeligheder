@@ -89,39 +89,29 @@ public struct PresenceGate: Sendable {
         public let maxAcceptableAccuracyMetres: Double
         public let dwellSeconds: Double
         public let accuracyProfile: AccuracyProfile
-        /// Blødt hint til retningspilen.
-        public let bearingDegrees: Double?
 
         public init(
             centre: GeoPoint,
             activationRadiusMetres: Double,
             maxAcceptableAccuracyMetres: Double,
             dwellSeconds: Double,
-            accuracyProfile: AccuracyProfile,
-            bearingDegrees: Double? = nil
+            accuracyProfile: AccuracyProfile
         ) {
             self.centre = centre
             self.activationRadiusMetres = activationRadiusMetres
             self.maxAcceptableAccuracyMetres = maxAcceptableAccuracyMetres
             self.dwellSeconds = dwellSeconds
             self.accuracyProfile = accuracyProfile
-            self.bearingDegrees = bearingDegrees
         }
 
         /// Bygger konfigurationen ud fra indholdet. Returnerer `nil`, hvis
         /// lokationen mangler koordinater — hvilket den gør i hele feature 001,
         /// indtil felten er besøgt (V-10).
         public init?(location: Location) {
-            let centre: GeoPoint
-            if let vantage = location.vantagePoint,
-               let latitude = vantage.latitude,
-               let longitude = vantage.longitude {
-                centre = GeoPoint(latitude: latitude, longitude: longitude)
-            } else if let latitude = location.latitude, let longitude = location.longitude {
-                centre = GeoPoint(latitude: latitude, longitude: longitude)
-            } else {
+            guard let latitude = location.latitude, let longitude = location.longitude else {
                 return nil
             }
+            let centre = GeoPoint(latitude: latitude, longitude: longitude)
 
             guard let radius = location.activationRadiusMetres,
                   let maxAccuracy = location.maxAcceptableAccuracyMetres
@@ -132,8 +122,7 @@ public struct PresenceGate: Sendable {
                 activationRadiusMetres: radius,
                 maxAcceptableAccuracyMetres: maxAccuracy,
                 dwellSeconds: location.dwellSeconds,
-                accuracyProfile: location.accuracyProfile.known ?? .standard,
-                bearingDegrees: location.vantagePoint?.bearingDegrees
+                accuracyProfile: location.accuracyProfile.known ?? .standard
             )
         }
     }
@@ -346,8 +335,10 @@ public struct PresenceGate: Sendable {
         }
 
         let distance = GeoMath.distanceMetres(from: centre, to: configuration.centre)
-        let bearing = configuration.bearingDegrees
-            ?? GeoMath.bearingDegrees(from: centre, to: configuration.centre)
+        // Regnes altid ud af de to punkter. Indholdet bar tidligere en fast
+        // kigretning, men den kunne stå og pege forkert, længe efter at
+        // koordinatet var rettet.
+        let bearing = GeoMath.bearingDegrees(from: centre, to: configuration.centre)
 
         // Usikkerhedsbevidst afstand (FR-026). Dårlig præcision gør vinduet
         // bredere, ikke smallere.

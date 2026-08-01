@@ -259,8 +259,8 @@ final class MissionEngine {
         )
     }
 
-    /// Standpunktet for en mission, hvis indholdet kender det.
-    func vantagePoint(for mission: Mission) -> GeoPoint? {
+    /// Opgavens koordinat — det punkt, gaten måler imod.
+    func startPoint(for mission: Mission) -> GeoPoint? {
         guard let location = location(for: mission),
               let configuration = PresenceGate.Configuration(location: location)
         else { return nil }
@@ -493,7 +493,7 @@ extension AnswerOutcome {
         switch self {
         case .correct: nil
         case .nearMiss(_, let feedback): feedback
-        case .incorrect(let feedback): feedback
+        case .incorrect: AnswerOutcome.standardIncorrectFeedback
         case .malformed(let reason): reason.message
         }
     }

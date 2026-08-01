@@ -2,11 +2,36 @@
   "description": "Testvektorer for pointberegning. Skal give identiske resultater i Swift og i en fremtidig ASP.NET Core-implementering.",
   "specification": "scoring.md",
   "rounding": [
-    { "name": "3 % af 100", "base": 100, "percent": 3, "expected": 3 },
-    { "name": "4 % af 100", "base": 100, "percent": 4, "expected": 4 },
-    { "name": "5 % af 100", "base": 100, "percent": 5, "expected": 5 },
-    { "name": "0 % giver intet fradrag", "base": 100, "percent": 0, "expected": 0 },
-    { "name": "100 % fjerner alt", "base": 100, "percent": 100, "expected": 100 },
+    {
+      "name": "3 % af 100",
+      "base": 100,
+      "percent": 3,
+      "expected": 3
+    },
+    {
+      "name": "4 % af 100",
+      "base": 100,
+      "percent": 4,
+      "expected": 4
+    },
+    {
+      "name": "5 % af 100",
+      "base": 100,
+      "percent": 5,
+      "expected": 5
+    },
+    {
+      "name": "0 % giver intet fradrag",
+      "base": 100,
+      "percent": 0,
+      "expected": 0
+    },
+    {
+      "name": "100 % fjerner alt",
+      "base": 100,
+      "percent": 100,
+      "expected": 100
+    },
     {
       "name": "halv opad, ikke til lige tal — bankers rounding ville give 2",
       "base": 50,
@@ -48,20 +73,95 @@
     {
       "name": "ét hint",
       "base": 100,
-      "hintPercents": [3],
+      "hintPercents": [
+        3
+      ],
       "expectedTotal": 97
     },
     {
       "name": "to hints",
       "base": 100,
-      "hintPercents": [3, 4],
+      "hintPercents": [
+        3,
+        4
+      ],
       "expectedTotal": 93
     },
     {
       "name": "alle tre hints — SC-005",
       "base": 100,
-      "hintPercents": [3, 4, 5],
+      "hintPercents": [
+        3,
+        4,
+        5
+      ],
       "expectedTotal": 88
+    }
+  ],
+  "wrongAnswers": [
+    {
+      "name": "valg med 4 muligheder: ét forkert",
+      "base": 100,
+      "options": 4,
+      "wrongAnswers": 1,
+      "expectedPercent": 4,
+      "expectedTotal": 96
+    },
+    {
+      "name": "valg med 4 muligheder: alle tre forkerte koster som alle hints",
+      "base": 100,
+      "options": 4,
+      "wrongAnswers": 3,
+      "expectedPercent": 12,
+      "expectedTotal": 88
+    },
+    {
+      "name": "valg med 2 muligheder: ét forkert afslører svaret og koster hele budgettet",
+      "base": 100,
+      "options": 2,
+      "wrongAnswers": 1,
+      "expectedPercent": 12,
+      "expectedTotal": 88
+    },
+    {
+      "name": "valg med 3 muligheder: to forkerte",
+      "base": 100,
+      "options": 3,
+      "wrongAnswers": 2,
+      "expectedPercent": 12,
+      "expectedTotal": 88
+    },
+    {
+      "name": "kode: ét forkert",
+      "base": 100,
+      "options": null,
+      "wrongAnswers": 1,
+      "expectedPercent": 2,
+      "expectedTotal": 98
+    },
+    {
+      "name": "kode: seks forkerte rammer loftet",
+      "base": 100,
+      "options": null,
+      "wrongAnswers": 6,
+      "expectedPercent": 12,
+      "expectedTotal": 88
+    },
+    {
+      "name": "kode: ti forkerte koster ikke mere end loftet",
+      "base": 100,
+      "options": null,
+      "wrongAnswers": 10,
+      "expectedPercent": 12,
+      "expectedTotal": 88
+    },
+    {
+      "name": "kode ved 50 grundpoint: 2 % afrundes til 1",
+      "base": 50,
+      "options": null,
+      "wrongAnswers": 1,
+      "expectedPercent": 2,
+      "expectedTotal": 49
     }
   ]
 }

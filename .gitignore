@@ -174,3 +174,10 @@ secrets.json
 *.pubxml
 *.pubxml.user
 PublishProfiles/
+
+# --- Revisionsspor -----------------------------------------------------------
+# `audit.jsonl` bærer navne på quizmastere og tidspunkter for deres arbejde. Det
+# er personoplysninger (forfatningens princip VI) og hører hjemme på serveren,
+# ikke i et public repo. Mønsteret står her, før serveren kan nå at oprette
+# filen — se CLAUDE.md afsnit 1.
+audit.jsonl

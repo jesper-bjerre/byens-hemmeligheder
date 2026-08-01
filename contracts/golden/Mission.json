@@ -7,6 +7,7 @@
     "messageLabel" : "Den femte besked",
     "subheadline" : "Du samlede den femte besked"
   },
+  "description" : "En glemt besked ved fjorden.",
   "difficulty" : 3,
   "estimatedMinutes" : 10,
   "fictionLabel" : "Fiktiv mission baseret på Bølgens byggehistorie.",
@@ -56,19 +57,16 @@
           "5"
         ],
         "canonicalAnswer" : "5",
-        "genericIncorrectFeedback" : "Tæl toppene igen.",
         "kind" : "exact",
         "nearMissResponses" : [
 
         ]
       },
-      "correctFeedback" : "Rigtigt.",
       "eyebrow" : "SPOR 1 AF 3",
       "hintIds" : [
         "hint.boelgen.1"
       ],
       "id" : "step.boelgen.oejet",
-      "instruction" : "Tæl kun de store hvide toppe.",
       "kind" : "singleChoice",
       "options" : [
         {
@@ -92,7 +90,6 @@
           "5-9-2"
         ],
         "canonicalAnswer" : "592",
-        "genericIncorrectFeedback" : "Find de tre delresultater hver for sig.",
         "kind" : "digitsOnly",
         "nearMissResponses" : [
           {
@@ -101,23 +98,11 @@
           }
         ]
       },
-      "evidenceCards" : [
-        {
-          "description" : "Fem hvide bølgeformede hoveddele.",
-          "displayValue" : "5",
-          "id" : "card.boelgen.oejet",
-          "label" : "Øjet",
-          "supportingText" : "Talt på stedet.",
-          "symbol" : "eye",
-          "title" : "Bølgetoppene"
-        }
-      ],
       "eyebrow" : "SAML KODEN",
       "hintIds" : [
         "hint.boelgen.1"
       ],
       "id" : "step.boelgen.koden",
-      "instruction" : "Sæt tallene sammen.",
       "kind" : "numericCode",
       "length" : 3,
       "order" : 5,
@@ -128,6 +113,5 @@
     "arkitektur",
     "observation"
   ],
-  "teaser" : "En glemt besked ved fjorden.",
   "title" : "Bølgen – Den femte besked"
 }

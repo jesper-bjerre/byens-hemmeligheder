@@ -37,6 +37,7 @@ public struct ScoreTransaction: Identifiable, Hashable, Sendable {
 public enum ScoreReason: String, Hashable, Sendable {
     case missionCompleted
     case hintUsed
+    case wrongAnswer
 }
 
 /// Beregner point som en liste af transaktioner frem for ét tal.
@@ -59,6 +60,62 @@ public struct ScoreLedger: Sendable {
         return Int(raw.rounded(.toNearestOrAwayFromZero))
     }
 
+    // MARK: - Hvad et forkert svar koster
+
+    /// Det samlede budget for både hints og forkerte svar — hver for sig.
+    ///
+    /// De tre hints summer til præcis 12 (V-04). Forkerte svar har sit eget
+    /// loft på det samme tal, så en spiller, der både gætter og læser hints,
+    /// i værste fald ender på 76 af 100. Under det bliver en opgave, familien
+    /// har brugt en halv time på, til en straf.
+    public static let budgetPercent: Double = 12
+
+    /// Hvad ét forkert svar koster på dette trin.
+    ///
+    /// ## Valg koster mere end tekst
+    ///
+    /// Med fire svarmuligheder kan man klikke sig frem til facit på tre
+    /// forsøg. Derfor koster hvert forkert valg `12 / (N − 1)` procent: at
+    /// eliminere sig hele vejen frem koster præcis lige så meget som at læse
+    /// alle tre hints. Ingen af de to genveje er billigere end den anden, og
+    /// det er hele pointen.
+    ///
+    /// En kode eller et fritekstsvar kan ikke brute-forces — der er tusind
+    /// trecifrede koder — så et forkert svar dér er næsten altid et ægte
+    /// forsøg. Det koster 2 procent: mindre end hint 1, så det aldrig kan
+    /// betale sig at springe gætteriet over af frygt for prisen.
+    public static func wrongAnswerPercent(for step: Step) -> Double {
+        switch step {
+        case .singleChoice(let choice):
+            let wrongOptions = Double(choice.options.count - 1)
+            // Under to muligheder er der intet at vælge imellem. Pakken er
+            // ugyldig, men et svar skal stadig kunne bedømmes.
+            return wrongOptions >= 1 ? budgetPercent / wrongOptions : budgetPercent
+        case .numericCode, .freeText:
+            return 2
+        case .narrative, .unknown:
+            // Der er intet at svare forkert på.
+            return 0
+        }
+    }
+
+    /// Et forkert svar, spilleren har afgivet.
+    public struct WrongAnswer: Hashable, Sendable {
+        public let stepId: String
+        /// Det normaliserede svar. Bruges til at genkende det samme fejlsvar
+        /// afgivet to gange.
+        public let answer: String
+        public let percent: Double
+        public let eventId: String
+
+        public init(stepId: String, answer: String, percent: Double, eventId: String) {
+            self.stepId = stepId
+            self.answer = answer
+            self.percent = percent
+            self.eventId = eventId
+        }
+    }
+
     /// Bygger transaktionerne for én gennemført mission.
     ///
     /// - Parameters:
@@ -66,10 +123,13 @@ public struct ScoreLedger: Sendable {
     ///     id'et på den hændelse, der åbnede dem. Et hint åbnet to gange
     ///     optræder kun én gang — genåbning er gratis (FR-019).
     ///   - completionEventId: hændelsen, der afsluttede missionen.
+    ///   - wrongAnswers: forkerte svar i den rækkefølge, de blev afgivet. Det
+    ///     samme forkerte svar to gange koster kun én gang — som med hints.
     public func transactions(
         missionId: String,
         basePoints: Int,
         usedHints: [UsedHint],
+        wrongAnswers: [WrongAnswer] = [],
         completionEventId: String
     ) -> [ScoreTransaction] {
         var result: [ScoreTransaction] = [
@@ -100,6 +160,34 @@ public struct ScoreLedger: Sendable {
                 )
             )
         }
+
+        var spent: Double = 0
+        var seenAnswers = Set<String>()
+        for wrong in wrongAnswers {
+            // Det samme fejlsvar to gange koster én gang. Et gentaget svar
+            // fortæller spilleren intet nyt, og et net, der sender den samme
+            // hændelse to gange, må ikke koste point.
+            guard seenAnswers.insert("\(wrong.stepId)|\(wrong.answer)").inserted else { continue }
+
+            // Loftet skæres på procenten og ikke på pointene, så regnestykket
+            // ser ens ud, uanset hvad grundpointene er.
+            let percent = Swift.min(wrong.percent, Self.budgetPercent - spent)
+            guard percent > 0 else { break }
+            spent += percent
+
+            let deduction = Self.penalty(base: basePoints, percent: percent)
+            result.append(
+                ScoreTransaction(
+                    id: "\(wrong.eventId):wrongAnswer",
+                    missionId: missionId,
+                    reason: .wrongAnswer,
+                    points: -deduction,
+                    hintId: nil,
+                    explanation: "Forkert svar"
+                )
+            )
+        }
+
         return result
     }
 

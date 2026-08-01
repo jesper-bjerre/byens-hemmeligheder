@@ -25,8 +25,7 @@ struct PresenceGateTests {
             activationRadiusMetres: radius,
             maxAcceptableAccuracyMetres: maxAccuracy,
             dwellSeconds: dwellSeconds,
-            accuracyProfile: profile,
-            bearingDegrees: 118
+            accuracyProfile: profile
         )
     }
 
@@ -289,7 +288,7 @@ struct PresenceGateTests {
     func locationWithoutCoordinatesYieldsNoConfiguration() {
         let location = Location(
             id: "loc.test",
-            areaId: "area.test",
+            postalCode: "7100",
             name: "Uden koordinat",
             address: "—",
             latitude: nil,
@@ -298,7 +297,6 @@ struct PresenceGateTests {
             maxAcceptableAccuracyMetres: nil,
             dwellSeconds: 20,
             accuracyProfile: .known(.standard),
-            vantagePoint: nil,
             publicAccess: true,
             safety: Safety(flags: [], notes: "—"),
             accessibility: Accessibility(

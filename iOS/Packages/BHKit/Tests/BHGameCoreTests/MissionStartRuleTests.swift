@@ -9,7 +9,7 @@ import Testing
 struct MissionStartRuleTests {
 
     @Test("Ved standpunktet kan opgaven startes")
-    func atTheVantagePointItStarts() {
+    func atTheStartPointItStarts() {
         #expect(MissionStartRule.evaluate(distanceMetres: 0, activationRadiusMetres: 45) == .ready)
         #expect(MissionStartRule.evaluate(distanceMetres: 20, activationRadiusMetres: 45) == .ready)
     }
@@ -134,7 +134,7 @@ struct MissionStartRuleTests {
 
     /// Mod den pakke, der faktisk shipper.
     @Test("Begge opgaver kan startes ved deres eget standpunkt")
-    func bothMissionsStartAtTheirOwnVantagePoint() throws {
+    func bothMissionsStartAtTheirOwnPoint() throws {
         let pack = try ContractFixtures.contentPack()
 
         for mission in pack.missions {

@@ -128,8 +128,7 @@ struct AnswerEvaluatorTests {
             kind: .known(.digitsOnly),
             canonicalAnswer: "007",
             acceptedAnswers: ["007"],
-            nearMissResponses: [],
-            genericIncorrectFeedback: "Prøv igen."
+            nearMissResponses: []
         )
         #expect(evaluator.evaluate("007", rule: rule).isCorrect)
         // Ville en talkonvertering være sneget sig ind, ville denne være korrekt.
@@ -142,8 +141,7 @@ struct AnswerEvaluatorTests {
             kind: .unknown("fuzzyMatch"),
             canonicalAnswer: "boelgen",
             acceptedAnswers: ["boelgen"],
-            nearMissResponses: [],
-            genericIncorrectFeedback: "Prøv igen."
+            nearMissResponses: []
         )
         #expect(evaluator.evaluate("Bølgen", rule: rule).isCorrect)
     }
@@ -157,8 +155,7 @@ struct AnswerEvaluatorTests {
             kind: .known(.digitsOnly),
             canonicalAnswer: "777",
             acceptedAnswers: ["592"],
-            nearMissResponses: [],
-            genericIncorrectFeedback: "Prøv igen."
+            nearMissResponses: []
         )
         #expect(evaluator.evaluate("777", rule: rule).isCorrect == false)
     }

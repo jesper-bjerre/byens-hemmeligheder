@@ -12,7 +12,11 @@ public enum AnswerOutcome: Hashable, Sendable {
     /// `id` er det normaliserede svar — svarreglen har ingen selvstændig nøgle,
     /// og den normaliserede form er stabil nok til at føre i hændelsesloggen.
     case nearMiss(id: String, feedback: String)
-    case incorrect(feedback: String)
+    /// Uden tekst. Der var tidligere en `genericIncorrectFeedback` pr. opgave,
+    /// men de fire, der blev skrevet, sagde alle det samme med hver sine ord —
+    /// og et felt, der skal udfyldes hver gang uden at bære noget nyt, bliver
+    /// udfyldt skødesløst. Teksten står nu ét sted: ``AnswerOutcome/standardIncorrectFeedback``.
+    case incorrect
     case malformed(reason: MalformedReason)
 
     /// Om udfaldet skal tælle som et fejlforsøg.
@@ -33,6 +37,15 @@ public enum AnswerOutcome: Hashable, Sendable {
 }
 
 /// Hvorfor et svar ikke kunne bedømmes.
+extension AnswerOutcome {
+    /// Vises, når svaret hverken er rigtigt eller et registreret fejlsvar.
+    ///
+    /// Ikke-nedgørende (FR-015). Den peger tilbage på stedet i stedet for på
+    /// spilleren — det er stedet, svaret findes på.
+    public static let standardIncorrectFeedback =
+        "Det er ikke rigtigt. Kig en gang til på stedet — svaret er der."
+}
+
 public enum MalformedReason: Hashable, Sendable {
     case empty
     case tooShort(expected: Int, actual: Int)
@@ -128,7 +141,7 @@ public struct AnswerEvaluator: Sendable {
         }
 
         // 5. Forkert, men mødt venligt.
-        return .incorrect(feedback: rule.genericIncorrectFeedback)
+        return .incorrect
     }
 
     /// Ukendte regeltyper behandles som ``AnswerRuleKind/exact``.

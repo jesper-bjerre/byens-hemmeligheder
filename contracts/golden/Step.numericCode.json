@@ -6,7 +6,6 @@
       "5-9-2"
     ],
     "canonicalAnswer" : "592",
-    "genericIncorrectFeedback" : "Find de tre delresultater hver for sig.",
     "kind" : "digitsOnly",
     "nearMissResponses" : [
       {
@@ -15,23 +14,11 @@
       }
     ]
   },
-  "evidenceCards" : [
-    {
-      "description" : "Fem hvide bølgeformede hoveddele.",
-      "displayValue" : "5",
-      "id" : "card.boelgen.oejet",
-      "label" : "Øjet",
-      "supportingText" : "Talt på stedet.",
-      "symbol" : "eye",
-      "title" : "Bølgetoppene"
-    }
-  ],
   "eyebrow" : "SAML KODEN",
   "hintIds" : [
     "hint.boelgen.1"
   ],
   "id" : "step.boelgen.koden",
-  "instruction" : "Sæt tallene sammen.",
   "kind" : "numericCode",
   "length" : 3,
   "order" : 5,

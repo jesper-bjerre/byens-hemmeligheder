@@ -80,7 +80,7 @@ struct GPXScenarioTests {
     }
 
     @Test("Standpunktet verificerer inden for dwell-tiden")
-    func standingAtVantagePointVerifies() throws {
+    func standingAtTheStartPointVerifies() throws {
         let configuration = try Self.configuration()
         let result = Self.replay(
             try Self.track("boelgen-standpunkt.gpx"),

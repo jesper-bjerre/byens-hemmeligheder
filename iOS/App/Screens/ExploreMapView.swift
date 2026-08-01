@@ -394,10 +394,10 @@ struct ExploreMapView: View {
     /// øjet ser. Bruges der to forskellige punkter, opstår præcis den slags
     /// fejl, der er umulig at få øje på i koden.
     private func displayPoint(for mission: Mission) -> GeoPoint? {
-        guard let anchor = engine.vantagePoint(for: mission) else { return nil }
+        guard let anchor = engine.startPoint(for: mission) else { return nil }
 
         let sharing = mappableMissions.filter { other in
-            guard let point = engine.vantagePoint(for: other) else { return false }
+            guard let point = engine.startPoint(for: other) else { return false }
             return Self.isSameSpot(point, anchor)
         }
         guard sharing.count > 1,
@@ -518,7 +518,7 @@ struct ExploreMapView: View {
 /// Den korte beskrivelse, der vises ved tryk på en markør.
 ///
 /// Indholdet er med vilje det samme som det gamle listekort: titel, status,
-/// teaser, sværhedsgrad, varighed og afstand. Spilleren skal kunne afgøre
+/// beskrivelse, sværhedsgrad, varighed og afstand. Spilleren skal kunne afgøre
 /// "gider jeg gå derhen?" uden at forlade kortet.
 struct MissionPreviewCard: View {
     let mission: Mission
@@ -675,7 +675,7 @@ struct MissionSummary: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text(mission.teaser)
+            Text(mission.description)
                 .font(BHFont.body)
                 .foregroundStyle(BHColor.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -715,7 +715,7 @@ struct MissionSummary: View {
         var parts = [
             mission.title,
             engine.isCompleted(mission) ? "Løst" : "Ikke løst",
-            mission.teaser,
+            mission.description,
             "Sværhedsgrad \(mission.difficulty) af 5",
             "Cirka \(mission.estimatedMinutes) minutter",
         ]

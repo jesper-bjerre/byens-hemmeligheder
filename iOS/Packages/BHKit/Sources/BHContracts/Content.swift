@@ -14,7 +14,6 @@ public struct ContentPack: Codable, Hashable, Sendable {
     /// Den version en ``GameSession`` bindes til ved start (FR-035).
     public let contentVersion: String
     public let locale: String
-    public let areas: [Area]
     public let locations: [Location]
     public let missions: [Mission]
     public let media: [MediaAsset]
@@ -24,7 +23,6 @@ public struct ContentPack: Codable, Hashable, Sendable {
         schemaVersion: String,
         contentVersion: String,
         locale: String,
-        areas: [Area],
         locations: [Location],
         missions: [Mission],
         media: [MediaAsset],
@@ -33,7 +31,6 @@ public struct ContentPack: Codable, Hashable, Sendable {
         self.schemaVersion = schemaVersion
         self.contentVersion = contentVersion
         self.locale = locale
-        self.areas = areas
         self.locations = locations
         self.missions = missions
         self.media = media
@@ -41,26 +38,26 @@ public struct ContentPack: Codable, Hashable, Sendable {
     }
 }
 
-public struct Area: Codable, Hashable, Sendable, Identifiable {
-    public let id: String
-    public let name: String
-    /// Spejler mappestrukturen i `docs/design af opgaver/opgaver/`.
-    public let postalCode: String
-
-    public init(id: String, name: String, postalCode: String) {
-        self.id = id
-        self.name = name
-        self.postalCode = postalCode
-    }
-}
-
 /// Stedet. Bærer alt, der gør forfatningens princip I og IV håndhævelige.
 public struct Location: Codable, Hashable, Sendable, Identifiable {
     public let id: String
-    public let areaId: String
+    /// Dansk postnummer. By og landsdel slås op i quizmasterappens
+    /// genererede tabel og gemmes ikke i pakken.
+    ///
+    /// Der var tidligere et `Area` med navn, landsdel og postnummer, som nogen
+    /// skulle vedligeholde. Postnummeret bestemmer alligevel de to andre, og to
+    /// kopier af det samme kan drive fra hinanden.
+    public let postalCode: String
     public let name: String
     public let address: String
-    /// Foreløbig i feature 001. `nil` er tilladt, men blokerer `publishReady` (V-10).
+    /// Opgavens startsted — det punkt, gaten måler imod.
+    ///
+    /// Der var tidligere et separat `vantagePoint` med sin egen kigretning og
+    /// ståvejledning. Det blev fjernet i feature 002: ét koordinat er nok, og
+    /// to koordinater for det samme sted kunne pege hver sin vej uden at nogen
+    /// opdagede det.
+    ///
+    /// `nil` er tilladt, men blokerer `publishReady` (V-10).
     public let latitude: Double?
     public let longitude: Double?
     public let activationRadiusMetres: Double?
@@ -70,8 +67,6 @@ public struct Location: Codable, Hashable, Sendable, Identifiable {
     /// låser op (FR-025, SC-010).
     public let dwellSeconds: Double
     public let accuracyProfile: Tolerant<AccuracyProfile>
-    /// Spillerens standpunkt — ikke bygningen. Dette er gate-centrum (R-007).
-    public let vantagePoint: VantagePoint?
     public let publicAccess: Bool
     public let safety: Safety
     public let accessibility: Accessibility
@@ -80,7 +75,7 @@ public struct Location: Codable, Hashable, Sendable, Identifiable {
 
     public init(
         id: String,
-        areaId: String,
+        postalCode: String,
         name: String,
         address: String,
         latitude: Double?,
@@ -89,7 +84,6 @@ public struct Location: Codable, Hashable, Sendable, Identifiable {
         maxAcceptableAccuracyMetres: Double?,
         dwellSeconds: Double,
         accuracyProfile: Tolerant<AccuracyProfile>,
-        vantagePoint: VantagePoint?,
         publicAccess: Bool,
         safety: Safety,
         accessibility: Accessibility,
@@ -97,7 +91,7 @@ public struct Location: Codable, Hashable, Sendable, Identifiable {
         lastPhysicallyVerified: String?
     ) {
         self.id = id
-        self.areaId = areaId
+        self.postalCode = postalCode
         self.name = name
         self.address = address
         self.latitude = latitude
@@ -106,7 +100,6 @@ public struct Location: Codable, Hashable, Sendable, Identifiable {
         self.maxAcceptableAccuracyMetres = maxAcceptableAccuracyMetres
         self.dwellSeconds = dwellSeconds
         self.accuracyProfile = accuracyProfile
-        self.vantagePoint = vantagePoint
         self.publicAccess = publicAccess
         self.safety = safety
         self.accessibility = accessibility
@@ -119,22 +112,6 @@ public struct Location: Codable, Hashable, Sendable, Identifiable {
 public enum AccuracyProfile: String, TolerantEnum {
     case standard
     case urbanCanyon
-}
-
-/// Spillerens standpunkt.
-public struct VantagePoint: Codable, Hashable, Sendable {
-    public let latitude: Double?
-    public let longitude: Double?
-    /// Kigretning. Blødt hint til retningspilen — aldrig en gate (R-007).
-    public let bearingDegrees: Double?
-    public let instruction: String
-
-    public init(latitude: Double?, longitude: Double?, bearingDegrees: Double?, instruction: String) {
-        self.latitude = latitude
-        self.longitude = longitude
-        self.bearingDegrees = bearingDegrees
-        self.instruction = instruction
-    }
 }
 
 public struct Safety: Codable, Hashable, Sendable {
@@ -197,7 +174,6 @@ public enum AccessLevel: String, TolerantEnum {
 // MARK: - Opslag
 
 extension ContentPack {
-    public func area(id: String) -> Area? { areas.first { $0.id == id } }
     public func location(id: String) -> Location? { locations.first { $0.id == id } }
     public func mission(id: String) -> Mission? { missions.first { $0.id == id } }
     public func media(id: String) -> MediaAsset? { media.first { $0.id == id } }

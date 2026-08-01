@@ -38,7 +38,7 @@ struct MissionSheet: View {
             Text(mission.title)
                 .font(BHFont.title)
                 .foregroundStyle(BHColor.ink)
-            Text(mission.teaser)
+            Text(mission.description)
                 .font(BHFont.body)
                 .foregroundStyle(BHColor.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -70,12 +70,6 @@ struct MissionSheet: View {
                 factRow("Point", "\(mission.basePoints) at hente", "star")
                 if let location {
                     factRow("Sted", location.name, "mappin.and.ellipse")
-                    if let vantage = location.vantagePoint {
-                        Text(vantage.instruction)
-                            .font(BHFont.caption)
-                            .foregroundStyle(BHColor.inkMuted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
                 }
             }
         }

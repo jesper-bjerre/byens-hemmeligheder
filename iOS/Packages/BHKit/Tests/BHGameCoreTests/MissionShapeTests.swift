@@ -88,7 +88,6 @@ struct MissionShapeTests {
             let challenge = try #require(mission.challengeStep)
             let prompt = try #require(challenge.prompt, "\(mission.id) har intet spørgsmålshoved")
             #expect(!prompt.title.isEmpty, "\(mission.id) mangler titel")
-            #expect(!prompt.instruction.isEmpty, "\(mission.id) mangler afgrænsning")
         }
     }
 
@@ -128,16 +127,13 @@ struct MissionShapeTests {
             eyebrow: nil,
             title: "Uden facit",
             question: "Hvilken vej?",
-            instruction: "Retningen er ikke målt endnu.",
             options: ["Nord", "Syd", "Øst", "Vest"].map { ChoiceOption(id: "opt.\($0)", label: $0) },
             answerRule: AnswerRule(
                 kind: .known(.exact),
                 canonicalAnswer: MissionShape.unsetFacit,
                 acceptedAnswers: [MissionShape.unsetFacit],
-                nearMissResponses: [],
-                genericIncorrectFeedback: "Prøv igen."
+                nearMissResponses: []
             ),
-            correctFeedback: "Rigtigt.",
             hintIds: []
         )
 
@@ -158,14 +154,12 @@ struct MissionShapeTests {
             kind: .known(.exact),
             canonicalAnswer: MissionShape.unsetFacit,
             acceptedAnswers: [MissionShape.unsetFacit],
-            nearMissResponses: [],
-            genericIncorrectFeedback: "Prøv igen."
+            nearMissResponses: []
         )
         let step = FreeTextStep(
             id: "step.ufaerdig",
             order: 1,
             title: "Uden facit",
-            instruction: "Facit mangler.",
             answerRule: rule,
             hintIds: []
         )
@@ -200,16 +194,13 @@ struct MissionShapeTests {
             eyebrow: nil,
             title: "Tre",
             question: "Hvor mange?",
-            instruction: "Tæl.",
             options: (1...3).map { ChoiceOption(id: "o\($0)", label: "\($0)") },
             answerRule: AnswerRule(
                 kind: .known(.exact),
                 canonicalAnswer: "1",
                 acceptedAnswers: ["1"],
-                nearMissResponses: [],
-                genericIncorrectFeedback: "Prøv igen."
+                nearMissResponses: []
             ),
-            correctFeedback: "Rigtigt.",
             hintIds: []
         )
 
@@ -253,7 +244,7 @@ private extension Mission {
             locationId: locationId,
             title: title,
             shortTitle: shortTitle,
-            teaser: teaser,
+            description: description,
             status: status ?? self.status,
             difficulty: difficulty,
             estimatedMinutes: estimatedMinutes,

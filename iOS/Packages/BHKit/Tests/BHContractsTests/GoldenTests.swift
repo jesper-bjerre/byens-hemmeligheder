@@ -97,9 +97,6 @@ struct GoldenTests {
 
     // MARK: - Indholdsmodellen
 
-    @Test("Area") func area() throws {
-        try assertGolden(GoldenSamples.area, named: "Area")
-    }
 
     @Test("Location") func location() throws {
         try assertGolden(GoldenSamples.location, named: "Location")

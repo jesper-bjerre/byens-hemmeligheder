@@ -17,19 +17,6 @@ enum GoldenSamples {
 
     // MARK: - Indholdsmodellen
 
-    static let area = Area(
-        id: "area.vejle-havn",
-        name: "Vejle Havn",
-        postalCode: "7100"
-    )
-
-    static let vantagePoint = VantagePoint(
-        latitude: 55.7089,
-        longitude: 9.5481,
-        bearingDegrees: 118,
-        instruction: "Stå på promenaden, så hele bygningen er synlig."
-    )
-
     static let safety = Safety(
         flags: [.known(.water), .known(.cyclePath)],
         notes: "Åben vandkant og cyklister tæt på."
@@ -47,7 +34,7 @@ enum GoldenSamples {
 
     static let location = Location(
         id: "loc.vejle-havn.boelgen",
-        areaId: "area.vejle-havn",
+        postalCode: "7100",
         name: "Bølgen",
         address: "Havneøen, 7100 Vejle",
         latitude: 55.7083,
@@ -56,7 +43,6 @@ enum GoldenSamples {
         maxAcceptableAccuracyMetres: 40,
         dwellSeconds: 20,
         accuracyProfile: .known(.urbanCanyon),
-        vantagePoint: vantagePoint,
         publicAccess: true,
         safety: safety,
         accessibility: accessibility,
@@ -70,8 +56,7 @@ enum GoldenSamples {
         acceptedAnswers: ["592", "5 9 2", "5-9-2"],
         nearMissResponses: [
             NearMissResponse(answer: "529", feedback: "Rækkefølgen er forkert.")
-        ],
-        genericIncorrectFeedback: "Find de tre delresultater hver for sig."
+        ]
     )
 
     static let hint = Hint(
@@ -106,7 +91,6 @@ enum GoldenSamples {
         eyebrow: "SPOR 1 AF 3",
         title: "Øjet",
         question: "Hvor mange bølgetoppe kan du se?",
-        instruction: "Tæl kun de store hvide toppe.",
         options: [
             ChoiceOption(id: "opt.4", label: "4"),
             ChoiceOption(id: "opt.5", label: "5"),
@@ -115,10 +99,8 @@ enum GoldenSamples {
             kind: .known(.exact),
             canonicalAnswer: "5",
             acceptedAnswers: ["5"],
-            nearMissResponses: [],
-            genericIncorrectFeedback: "Tæl toppene igen."
+            nearMissResponses: []
         ),
-        correctFeedback: "Rigtigt.",
         hintIds: ["hint.boelgen.1"]
     )
 
@@ -127,9 +109,7 @@ enum GoldenSamples {
         order: 5,
         eyebrow: "SAML KODEN",
         title: "Åbn beskeden",
-        instruction: "Sæt tallene sammen.",
         length: 3,
-        evidenceCards: [evidenceCard],
         answerRule: answerRule,
         hintIds: ["hint.boelgen.1"]
     )
@@ -140,7 +120,6 @@ enum GoldenSamples {
         eyebrow: "VERAS GÅDE",
         title: "Hvad er jeg?",
         question: "Jeg gemmer mig under jorden, men mit grønne hår kan ses.",
-        instruction: "Skriv svaret som ét ord.",
         placeholder: "Skriv dit svar",
         answerRule: AnswerRule(
             kind: .known(.exact),
@@ -148,8 +127,7 @@ enum GoldenSamples {
             acceptedAnswers: ["gulerod", "en gulerod"],
             nearMissResponses: [
                 NearMissResponse(answer: "kartoffel", feedback: "Den er ikke orange.")
-            ],
-            genericIncorrectFeedback: "Tænk på noget orange under jorden."
+            ]
         ),
         hintIds: ["hint.vera.1"]
     )
@@ -168,7 +146,7 @@ enum GoldenSamples {
         locationId: "loc.vejle-havn.boelgen",
         title: "Bølgen – Den femte besked",
         shortTitle: "Den femte besked",
-        teaser: "En glemt besked ved fjorden.",
+        description: "En glemt besked ved fjorden.",
         status: .known(.fieldTestReady),
         difficulty: 3,
         estimatedMinutes: 10,
@@ -210,7 +188,6 @@ enum GoldenSamples {
         schemaVersion: "1.0",
         contentVersion: "2026-07-25.1",
         locale: "da-DK",
-        areas: [area],
         locations: [location],
         missions: [mission],
         media: [mediaAsset],

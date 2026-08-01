@@ -48,6 +48,7 @@ public enum StateProjection {
         // Første gennemløb: saml rå fakta pr. mission.
         var hintsPerMission: [String: [ScoreLedger.UsedHint]] = [:]
         var seenHintKeys: Set<String> = []
+        var wrongPerMission: [String: [ScoreLedger.WrongAnswer]] = [:]
         var completionEventId: [String: String] = [:]
 
         for event in ordered {
@@ -84,7 +85,30 @@ public enum StateProjection {
                 guard state.completedMissionIds.insert(missionId).inserted else { continue }
                 completionEventId[missionId] = event.id.uuidString
 
-            case .missionOpened, .answerSubmitted, nil:
+            case .answerSubmitted:
+                // Kun `incorrect` og `nearMiss` koster. Et tomt felt eller en
+                // halvskrevet kode er `malformed` og er ikke et forsøg — det er
+                // en finger, der gled.
+                guard let outcome = event.payload.outcome,
+                      outcome == "incorrect" || outcome == "nearMiss",
+                      let stepId = event.payload.stepId,
+                      let mission = pack.mission(id: missionId),
+                      let step = mission.steps.first(where: { $0.id == stepId })
+                else { continue }
+
+                let percent = ScoreLedger.wrongAnswerPercent(for: step)
+                guard percent > 0 else { continue }
+
+                wrongPerMission[missionId, default: []].append(
+                    ScoreLedger.WrongAnswer(
+                        stepId: stepId,
+                        answer: event.payload.answer ?? event.id.uuidString,
+                        percent: percent,
+                        eventId: event.id.uuidString
+                    )
+                )
+
+            case .missionOpened, nil:
                 continue
             }
         }
@@ -102,6 +126,7 @@ public enum StateProjection {
                     missionId: missionId,
                     basePoints: mission.basePoints,
                     usedHints: used,
+                    wrongAnswers: wrongPerMission[missionId] ?? [],
                     completionEventId: eventId
                 )
             )

@@ -7,7 +7,7 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
     public let locationId: String
     public let title: String
     public let shortTitle: String
-    public let teaser: String
+    public let description: String
     public let status: Tolerant<MissionStatus>
     /// Mental udfordring. Aldrig fysisk risiko (forfatningens princip VII).
     public let difficulty: Int
@@ -68,7 +68,7 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         locationId: String,
         title: String,
         shortTitle: String,
-        teaser: String,
+        description: String,
         status: Tolerant<MissionStatus>,
         difficulty: Int,
         estimatedMinutes: Int,
@@ -94,7 +94,7 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         self.locationId = locationId
         self.title = title
         self.shortTitle = shortTitle
-        self.teaser = teaser
+        self.description = description
         self.status = status
         self.difficulty = difficulty
         self.estimatedMinutes = estimatedMinutes
@@ -226,21 +226,18 @@ public enum Step: Hashable, Sendable, Identifiable {
                 eyebrow: step.eyebrow,
                 title: step.title,
                 question: step.question,
-                instruction: step.instruction
             )
         case .numericCode(let step):
             ChallengePrompt(
                 eyebrow: step.eyebrow,
                 title: step.title,
                 question: step.question,
-                instruction: step.instruction
             )
         case .freeText(let step):
             ChallengePrompt(
                 eyebrow: step.eyebrow,
                 title: step.title,
                 question: step.question,
-                instruction: step.instruction
             )
         case .narrative, .unknown:
             nil
@@ -348,11 +345,8 @@ public struct SingleChoiceStep: Codable, Hashable, Sendable, Identifiable {
     public let eyebrow: String?
     public let title: String
     public let question: String
-    /// Afgrænsningen: hvad skal ignoreres (FR-009).
-    public let instruction: String
     public let options: [ChoiceOption]
     public let answerRule: AnswerRule
-    public let correctFeedback: String
     public let hintIds: [String]
 
     public init(
@@ -361,10 +355,8 @@ public struct SingleChoiceStep: Codable, Hashable, Sendable, Identifiable {
         eyebrow: String?,
         title: String,
         question: String,
-        instruction: String,
         options: [ChoiceOption],
         answerRule: AnswerRule,
-        correctFeedback: String,
         hintIds: [String]
     ) {
         self.id = id
@@ -372,16 +364,14 @@ public struct SingleChoiceStep: Codable, Hashable, Sendable, Identifiable {
         self.eyebrow = eyebrow
         self.title = title
         self.question = question
-        self.instruction = instruction
         self.options = options
         self.answerRule = answerRule
-        self.correctFeedback = correctFeedback
         self.hintIds = hintIds
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, order, kind, eyebrow, title, question, instruction
-        case options, answerRule, correctFeedback, hintIds
+        case id, order, kind, eyebrow, title, question
+        case options, answerRule, hintIds
     }
 
     public init(from decoder: any Decoder) throws {
@@ -391,10 +381,8 @@ public struct SingleChoiceStep: Codable, Hashable, Sendable, Identifiable {
         eyebrow = try container.decodeIfPresent(String.self, forKey: .eyebrow)
         title = try container.decode(String.self, forKey: .title)
         question = try container.decode(String.self, forKey: .question)
-        instruction = try container.decode(String.self, forKey: .instruction)
         options = try container.decode([ChoiceOption].self, forKey: .options)
         answerRule = try container.decode(AnswerRule.self, forKey: .answerRule)
-        correctFeedback = try container.decode(String.self, forKey: .correctFeedback)
         hintIds = try container.decode([String].self, forKey: .hintIds)
     }
 
@@ -406,10 +394,8 @@ public struct SingleChoiceStep: Codable, Hashable, Sendable, Identifiable {
         try container.encodeIfPresent(eyebrow, forKey: .eyebrow)
         try container.encode(title, forKey: .title)
         try container.encode(question, forKey: .question)
-        try container.encode(instruction, forKey: .instruction)
         try container.encode(options, forKey: .options)
         try container.encode(answerRule, forKey: .answerRule)
-        try container.encode(correctFeedback, forKey: .correctFeedback)
         try container.encode(hintIds, forKey: .hintIds)
     }
 }
@@ -419,15 +405,11 @@ public struct ChallengePrompt: Hashable, Sendable {
     public let eyebrow: String?
     public let title: String
     public let question: String?
-    /// Afgrænsningen: hvad der skal ignoreres, eller hvad der skal svares på
-    /// (FR-009).
-    public let instruction: String
 
-    public init(eyebrow: String?, title: String, question: String?, instruction: String) {
+    public init(eyebrow: String?, title: String, question: String?) {
         self.eyebrow = eyebrow
         self.title = title
         self.question = question
-        self.instruction = instruction
     }
 }
 
@@ -477,10 +459,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
     /// svartyper. Uden det måtte UI'et bygge kodeskærmen anderledes end de
     /// øvrige — og så var opgaverne ikke ens igen.
     public let question: String?
-    public let instruction: String
     public let length: Int
-    /// Tidligere fundne deltal vises igen, så spilleren ikke skal huske dem (FR-010).
-    public let evidenceCards: [EvidenceCard]
     public let answerRule: AnswerRule
     public let hintIds: [String]
 
@@ -490,9 +469,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         eyebrow: String?,
         title: String,
         question: String? = nil,
-        instruction: String,
         length: Int,
-        evidenceCards: [EvidenceCard],
         answerRule: AnswerRule,
         hintIds: [String]
     ) {
@@ -501,16 +478,14 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         self.eyebrow = eyebrow
         self.title = title
         self.question = question
-        self.instruction = instruction
         self.length = length
-        self.evidenceCards = evidenceCards
         self.answerRule = answerRule
         self.hintIds = hintIds
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, order, kind, eyebrow, title, question, instruction
-        case length, evidenceCards, answerRule, hintIds
+        case id, order, kind, eyebrow, title, question
+        case length, answerRule, hintIds
     }
 
     public init(from decoder: any Decoder) throws {
@@ -520,9 +495,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         eyebrow = try container.decodeIfPresent(String.self, forKey: .eyebrow)
         title = try container.decode(String.self, forKey: .title)
         question = try container.decodeIfPresent(String.self, forKey: .question)
-        instruction = try container.decode(String.self, forKey: .instruction)
         length = try container.decode(Int.self, forKey: .length)
-        evidenceCards = try container.decode([EvidenceCard].self, forKey: .evidenceCards)
         answerRule = try container.decode(AnswerRule.self, forKey: .answerRule)
         hintIds = try container.decode([String].self, forKey: .hintIds)
     }
@@ -535,9 +508,7 @@ public struct NumericCodeStep: Codable, Hashable, Sendable, Identifiable {
         try container.encodeIfPresent(eyebrow, forKey: .eyebrow)
         try container.encode(title, forKey: .title)
         try container.encodeIfPresent(question, forKey: .question)
-        try container.encode(instruction, forKey: .instruction)
         try container.encode(length, forKey: .length)
-        try container.encode(evidenceCards, forKey: .evidenceCards)
         try container.encode(answerRule, forKey: .answerRule)
         try container.encode(hintIds, forKey: .hintIds)
     }
@@ -561,8 +532,6 @@ public struct FreeTextStep: Codable, Hashable, Sendable, Identifiable {
     public let eyebrow: String?
     public let title: String
     public let question: String?
-    /// Afgrænsningen: hvad spilleren skal svare på (FR-009).
-    public let instruction: String
     /// Vist i det tomme felt. Må aldrig røbe svaret.
     public let placeholder: String?
     public let answerRule: AnswerRule
@@ -574,7 +543,6 @@ public struct FreeTextStep: Codable, Hashable, Sendable, Identifiable {
         eyebrow: String? = nil,
         title: String,
         question: String? = nil,
-        instruction: String,
         placeholder: String? = nil,
         answerRule: AnswerRule,
         hintIds: [String]
@@ -584,14 +552,13 @@ public struct FreeTextStep: Codable, Hashable, Sendable, Identifiable {
         self.eyebrow = eyebrow
         self.title = title
         self.question = question
-        self.instruction = instruction
         self.placeholder = placeholder
         self.answerRule = answerRule
         self.hintIds = hintIds
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, order, kind, eyebrow, title, question, instruction
+        case id, order, kind, eyebrow, title, question
         case placeholder, answerRule, hintIds
     }
 
@@ -602,7 +569,6 @@ public struct FreeTextStep: Codable, Hashable, Sendable, Identifiable {
         eyebrow = try container.decodeIfPresent(String.self, forKey: .eyebrow)
         title = try container.decode(String.self, forKey: .title)
         question = try container.decodeIfPresent(String.self, forKey: .question)
-        instruction = try container.decode(String.self, forKey: .instruction)
         placeholder = try container.decodeIfPresent(String.self, forKey: .placeholder)
         answerRule = try container.decode(AnswerRule.self, forKey: .answerRule)
         hintIds = try container.decode([String].self, forKey: .hintIds)
@@ -616,7 +582,6 @@ public struct FreeTextStep: Codable, Hashable, Sendable, Identifiable {
         try container.encodeIfPresent(eyebrow, forKey: .eyebrow)
         try container.encode(title, forKey: .title)
         try container.encodeIfPresent(question, forKey: .question)
-        try container.encode(instruction, forKey: .instruction)
         try container.encodeIfPresent(placeholder, forKey: .placeholder)
         try container.encode(answerRule, forKey: .answerRule)
         try container.encode(hintIds, forKey: .hintIds)
@@ -674,21 +639,17 @@ public struct AnswerRule: Codable, Hashable, Sendable {
     public let canonicalAnswer: String
     public let acceptedAnswers: [String]
     public let nearMissResponses: [NearMissResponse]
-    /// Ikke-nedgørende (FR-015).
-    public let genericIncorrectFeedback: String
 
     public init(
         kind: Tolerant<AnswerRuleKind>,
         canonicalAnswer: String,
         acceptedAnswers: [String],
-        nearMissResponses: [NearMissResponse],
-        genericIncorrectFeedback: String
+        nearMissResponses: [NearMissResponse]
     ) {
         self.kind = kind
         self.canonicalAnswer = canonicalAnswer
         self.acceptedAnswers = acceptedAnswers
         self.nearMissResponses = nearMissResponses
-        self.genericIncorrectFeedback = genericIncorrectFeedback
     }
 }
 

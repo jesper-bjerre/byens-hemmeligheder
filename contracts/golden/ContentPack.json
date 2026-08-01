@@ -1,11 +1,4 @@
 {
-  "areas" : [
-    {
-      "id" : "area.vejle-havn",
-      "name" : "Vejle Havn",
-      "postalCode" : "7100"
-    }
-  ],
   "contentVersion" : "2026-07-25.1",
   "locale" : "da-DK",
   "locations" : [
@@ -22,7 +15,6 @@
       "accuracyProfile" : "urbanCanyon",
       "activationRadiusMetres" : 45,
       "address" : "Havneøen, 7100 Vejle",
-      "areaId" : "area.vejle-havn",
       "dwellSeconds" : 20,
       "fieldVerified" : false,
       "id" : "loc.vejle-havn.boelgen",
@@ -30,6 +22,7 @@
       "longitude" : 9.5497,
       "maxAcceptableAccuracyMetres" : 40,
       "name" : "Bølgen",
+      "postalCode" : "7100",
       "publicAccess" : true,
       "safety" : {
         "flags" : [
@@ -37,12 +30,6 @@
           "cyclePath"
         ],
         "notes" : "Åben vandkant og cyklister tæt på."
-      },
-      "vantagePoint" : {
-        "bearingDegrees" : 118,
-        "instruction" : "Stå på promenaden, så hele bygningen er synlig.",
-        "latitude" : 55.7089,
-        "longitude" : 9.5481
       }
     }
   ],
@@ -68,6 +55,7 @@
         "messageLabel" : "Den femte besked",
         "subheadline" : "Du samlede den femte besked"
       },
+      "description" : "En glemt besked ved fjorden.",
       "difficulty" : 3,
       "estimatedMinutes" : 10,
       "fictionLabel" : "Fiktiv mission baseret på Bølgens byggehistorie.",
@@ -117,19 +105,16 @@
               "5"
             ],
             "canonicalAnswer" : "5",
-            "genericIncorrectFeedback" : "Tæl toppene igen.",
             "kind" : "exact",
             "nearMissResponses" : [
 
             ]
           },
-          "correctFeedback" : "Rigtigt.",
           "eyebrow" : "SPOR 1 AF 3",
           "hintIds" : [
             "hint.boelgen.1"
           ],
           "id" : "step.boelgen.oejet",
-          "instruction" : "Tæl kun de store hvide toppe.",
           "kind" : "singleChoice",
           "options" : [
             {
@@ -153,7 +138,6 @@
               "5-9-2"
             ],
             "canonicalAnswer" : "592",
-            "genericIncorrectFeedback" : "Find de tre delresultater hver for sig.",
             "kind" : "digitsOnly",
             "nearMissResponses" : [
               {
@@ -162,23 +146,11 @@
               }
             ]
           },
-          "evidenceCards" : [
-            {
-              "description" : "Fem hvide bølgeformede hoveddele.",
-              "displayValue" : "5",
-              "id" : "card.boelgen.oejet",
-              "label" : "Øjet",
-              "supportingText" : "Talt på stedet.",
-              "symbol" : "eye",
-              "title" : "Bølgetoppene"
-            }
-          ],
           "eyebrow" : "SAML KODEN",
           "hintIds" : [
             "hint.boelgen.1"
           ],
           "id" : "step.boelgen.koden",
-          "instruction" : "Sæt tallene sammen.",
           "kind" : "numericCode",
           "length" : 3,
           "order" : 5,
@@ -189,7 +161,6 @@
         "arkitektur",
         "observation"
       ],
-      "teaser" : "En glemt besked ved fjorden.",
       "title" : "Bølgen – Den femte besked"
     }
   ],

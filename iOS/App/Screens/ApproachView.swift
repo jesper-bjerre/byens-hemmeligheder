@@ -3,12 +3,12 @@ import BHDesignSystem
 import BHGameCore
 import SwiftUI
 
-/// Vejen frem til standpunktet.
+/// Vejen frem til stedet.
 ///
-/// Retningspilen kommer fra indholdets `bearingDegrees`, ikke fra kompasset.
-/// `CLHeading` kræver kalibrering og er upålideligt nær stål og store
-/// konstruktioner — og begge lokationer i feature 001 er netop dét (R-007).
-/// Pilen er derfor et blødt hint, aldrig en gate.
+/// Retningspilen regnes ud af spillerens position og opgavens koordinat, ikke
+/// af kompasset. `CLHeading` kræver kalibrering og er upålideligt nær stål og
+/// store konstruktioner — og begge lokationer i feature 001 er netop dét
+/// (R-007). Pilen er derfor et blødt hint, aldrig en gate.
 struct ApproachView: View {
     let mission: Mission
 
@@ -23,9 +23,6 @@ struct ApproachView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: BHSpacing.loose) {
                 statusCard
-                if let vantage = location?.vantagePoint {
-                    vantageCard(vantage)
-                }
                 actions
             }
             .padding(BHSpacing.regular)
@@ -121,7 +118,8 @@ struct ApproachView: View {
     private var bearing: Double? {
         switch engine.presence {
         case .tooFar(_, let bearing), .approaching(_, let bearing): bearing
-        default: location?.vantagePoint?.bearingDegrees
+        // Uden en position er der ingen retning at pege i.
+        default: nil
         }
     }
 
@@ -136,24 +134,6 @@ struct ApproachView: View {
         default:
             "Afstanden er ikke kendt endnu"
         }
-    }
-
-    // MARK: - Standpunkt og sikkerhed
-
-    private func vantageCard(_ vantage: VantagePoint) -> some View {
-        BHCard {
-            VStack(alignment: .leading, spacing: BHSpacing.tight) {
-                Label("Sådan står du", systemImage: "figure.stand")
-                    .font(BHFont.heading)
-                    .foregroundStyle(BHColor.ink)
-                    .labelStyle(.titleAndIcon)
-                Text(vantage.instruction)
-                    .font(BHFont.body)
-                    .foregroundStyle(BHColor.inkMuted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .accessibilityElement(children: .combine)
     }
 
     /// Udfører tilstandens egen handling.

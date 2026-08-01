@@ -8,7 +8,6 @@
     "schemaVersion",
     "contentVersion",
     "locale",
-    "areas",
     "locations",
     "missions",
     "media",
@@ -26,13 +25,6 @@
     "locale": {
       "type": "string",
       "const": "da-DK"
-    },
-    "areas": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "$ref": "#/$defs/area"
-      }
     },
     "locations": {
       "type": "array",
@@ -67,33 +59,11 @@
       "pattern": "^[a-z0-9]+([._-][a-z0-9]+)*$",
       "minLength": 2
     },
-    "area": {
-      "type": "object",
-      "required": [
-        "id",
-        "name",
-        "postalCode"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "postalCode": {
-          "type": "string",
-          "pattern": "^[0-9]{4}$"
-        }
-      }
-    },
     "location": {
       "type": "object",
       "required": [
         "id",
-        "areaId",
+        "postalCode",
         "name",
         "address",
         "latitude",
@@ -102,7 +72,6 @@
         "maxAcceptableAccuracyMetres",
         "dwellSeconds",
         "accuracyProfile",
-        "vantagePoint",
         "publicAccess",
         "safety",
         "accessibility",
@@ -114,8 +83,10 @@
         "id": {
           "$ref": "#/$defs/id"
         },
-        "areaId": {
-          "$ref": "#/$defs/id"
+        "postalCode": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$",
+          "description": "Dansk postnummer. By og landsdel slås op i quizmasterappens genererede tabel og gemmes ikke i pakken — to kopier af det samme kunne drive fra hinanden, og postnummeret er den eneste, nogen taster."
         },
         "name": {
           "type": "string",
@@ -166,53 +137,6 @@
           "enum": [
             "standard",
             "urbanCanyon"
-          ]
-        },
-        "vantagePoint": {
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "type": "object",
-              "required": [
-                "latitude",
-                "longitude",
-                "bearingDegrees",
-                "instruction"
-              ],
-              "additionalProperties": false,
-              "properties": {
-                "latitude": {
-                  "type": [
-                    "number",
-                    "null"
-                  ],
-                  "minimum": -90,
-                  "maximum": 90
-                },
-                "longitude": {
-                  "type": [
-                    "number",
-                    "null"
-                  ],
-                  "minimum": -180,
-                  "maximum": 180
-                },
-                "bearingDegrees": {
-                  "type": [
-                    "number",
-                    "null"
-                  ],
-                  "minimum": 0,
-                  "exclusiveMaximum": 360
-                },
-                "instruction": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              }
-            }
           ]
         },
         "publicAccess": {
@@ -319,7 +243,7 @@
         "locationId",
         "title",
         "shortTitle",
-        "teaser",
+        "description",
         "status",
         "difficulty",
         "estimatedMinutes",
@@ -354,7 +278,7 @@
           "type": "string",
           "minLength": 1
         },
-        "teaser": {
+        "description": {
           "type": "string",
           "minLength": 1
         },
@@ -436,10 +360,10 @@
         },
         "sourceIds": {
           "type": "array",
-          "minItems": 1,
           "items": {
             "$ref": "#/$defs/id"
-          }
+          },
+          "description": "Må være tom. En lille gåde på vejen hen til en anden opgave hviler ikke på en kilde, den skal kunne dokumentere — kravet gælder de bærende opgaver og håndhæves redaktionelt, ikke af skemaet."
         },
         "steps": {
           "type": "array",
@@ -541,10 +465,8 @@
             "required": [
               "title",
               "question",
-              "instruction",
               "options",
               "answerRule",
-              "correctFeedback",
               "hintIds"
             ],
             "properties": {
@@ -556,10 +478,6 @@
                 "minLength": 1
               },
               "question": {
-                "type": "string",
-                "minLength": 1
-              },
-              "instruction": {
                 "type": "string",
                 "minLength": 1
               },
@@ -588,10 +506,6 @@
               "answerRule": {
                 "$ref": "#/$defs/answerRule"
               },
-              "correctFeedback": {
-                "type": "string",
-                "minLength": 1
-              },
               "hintIds": {
                 "type": "array",
                 "items": {
@@ -615,7 +529,6 @@
           "then": {
             "required": [
               "title",
-              "instruction",
               "answerRule",
               "hintIds"
             ],
@@ -628,10 +541,6 @@
                 "minLength": 1
               },
               "question": {
-                "type": "string",
-                "minLength": 1
-              },
-              "instruction": {
                 "type": "string",
                 "minLength": 1
               },
@@ -664,9 +573,7 @@
           "then": {
             "required": [
               "title",
-              "instruction",
               "length",
-              "evidenceCards",
               "answerRule",
               "hintIds"
             ],
@@ -678,56 +585,10 @@
                 "type": "string",
                 "minLength": 1
               },
-              "instruction": {
-                "type": "string",
-                "minLength": 1
-              },
               "length": {
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 12
-              },
-              "evidenceCards": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "id",
-                    "label",
-                    "title",
-                    "description",
-                    "supportingText",
-                    "displayValue"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "id": {
-                      "$ref": "#/$defs/id"
-                    },
-                    "symbol": {
-                      "type": "string"
-                    },
-                    "label": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "title": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "description": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "supportingText": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "displayValue": {
-                      "type": "string"
-                    }
-                  }
-                }
               },
               "answerRule": {
                 "$ref": "#/$defs/answerRule"
@@ -749,8 +610,7 @@
         "kind",
         "canonicalAnswer",
         "acceptedAnswers",
-        "nearMissResponses",
-        "genericIncorrectFeedback"
+        "nearMissResponses"
       ],
       "additionalProperties": false,
       "properties": {
@@ -793,10 +653,6 @@
               }
             }
           }
-        },
-        "genericIncorrectFeedback": {
-          "type": "string",
-          "minLength": 1
         }
       }
     },

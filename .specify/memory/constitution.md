@@ -1,6 +1,33 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version: 2.0.0 → 3.0.0
+Bump-type: MAJOR (princip I omdefineret bagudinkompatibelt)
+
+Ændring 2026-07-31 — princip I:
+  Var:  "et registreret, præcist standpunkt (GPS + kigretning + sikker ståflade)"
+  Nu:   "et registreret, præcist startsted — ét GPS-koordinat på en sikker
+        ståflade"
+  Hvorfor: kontrakten bar to koordinater for det samme sted — lokationens og
+        standpunktets — plus en fast kigretning. To koordinater kan pege hver
+        sin vej uden at nogen opdager det, og den faste kigretning kunne stå og
+        pege forkert, længe efter at koordinatet var rettet. Retningspilen
+        regnes nu ud af spillerens position og opgavens koordinat.
+  Pris: ståvejledningen ("Stå på promenaden med fjorden på din venstre side")
+        er væk fra kontrakten. Skal den tilbage, hører den til som indhold på
+        opgaven og ikke som et andet koordinat.
+  Samme ændring i kvalitetsrubrikken: "Præcist standpunkt" → "Præcist startsted".
+
+Ændring 2026-07-31 — princip VII:
+  Nyt:  et forkert svar SKAL koste point, fradraget SKAL være mindre end eller
+        lig med hintbudgettet, og point MÅ ALDRIG kunne gå i nul på en
+        gennemført opgave.
+  Hvorfor: et gæt var gratis. Den billigste vej gennem en opgave med fire
+        svarmuligheder var at klikke sig igennem dem, og den, der tænkte sig om,
+        fik ikke mere for det end den, der ikke gjorde.
+  Se `contracts/spec/scoring.md` og `contracts/spec/scoring-testvectors.json`.
+
+Historik:
 Version: 1.0.0 → 2.0.0
 Bump-type: MAJOR (princip V omdefineret bagudinkompatibelt)
 
@@ -75,8 +102,9 @@ Konkrete krav:
   retning eller et tilsvarende stabilt træk ved stedet.
 - Facit MÅ IKKE afhænge af variable forhold: refleksioner, forbipasserende,
   events, vegetation, midlertidige skilte, belysning eller vejr.
-- Hver publiceret opgave SKAL have et registreret, præcist standpunkt (GPS +
-  kigretning + sikker ståflade) verificeret ved fysisk besøg.
+- Hver publiceret opgave SKAL have et registreret, præcist **startsted** —
+  ét GPS-koordinat på en sikker ståflade — verificeret ved fysisk besøg.
+  Standpunktet er opgavens koordinat; der findes ikke et separat.
 - Kvalitetsrubrikkens kriterium **Lokationsrelevans** SKAL være mindst 4 af 5.
 
 *Begrundelse:* Produktets eneste reelle differentiering er stedsspecifik
@@ -223,6 +251,14 @@ Konkrete krav:
 - Hints er en normal del af spillet. Den samlede hintstraf SKAL forblive lille
   (standard: 3 % + 4 % + 5 %, så alle tre hints efterlader 88 % af grundpointene)
   og SKAL være konfigurerbar frem for hårdkodet.
+- Et forkert svar SKAL koste point, og fradraget SKAL være mindre end eller lig
+  med hintbudgettet. At gætte sig frem MÅ IKKE være billigere end at bede om
+  hjælp — og hjælp MÅ IKKE være så dyr, at ingen tør prøve. Konkret: forkerte
+  svar kan tilsammen højst koste det samme som alle tre hints, og et
+  ufuldstændigt svar koster intet. Reglen er skrevet ud i
+  `contracts/spec/scoring.md` og dækket af testvektorer.
+- Point MÅ ALDRIG kunne gå i nul på en gennemført opgave. En familie, der har
+  brugt en halv time på stedet og fandt svaret, SKAL have noget med hjem.
 - UI SKAL levere høj kontrast, store trykflader, korte tekstblokke, understøttelse
   af tekstskalering og skærmlæsning samt én hovedregel ad gangen.
 - Hver mission SKAL beskrive distance, forventet varighed, underlag og stigninger,
@@ -300,7 +336,7 @@ En opgave må først publiceres, når alt følgende foreligger:
 
 | Leverance | Minimumskrav |
 |---|---|
-| Præcist standpunkt | GPS, foto, kigretning, sikker ståflade |
+| Præcist startsted | GPS-koordinat, foto, sikker ståflade |
 | Referencefotos | 3–8 fotos i dagslys |
 | Entydigt facit | Kanonisk svar + accepterede alternativer |
 | Løsningsbevis | Alle mellemtrin dokumenteret |
@@ -365,4 +401,4 @@ prioritering, historisk/redaktionel kvalitet, fysisk sikkerhed, GDPR og
 rettigheder, teknik og drift samt support og indholdsfejl. Uden en navngiven ejer
 for et område må der ikke publiceres indhold, som falder inden for det område.
 
-**Version**: 2.0.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-27
+**Version**: 3.0.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-31

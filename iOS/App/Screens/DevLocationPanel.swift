@@ -271,7 +271,7 @@ struct DevLocationPanel: View {
                 .foregroundStyle(BHColor.ink)
 
             ForEach(engine.playableMissions) { mission in
-                if let vantage = engine.vantagePoint(for: mission) {
+                if let startPoint = engine.startPoint(for: mission) {
                     BHCard {
                         VStack(alignment: .leading, spacing: BHSpacing.snug) {
                             Text(mission.shortTitle)
@@ -286,18 +286,18 @@ struct DevLocationPanel: View {
 
                             Button("Sæt mig 20 m væk") {
                                 provider?.teleport(
-                                    to: ScriptedLocationProvider.offset(vantage, northMetres: 20)
+                                    to: ScriptedLocationProvider.offset(startPoint, northMetres: 20)
                                 )
                             }
                             .buttonStyle(.bhSecondary)
 
                             Button("Gå hen til standpunktet") {
-                                provider?.walk(to: vantage, pace: pace)
+                                provider?.walk(to: startPoint, pace: pace)
                             }
                             .buttonStyle(.bhPrimary)
 
                             Button("Gå forbi uden at standse") {
-                                provider?.walkPast(vantage, pace: pace)
+                                provider?.walkPast(startPoint, pace: pace)
                             }
                             .buttonStyle(.bhSecondary)
                             .accessibilityHint("Afprøver SC-010: en forbipasserende må aldrig låse opgaven op")

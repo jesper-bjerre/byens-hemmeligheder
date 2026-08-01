@@ -30,9 +30,14 @@ struct ContentConsistencyTests {
 
         for mission in pack.missions {
             #expect(!mission.fictionLabel.isEmpty, "\(mission.id) mangler fiktionsmarkering")
-            #expect(!mission.sourceIds.isEmpty, "\(mission.id) mangler kilder")
             #expect(!mission.completion.historyFact.isEmpty, "\(mission.id) mangler historisk forklaring")
         }
+
+        // `sourceIds` kontrolleres bevidst **ikke** her. En lille gåde på vejen
+        // hen til en anden opgave hviler ikke på en kilde, den skal kunne
+        // dokumentere. Kravet gælder de bærende opgaver, og det håndhæves
+        // redaktionelt — V-05 sikrer kun, at de kilder, der *er* angivet,
+        // faktisk findes.
 
         for location in pack.locations {
             #expect(!location.safety.notes.isEmpty, "\(location.id) mangler sikkerhedsnoter")
@@ -189,11 +194,16 @@ struct ContentConsistencyTests {
     func allReferencesResolve() {
         let mediaIds = Set(pack.media.map(\.id))
         let sourceIds = Set(pack.sources.map(\.id))
-        let areaIds = Set(pack.areas.map(\.id))
+
         let locationIds = Set(pack.locations.map(\.id))
 
+        // Postnummeret erstattede `areaId`, og der er ingen `areas` at slå op i
+        // længere. Formen er det eneste, kontrakten kan hævde; om 7100 findes,
+        // ved kun quizmasterappens genererede tabel.
         for location in pack.locations {
-            #expect(areaIds.contains(location.areaId), "\(location.id) peger på ukendt område")
+            #expect(
+                location.postalCode.count == 4 && location.postalCode.allSatisfy(\.isNumber),
+                "\(location.id) har et postnummer, der ikke er fire cifre: \(location.postalCode)")
         }
 
         for mission in pack.missions {
@@ -220,7 +230,6 @@ struct ContentConsistencyTests {
         func expectUnique(_ ids: [String], _ label: String) {
             #expect(Set(ids).count == ids.count, "Dublet-id blandt \(label)")
         }
-        expectUnique(pack.areas.map(\.id), "områder")
         expectUnique(pack.locations.map(\.id), "lokationer")
         expectUnique(pack.missions.map(\.id), "missioner")
         expectUnique(pack.media.map(\.id), "medier")

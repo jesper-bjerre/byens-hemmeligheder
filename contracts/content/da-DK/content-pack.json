@@ -2,22 +2,10 @@
   "schemaVersion": "1.0",
   "contentVersion": "2026-07-28.1",
   "locale": "da-DK",
-  "areas": [
-    {
-      "id": "area.vejle-havn",
-      "name": "Vejle Havn",
-      "postalCode": "7100"
-    },
-    {
-      "id": "area.vejle-oest",
-      "name": "Vejle Øst",
-      "postalCode": "7120"
-    }
-  ],
   "locations": [
     {
       "id": "loc.vejle-havn.boelgen",
-      "areaId": "area.vejle-havn",
+      "postalCode": "7100",
       "name": "Bølgen",
       "address": "Havneøen, 7100 Vejle",
       "latitude": 55.710503,
@@ -26,12 +14,6 @@
       "maxAcceptableAccuracyMetres": 40,
       "dwellSeconds": 20,
       "accuracyProfile": "urbanCanyon",
-      "vantagePoint": {
-        "latitude": 55.710503,
-        "longitude": 9.557547,
-        "bearingDegrees": 118,
-        "instruction": "Stå på promenaden med fjorden på din venstre side, så hele byggeriet kan ses på én gang. Du skal ikke tættere på for at løse opgaven."
-      },
       "publicAccess": true,
       "safety": {
         "flags": [
@@ -55,7 +37,7 @@
     },
     {
       "id": "loc.vejle-havn.fjordenhus",
-      "areaId": "area.vejle-havn",
+      "postalCode": "7100",
       "name": "Fjordenhus",
       "address": "Havneøen 1, 7100 Vejle",
       "latitude": 55.706393,
@@ -64,12 +46,6 @@
       "maxAcceptableAccuracyMetres": 35,
       "dwellSeconds": 20,
       "accuracyProfile": "urbanCanyon",
-      "vantagePoint": {
-        "latitude": 55.706393,
-        "longitude": 9.55436,
-        "bearingDegrees": 52,
-        "instruction": "Stå på kajen et stykke fra bygningen, så du kan se hele huset som én form. Du skal hverken ind i huset eller ud på broen for at løse opgaven."
-      },
       "publicAccess": true,
       "safety": {
         "flags": [
@@ -92,7 +68,7 @@
     },
     {
       "id": "loc.vejle-oest.tirsbaek-broen",
-      "areaId": "area.vejle-oest",
+      "postalCode": "7120",
       "name": "Den gamle bro i Tirsbæk Bakker",
       "address": "Tirsbæk Bakker, 7120 Vejle",
       "latitude": 55.7261,
@@ -101,12 +77,6 @@
       "maxAcceptableAccuracyMetres": 10,
       "dwellSeconds": 5,
       "accuracyProfile": "standard",
-      "vantagePoint": {
-        "latitude": 55.7261,
-        "longitude": 9.63084,
-        "bearingDegrees": 0,
-        "instruction": "Standpunktet er endnu ikke opmålt i felten. Bliv på det offentlige stisystem, bloker ikke stien, og klatr ikke på broen."
-      },
       "publicAccess": true,
       "safety": {
         "flags": [],
@@ -126,7 +96,7 @@
     },
     {
       "id": "loc.vejle-oest.frydenlund98-vera",
-      "areaId": "area.vejle-oest",
+      "postalCode": "7120",
       "name": "Frydenlund 98 – kaninburet",
       "address": "Frydenlund 98, 7120 Vejle",
       "latitude": 55.734797,
@@ -135,12 +105,6 @@
       "maxAcceptableAccuracyMetres": 40,
       "dwellSeconds": 5,
       "accuracyProfile": "standard",
-      "vantagePoint": {
-        "latitude": 55.734797,
-        "longitude": 9.620308,
-        "bearingDegrees": 0,
-        "instruction": "Bliv på det offentligt tilgængelige standpunkt. Gå ikke ind på grunden, åbn ikke buret, og forsøg ikke at fodre eller kalde på kaninen."
-      },
       "publicAccess": false,
       "safety": {
         "flags": [
@@ -168,7 +132,7 @@
       "locationId": "loc.vejle-havn.boelgen",
       "title": "Bølgen – Den skjulte besked",
       "shortTitle": "Den skjulte besked",
-      "teaser": "En glemt besked ved fjorden kunne først åbnes, når alle bølger stod færdige.",
+      "description": "En glemt besked ved fjorden kunne først åbnes, når alle bølger stod færdige.",
       "status": "fieldTestReady",
       "difficulty": 3,
       "estimatedMinutes": 10,
@@ -191,9 +155,7 @@
           "order": 1,
           "kind": "numericCode",
           "title": "Den skjulte besked",
-          "instruction": "1. Tæl de store, hvide bølgetoppe. Kun de store — ikke vinduer, altaner eller master.\n2. Hver bølge har ni etager.\n3. To bølger stod færdige, før byggeriet gik i stå i 2009.",
           "length": 3,
-          "evidenceCards": [],
           "answerRule": {
             "kind": "digitsOnly",
             "canonicalAnswer": "592",
@@ -223,8 +185,7 @@
                 "answer": "492",
                 "feedback": "Tæl kun de store, hvide bølgeformede hoveddele. Ignorér vinduer, altaner, boliger, master og refleksioner."
               }
-            ],
-            "genericIncorrectFeedback": "Find først de tre delresultater hver for sig. Saml dem først bagefter i rækkefølgen Øjet → Etagerne → Pausen."
+            ]
           },
           "hintIds": [
             "hint.boelgen.1",
@@ -298,7 +259,7 @@
       "locationId": "loc.vejle-havn.fjordenhus",
       "title": "Fjordenhus – Vandets tromler",
       "shortTitle": "Vandets tromler",
-      "teaser": "Fjorden har gemt en besked i huset. Men huset skal ikke læses gennem vinduerne – det skal læses som form, vand og højde.",
+      "description": "Fjorden har gemt en besked i huset. Men huset skal ikke læses gennem vinduerne – det skal læses som form, vand og højde.",
       "status": "fieldTestReady",
       "difficulty": 3,
       "estimatedMinutes": 7,
@@ -321,9 +282,7 @@
           "order": 1,
           "kind": "numericCode",
           "title": "Vandets tromler",
-          "instruction": "1. Tæl husets store, cylindriske hoveddele. Se formen som helhed — ignorér vinduer, buer og gangbro.\n2. Fjordens vand løber gennem to af husets rum.\n3. Huset er 28 meter højt. Brug det sidste ciffer.",
           "length": 3,
-          "evidenceCards": [],
           "answerRule": {
             "kind": "digitsOnly",
             "canonicalAnswer": "428",
@@ -353,8 +312,7 @@
                 "answer": "528",
                 "feedback": "Tæl kun husets store cylindriske hoveddele. Ignorér åbninger, vinduer, buer og gangbroen."
               }
-            ],
-            "genericIncorrectFeedback": "Find først de tre delresultater hver for sig. Saml dem først bagefter i rækkefølgen form → vand → højde."
+            ]
           },
           "hintIds": [
             "hint.fjordenhus.1",
@@ -428,7 +386,7 @@
       "locationId": "loc.vejle-oest.frydenlund98-vera",
       "title": "Vera's hul",
       "shortTitle": "Vera's hul",
-      "teaser": "I haven bor kaninen Vera. Kan du finde Vera's hul?",
+      "description": "I haven bor kaninen Vera. Kan du finde Vera's hul?",
       "status": "fieldTestReady",
       "difficulty": 2,
       "estimatedMinutes": 5,
@@ -452,7 +410,6 @@
           "kind": "singleChoice",
           "title": "Veras hul",
           "question": "Hvilket hul bor Vera i?",
-          "instruction": "Brug alle fire spor. Der er kun én mulig løsning.",
           "options": [
             {
               "id": "opt.vera.hul1",
@@ -484,10 +441,8 @@
                 "answer": "Hul 2",
                 "feedback": "Tæt på. Hvis Vera boede i hul 2, skulle Plet bo i hul 1 — og så er der ikke plads til Skygge til venstre for Plet."
               }
-            ],
-            "genericIncorrectFeedback": "Det hul passer ikke med alle sporene. Husk, at Plet bor lige til venstre for Vera, og at Skygge bor til venstre for Plet."
+            ]
           },
-          "correctFeedback": "Rigtigt. Vera bor i hul 3.",
           "hintIds": [
             "hint.vera.1",
             "hint.vera.2",
@@ -564,7 +519,7 @@
       "locationId": "loc.vejle-oest.tirsbaek-broen",
       "title": "Den forsvundne landevej",
       "shortTitle": "Landevejen",
-      "teaser": "En gammel bro gemmer på en hemmelighed.",
+      "description": "En gammel bro gemmer på en hemmelighed.",
       "status": "fieldTestReady",
       "difficulty": 3,
       "estimatedMinutes": 10,
@@ -587,7 +542,6 @@
           "kind": "singleChoice",
           "title": "Budbringerens retning",
           "question": "Hvilken vej fortsatte budbringeren fra broen?",
-          "instruction": "Find de to byer på kortet, og se hvilken vej rejsen gik.",
           "options": [
             {
               "id": "opt.broen.nord",
@@ -619,10 +573,8 @@
                 "answer": "Syd",
                 "feedback": "Syd er tilbage mod Vejle — dér kom budbringeren fra. Hvor skulle han hen?"
               }
-            ],
-            "genericIncorrectFeedback": "Se på kortet igen. Vejle og Horsens ligger ikke øst og vest for hinanden."
+            ]
           },
-          "correctFeedback": "Rigtigt. Horsens ligger nord for Vejle, og den gamle landevej fulgte den vej.",
           "hintIds": [
             "hint.broen.1",
             "hint.broen.2",
@@ -980,7 +932,6 @@
       "url": "https://byensgaader.dk/kilder/frydenlund98-vera",
       "kind": "other"
     },
-
     {
       "id": "source.vafo.tirsbaek-broen",
       "title": "Gammel bro fra 1700-tallet er fundet i nybyggerkvarter",

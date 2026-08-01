@@ -27,19 +27,18 @@ Rodobjektet. Én pakke pr. sprog.
 | `schemaVersion` | string | ✅ | `"1.0"` |
 | `contentVersion` | string | ✅ | Fx `"2026-07-25.1"`. En `GameSession` bindes til denne værdi (FR-035) |
 | `locale` | string | ✅ | `"da-DK"` |
-| `areas` | Area[] | ✅ | Mindst 1 |
 | `locations` | Location[] | ✅ | Mindst 1 |
 | `missions` | Mission[] | ✅ | Mindst 1 |
 | `media` | MediaAsset[] | ✅ | Kan være tom |
 | `sources` | Source[] | ✅ | Kan være tom, men se FR-042 |
 
-### Area
+### Area — fjernet i feature 002
 
-| Felt | Type | Krav |
-|---|---|---|
-| `id` | string | ✅ Fx `area.vejle-havn` |
-| `name` | string | ✅ Fx `"Vejle Havn"` |
-| `postalCode` | string | ✅ Fx `"7100"` — spejler mappestrukturen i `docs/design af opgaver/opgaver/` |
+Kvartererne var en liste, nogen skulle vedligeholde: id, navn, landsdel og
+postnummer. Postnummeret bestemmer alligevel de to sidste, og to kopier af det
+samme kan drive fra hinanden. `Location` bærer nu selv `postalCode`, og by og
+landsdel slås op i quizmasterappens genererede tabel over Danmarks 1089
+postnumre.
 
 ### Location
 
@@ -48,25 +47,27 @@ Stedet. Bærer alt, der gør princip I og IV håndhævelige.
 | Felt | Type | Krav | Note |
 |---|---|---|---|
 | `id` | string | ✅ | Fx `loc.vejle-havn.boelgen` |
-| `areaId` | string | ✅ | Skal resolve til en Area (FR-046) |
+| `postalCode` | string | ✅ | Fire cifre. By og landsdel slås op i quizmasterappens tabel (002) |
 | `name`, `address` | string | ✅ | |
 | `latitude`, `longitude` | number \| null | ✅ | **Foreløbige i 001.** `null` er tilladt af skemaet, men blokerer status `publishReady` |
 | `activationRadiusMetres` | number \| null | ✅ | Projektgrundlagets interval er 20–60 m |
 | `maxAcceptableAccuracyMetres` | number \| null | ✅ | Skal være `≤ activationRadiusMetres` (R-010) |
 | `dwellSeconds` | number | ✅ | Hvor længe spilleren skal opholde sig. Forhindrer at en forbipasserende låser op (FR-025, SC-010) |
 | `accuracyProfile` | enum | ✅ | `standard` \| `urbanCanyon`. Begge lokationer i 001 er `urbanCanyon` — høje konstruktioner ved vand |
-| `vantagePoint` | VantagePoint \| null | ✅ | Se nedenfor |
 | `publicAccess` | bool | ✅ | |
 | `safety` | Safety | ✅ | Obligatorisk (FR-042) |
 | `accessibility` | Accessibility | ✅ | Obligatorisk (FR-042) |
 | `fieldVerified` | bool | ✅ | `false` i 001 |
 | `lastPhysicallyVerified` | date \| null | ✅ | `null` indtil feltbesøg |
 
-**VantagePoint** — spillerens standpunkt, ikke bygningen. Dette er gate-centrum
-(R-007, mitigering 1).
+**Startstedet** er `latitude`/`longitude` på lokationen selv, og det er
+gate-centrum (R-007, mitigering 1).
 
-`latitude`, `longitude`, `bearingDegrees` (kigretning, blødt hint — aldrig gate),
-`instruction` (dansk tekst, fx `"Stå på promenaden, så hele bygningen er synlig"`).
+Der var indtil feature 002 et separat `vantagePoint` med sit eget koordinat, sin
+egen kigretning og en ståvejledning. To koordinater for det samme sted kan pege
+hver sin vej uden at nogen opdager det, og den faste kigretning kunne stå og pege
+forkert, længe efter at koordinatet var rettet. Retningspilen regnes nu ud af
+spillerens position og opgavens koordinat.
 
 **Safety**: `flags[]` (enum: `traffic`, `water`, `steepSlope`, `darkness`,
 `privateProperty`, `cyclePath`, `construction`, `crowding`) og `notes` (dansk
@@ -83,15 +84,15 @@ Den fritstående opgave. Én mission hører til én lokation.
 |---|---|---|---|
 | `id`, `slug` | string | ✅ | |
 | `locationId` | string | ✅ | Skal resolve (FR-046) |
-| `title`, `shortTitle`, `teaser` | string | ✅ | |
-| `status` | enum | ✅ | `draft` \| `researchReady` \| `fieldTestReady` \| `publishReady` \| `paused`. Begge missioner i 001 er `fieldTestReady` |
+| `title`, `shortTitle`, `description` | string | ✅ | `description` hed `teaser` indtil feature 002 |
+| `status` | enum | ✅ | `draft` \| `researchReady` \| `fieldTestReady` \| `publishReady` \| `paused`. Begge missioner i 001 er `fieldTestReady`. Quizmasterens app tilbyder kun `draft` og `fieldTestReady` (002) |
 | `difficulty` | int 1–5 | ✅ | Mental udfordring. Aldrig fysisk risiko (princip VII) |
 | `estimatedMinutes` | int | ✅ | |
 | `basePoints` | int | ✅ | 100 for begge |
 | `tags` | string[] | ✅ | |
 | `fictionLabel` | string | ✅ | Vises på intro og i infovisning (FR-007) |
 | `heroMediaId` | string \| null | ✅ | Skal resolve hvis sat |
-| `sourceIds` | string[] | ✅ | Mindst 1 (FR-042) |
+| `sourceIds` | string[] | ✅ | Må være tom siden 002 — en lille gåde på vejen hviler ikke på en kilde |
 | `steps` | Step[] | ✅ | Ordnet, mindst 1 |
 | `hints` | Hint[] | ✅ | **Præcis 3** (FR-017) |
 | `completion` | Completion | ✅ | |
@@ -129,7 +130,6 @@ ikke skal huske dem. Felter: `id`, `symbol`, `label`, `title`, `description`,
 | `canonicalAnswer` | string | ✅ | **Altid string.** Foranstillede nuller er betydende (R-006) |
 | `acceptedAnswers` | string[] | ✅ | Bølgen: `["592", "5 9 2", "5-9-2"]` |
 | `nearMissResponses` | NearMiss[] | ✅ | `{answer, feedback}`. Bølgen har fem registrerede |
-| `genericIncorrectFeedback` | string | ✅ | Ikke-nedgørende (FR-015) |
 
 ### Hint
 
@@ -223,7 +223,7 @@ Håndhæves af skema plus selvkonsistenstest. Hver regel svarer til et krav.
 | V-02 | `evaluate(canonicalAnswer) == .correct` for hver svarregel | FR-043 |
 | V-03 | Ingen `nearMissResponses.answer` evaluerer til `.correct` | FR-044 |
 | V-04 | Hintfradrag summer til præcis 12 % | FR-045 |
-| V-05 | Alle id-referencer resolver: `areaId`, `locationId`, `heroMediaId`, `sourceIds`, `hintIds`, `evidenceCards` | FR-046 |
+| V-05 | Alle id-referencer resolver: `locationId`, `heroMediaId`, `sourceIds`, `hintIds`, `evidenceCards` | FR-046 |
 | V-06 | Ugyldige koder registreret i opgavedokumentet forekommer ingen steder i pakken — for Bølgen `541` | FR-047, SC-008 |
 | V-07 | Hvert medie har `kind` sat | FR-048 |
 | V-08 | `maxAcceptableAccuracyMetres ≤ activationRadiusMetres` | R-010 |
