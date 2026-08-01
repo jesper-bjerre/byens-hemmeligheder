@@ -18,6 +18,18 @@ permissions:
   # OIDC frem for en publish profile. En publish profile er en adgangskode, der
   # skal ligge i GitHub-secrets og roteres i hånden; en federated credential er
   # en tillidsrelation, der ikke kan lækkes ud af en logfil.
+  #
+  # ## Emnet bærer uforanderlige id'er
+  #
+  # GitHub sender ikke længere `repo:ejer/repo:ref:...` men
+  # `repo:ejer@ejer-id/repo@repo-id:ref:...`, så en omdøbning af repoet ikke
+  # bryder tillidsrelationen. Både den credential, vi lavede i hånden, og den
+  # Azures Deployment Center oprettede, stod med de rene navne — og begge
+  # fejlede med AADSTS700213.
+  #
+  # Ændres ejer- eller repo-id nogensinde (en overførsel til en anden konto),
+  # skal `github-main-uforanderligt-id` på identiteten `oidc-msi-8800` rettes.
+  # Emnet står i logfilen under "Federated token details".
   id-token: write
   contents: read
 
