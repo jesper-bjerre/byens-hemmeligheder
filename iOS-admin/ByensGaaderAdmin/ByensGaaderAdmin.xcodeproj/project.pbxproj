@@ -326,7 +326,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				BH_BACKEND_URL = "http://localhost:5199";
+				BH_BACKEND_URL = "https://byensgaader-api-p.azurewebsites.net";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QHL89A7A8J;

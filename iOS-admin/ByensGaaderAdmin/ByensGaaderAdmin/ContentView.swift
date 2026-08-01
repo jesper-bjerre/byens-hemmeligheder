@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var newMission: MissionSummary?
     @State private var pendingDeletion: MissionSummary?
     @State private var conflicts: [String] = []
+    @State private var pendingBackend: AdminConfiguration.Backend?
     @State private var draft: DraftStore.Restored?
     @State private var drafts = DraftWriter()
 
@@ -72,6 +73,27 @@ struct ContentView: View {
                      + "er den væk for de andre quizmastere.")
             }
             .sheet(isPresented: $showsAudit) { AuditView() }
+            // At skifte server med ugemte rettelser er farligt: rettelserne
+            // hører til den pakke, de blev lagt oven på, og den ligger et
+            // andet sted.
+            .confirmationDialog(
+                "Skift til \(pendingBackend?.name ?? "")?",
+                isPresented: Binding(
+                    get: { pendingBackend != nil },
+                    set: { if !$0 { pendingBackend = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Skift og kassér mine rettelser", role: .destructive) {
+                    if let pendingBackend { switchTo(pendingBackend) }
+                    pendingBackend = nil
+                }
+                Button("Bliv her", role: .cancel) { pendingBackend = nil }
+            } message: {
+                Text("Du har rettelser, der ikke er gemt. De hører til "
+                     + "\(AdminConfiguration.backend.name) og kan ikke lægges over på en "
+                     + "anden server.")
+            }
             // Skubbes på stakken og vises ikke som et ark. Den nye opgave
             // åbnes samme sted som alle andre, og tilbageknappen fører hen,
             // hvor quizmasteren kom fra.
@@ -189,9 +211,21 @@ struct ContentView: View {
                     }
                 }
                 Divider()
-                // Hvilket indhold retter jeg i. Med en Debug-overstyring og en
-                // rigtig server er det ikke til at se uden.
-                Label(client.host, systemImage: "server.rack")
+
+                if AdminConfiguration.canChooseBackend {
+                    Picker("Server", selection: Binding(
+                        get: { AdminConfiguration.backend },
+                        set: { choose($0) }
+                    )) {
+                        ForEach(AdminConfiguration.Backend.allCases) { backend in
+                            Text(backend.name).tag(backend)
+                        }
+                    }
+                } else {
+                    // Hvilket indhold retter jeg i. Uden det kan man rette i
+                    // det forkerte uden at opdage det.
+                    Label(client.host, systemImage: "server.rack")
+                }
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
@@ -303,6 +337,29 @@ struct ContentView: View {
             status = "Kunne ikke flette: \(PackClient.describe(error)) "
                 + "Dine rettelser er gemt på telefonen."
         }
+    }
+
+    /// Skifter server.
+    ///
+    /// Har quizmasteren ugemte rettelser, spørges der først — de hører til den
+    /// pakke, de blev lagt oven på, og den ligger på den server, hen forlader.
+    private func choose(_ backend: AdminConfiguration.Backend) {
+        guard backend != AdminConfiguration.backend else { return }
+        if document?.hasUnsavedChanges == true {
+            pendingBackend = backend
+        } else {
+            switchTo(backend)
+        }
+    }
+
+    private func switchTo(_ backend: AdminConfiguration.Backend) {
+        AdminConfiguration.select(backend)
+        // Kladden hørte til den gamle server. Genoprettet mod en anden ville
+        // den skrive fremmed indhold ind som "mine rettelser".
+        DraftStore.clear()
+        document = nil
+        status = "Skiftet til \(backend.name)."
+        load()
     }
 
     /// Fjerner opgaven fra dokumentet. Der gemmes ikke — sletningen står først

@@ -51,6 +51,70 @@ enum AdminConfiguration {
         return url
     }
 
+    // MARK: - Hvilken server
+
+    /// De servere, der findes. Ikke et skrivefelt.
+    ///
+    /// FR-102 siger, at adressen er en app-konfiguration og ikke et felt i
+    /// UI'et. Pointen var, at en adresse, man kan taste, er en, man kan taste
+    /// forkert — og fejlen viser sig som "kunne ikke hente", langt fra det
+    /// sted, den blev lavet.
+    ///
+    /// En vælger mellem to navngivne servere bryder ikke det: der er ikke noget
+    /// at stave forkert, og der er stadig kun ét sted, adresserne står.
+    enum Backend: String, CaseIterable, Identifiable {
+        case drift
+        case lokal
+
+        var id: String { rawValue }
+
+        var name: String {
+            switch self {
+            case .drift: "Drift"
+            case .lokal: "Lokal maskine"
+            }
+        }
+
+        var url: URL {
+            switch self {
+            case .drift: URL(string: "https://byensgaader-api-p.azurewebsites.net")!
+            case .lokal: URL(string: "http://localhost:5199")!
+            }
+        }
+
+        /// Hvad valget betyder i praksis. Står under vælgeren, fordi "Lokal
+        /// maskine" på en telefon peger på telefonen selv og ikke på noget,
+        /// der svarer.
+        var note: String {
+            switch self {
+            case .drift: "Det indhold, quizmasterne arbejder i."
+            case .lokal: "Kræver ./backend/run.sh. Virker kun i simulatoren."
+            }
+        }
+    }
+
+    /// Serveren, appen taler med lige nu.
+    static var backend: Backend {
+        Backend.allCases.first { $0.url == backendURL } ?? .drift
+    }
+
+    /// Skifter server. Kun i Debug — en udsendt bygning peger på drift og
+    /// bliver der.
+    static func select(_ backend: Backend) {
+        #if DEBUG
+        UserDefaults.standard.set(backend.url.absoluteString, forKey: backendKey)
+        #endif
+    }
+
+    /// Sandt, når serveren kan vælges. Falsk i Release.
+    static var canChooseBackend: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
+    }
+
     // MARK: - Hvem der retter
 
     private static let quizmasterKey = "bh.admin.quizmaster"
