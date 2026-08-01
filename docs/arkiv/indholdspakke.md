@@ -1,0 +1,1189 @@
+# Indholdspakken — arkiv
+> Genereret af `contracts/arkiver-indhold.py`. Rediger ikke i hånden.
+
+| | |
+|---|---|
+| Kilde | `https://byensgaader-api-p.azurewebsites.net` |
+| Hentet | 2026-08-01 |
+| Indholdsversion | `2026-07-28.1` |
+| ETag | `"38c2e8325e86ea67e8b1c93ccc5e18f8"` |
+| Opgaver | 4 |
+| Medier | 19 |
+
+Indholdet bor i Azure Blob Storage. Denne fil er en læsbar gengivelse,
+ikke kilden — se `contracts/README.md`.
+
+## Bølgen – Den skjulte besked
+
+*En glemt besked ved fjorden kunne først åbnes, når alle bølger stod færdige.*
+
+| | |
+|---|---|
+| Id | `mission.boelgen.den-femte-besked` |
+| Status | fieldTestReady |
+| Sted | Bølgen, Havneøen, 7100 Vejle |
+| Postnummer | 7100 |
+| Koordinat | 55.710503, 9.557547 |
+| Sværhedsgrad | 3 af 5 |
+| Grundpoint | 100 |
+
+**Fiktionsmarkering.** Fiktiv mission baseret på Bølgens dokumenterede bygge- og arkitekturhistorie.
+
+### Spørgsmål — Den skjulte besked
+
+Hvilken trecifret kode åbner beskeden?
+
+- **Facit:** `592`
+- **Accepteres også:** `592`, `5 9 2`, `5-9-2`
+- **Nær ved `529`:** Du har sandsynligvis de rigtige tal, men rækkefølgen er forkert.
+- **Nær ved `952`:** Begynd med det, du selv kan se ved fjorden.
+- **Nær ved `593`:** De sidste tre bølger blev bygget efter pausen. Sporet spørger efter dem, der allerede stod færdige før pausen.
+- **Nær ved `5918`:** Det tredje spor spørger ikke efter året, hvor hele byggeriet stod færdigt. Det spørger efter antallet af bølger før pausen.
+- **Nær ved `492`:** Tæl kun de store, hvide bølgeformede hoveddele. Ignorér vinduer, altaner, boliger, master og refleksioner.
+
+### Hints
+
+1. **Hvor** (−3 %) — Det første tal findes ved at se på hele byggeriet. Tæl de store hvide toppe – ikke vinduer eller altaner.
+2. **Hvordan** (−4 %) — Koden følger rækkefølgen: antal bølger i dag → etager i hver bølge.
+3. **Næsten løsningen** (−5 %) — Du skal bruge fem bølger, ni etager og to bølger før pausen. Sæt tallene i den viste rækkefølge.
+
+### Belønning
+
+**Beskeden er åben** — Du samlede den skjulte besked
+
+Beskeden kunne først åbnes, når alle fem bølger var rejst ved fjorden. Nu står de der alle sammen – og du læste bygningen, som den skulle læses.
+
+*Fem toppe rejser sig ved fjorden. De spejler det bakkede landskab omkring Vejle og fortæller om byen mellem landskab og hav. De første to bølger stod færdige i 2009. Efter en lang pause blev de sidste tre bygget, og hele Bølgen stod færdig i 2018.*
+
+### Kort
+
+1. `boelgen-003.jpg` — I 2009 stod kun begyndelsen af Bølgen færdig.  En glemt besked fortæller, at den først kan åbnes, når alle bølger er rejst ved fjorden.
+2. `boelgen-001.jpg` — Tre symboler viser vejen: Øjet → Etagerne → Pausen.
+3. `boelgen-002.jpg` — Hvilken trecifret kode åbner beskeden?
+
+### Kilder
+
+- [Bølgen](https://www.visitvejle.dk/vejle/planlaeg-ferien/boelgen-gdk724987) — VisitVejle
+- [The Wave in Vejle](https://www.henninglarsen.com/projects/the-wave-in-vejle) — Henning Larsen
+
+## Fjordenhus – Vandets tromler
+
+*Fjorden har gemt en besked i huset. Men huset skal ikke læses gennem vinduerne – det skal læses som form, vand og højde.*
+
+| | |
+|---|---|
+| Id | `mission.fjordenhus.vandets-tromler` |
+| Status | fieldTestReady |
+| Sted | Fjordenhus, Havneøen 1, 7100 Vejle |
+| Postnummer | 7100 |
+| Koordinat | 55.706393, 9.55436 |
+| Sværhedsgrad | 3 af 5 |
+| Grundpoint | 100 |
+
+**Fiktionsmarkering.** Fiktiv mission baseret på Fjordenhus' dokumenterede arkitektur.
+
+### Spørgsmål — Vandets tromler
+
+Hvilken trecifret kode åbner beskeden?
+
+- **Facit:** `428`
+- **Accepteres også:** `428`, `4 2 8`, `4-2-8`
+- **Nær ved `482`:** Du har sandsynligvis de rigtige tal, men rækkefølgen er forkert. Følg arkitektens note: form → vand → højde.
+- **Nær ved `4280`:** Højden skal kun give ét tal. Brug det sidste ciffer i 28.
+- **Nær ved `4228`:** Højden skal kun give ét tal. Brug det sidste ciffer i 28.
+- **Nær ved `2228`:** Første spor handler om husets samlede form – ikke om rummene eller åbningerne.
+- **Nær ved `528`:** Tæl kun husets store cylindriske hoveddele. Ignorér åbninger, vinduer, buer og gangbroen.
+
+### Hints
+
+1. **Hvor** (−3 %) — Du skal ikke tælle vinduer eller åbninger. Se i stedet på de store, runde hovedformer, som huset er bygget af (hovedcylindre).
+2. **Hvordan** (−4 %) — Det andet ciffer handler om vandet i stueetagen. Antal vandgennemstrømmede rum.
+3. **Næsten løsningen** (−5 %) — Det tredje er sidste ciffer er noget med højde at gøre.
+
+### Belønning
+
+**Beskeden er åben** — Du læste huset gennem fjorden
+
+Du læste ikke huset gennem vinduerne, men som form, vand og højde – præcis som noten bad om. Fjorden havde gemt sin besked i selve bygningens opbygning.
+
+*Fjordenhus består af fire sammenhængende cylindriske former. Bygningen rejser sig 28 meter over vandet, mens fjorden løber gennem to rum i stueetagen. Huset står ikke bare ved vandet – vandet er en del af selve arkitekturen.*
+
+### Kort
+
+1. `fjordenhus-001.jpg` — Fjorden har gemt en besked i huset.  Men huset skal ikke læses gennem vinduerne eller de mange åbninger. Det skal læses som tre enkle spor: Form. Vand. Højde.
+2. `fjordenhus-002.jpg` — Find de tre tal, og åbn beskeden.  Hvilken trecifret kode åbner beskeden?
+3. `fjordenhus-003.jpg` — Først det, der bærer huset.  Så det, fjorden får lov at løbe igennem.  Til sidst det sidste ciffer i husets højde.
+
+### Kilder
+
+- [Fjordenhus](https://www.fjordenhus.dk/dk/fjordenhus/) — Fjordenhus
+- [Fjordenhus](https://www.visitvejle.dk/vejle/planlaeg-ferien/fjordenhus-gdk1101859) — VisitVejle
+
+## Vera's hul
+
+*I haven bor kaninen Vera. Kan du finde Vera's hul?*
+
+| | |
+|---|---|
+| Id | `mission.frydenlund98.veras-hemmelige-snack` |
+| Status | fieldTestReady |
+| Sted | Frydenlund 98 – kaninburet, Frydenlund 98, 7120 Vejle |
+| Postnummer | 7120 |
+| Koordinat | 55.734797, 9.620308 |
+| Sværhedsgrad | 2 af 5 |
+| Grundpoint | 50 |
+
+**Fiktionsmarkering.** Fiktiv gåde. Kaninen Vera er virkelig.
+
+### Spørgsmål — Veras hul
+
+Hvilket hul bor Vera i?
+
+- **Facit:** `Hul 3`
+- **Accepteres også:** `Hul 3`, `hul 3`, `3`
+- **Nær ved `Hul 2`:** Tæt på. Hvis Vera boede i hul 2, skulle Plet bo i hul 1 — og så er der ikke plads til Skygge til venstre for Plet.
+
+### Hints
+
+1. **Start med det sikre** (−3 %) — Én kanin har allerede fået et bestemt hul. Placer Sne først.
+2. **Find parret** (−4 %) — Plet skal bo lige til venstre for Vera. De to står altså ved siden af hinanden.
+3. **Næsten løsningen** (−5 %) — Vera kan ikke bo i hul 1 eller hul 4. Undersøg, om hul 2 kan passe med Skygges spor.
+
+### Belønning
+
+**I fandt Veras hul!** — Vera bor i hul 3
+
+Skygge bor i hul 1, Plet i hul 2 og Sne i hul 4. Alle fire kaniner har nu fundet hjem.
+
+*Kaniner graver gange og huler under jorden. Et sammenhængende system af gange kaldes en grav, og der kan bo flere kaniner i den samme.*
+
+### Kort
+
+1. `vera-001.jpg` — I haven bor kaninen Vera. Men i nat har 3 andre kaniner også gravet huller.
+2. `vera-003.jpg` — Kaninerne hedder Vera, Plet, Sne og Skygge.  Spor 1: Vera bor hverken i hul 1 eller hul 4.
+3. `vera-002.jpg` — Spor 2: Plet bor i hullet lige til venstre for Vera.  Spor 3: Sne bor i hul 4.  Spor 4: Skygge bor til venstre for Plet.
+4. `vera-004.jpg` — Hvilket hul bor Vera i?
+
+### Kilder
+
+- [Kaninen Vera på Frydenlund 98](https://byensgaader.dk/kilder/frydenlund98-vera) — Byens Gåder
+
+## Den forsvundne landevej
+
+*En gammel bro gemmer på en hemmelighed.*
+
+| | |
+|---|---|
+| Id | `mission.broen.den-forsvundne-landevej` |
+| Status | fieldTestReady |
+| Sted | Den gamle bro i Tirsbæk Bakker, Tirsbæk Bakker, 7120 Vejle |
+| Postnummer | 7120 |
+| Koordinat | 55.7261, 9.63084 |
+| Sværhedsgrad | 3 af 5 |
+| Grundpoint | 100 |
+
+**Fiktionsmarkering.** Fiktiv mission baseret på broens dokumenterede historie som del af den gamle vej mellem Vejle og Horsens.
+
+### Spørgsmål — Budbringerens retning
+
+Hvilken vej fortsatte budbringeren fra broen?
+
+- **Facit:** `Nord`
+- **Accepteres også:** `Nord`, `nord`, `mod nord`
+- **Nær ved `Syd`:** Syd er tilbage mod Vejle — dér kom budbringeren fra. Hvor skulle han hen?
+
+### Hints
+
+1. **Hvor er byerne?** (−3 %) — Zoom ud på kortet.
+2. **Hvilken vej gik rejsen?** (−4 %) — Budbringeren forlod Vejle.
+3. **Næsten der** (−5 %) — Horsens ligger cirka 28 kilometer fra Vejle.
+
+### Belønning
+
+**Den gamle vej er fundet** — Svaret er nord
+
+Broen blev ikke bygget som et monument. Den var en del af hverdagen for mennesker, dyr og vogne på rejsen mellem Vejle og Horsens.
+
+*Broen stammer efter det foreløbige kildegrundlag fra 1700-tallet og blev fundet, da boligområdet Tirsbæk Bakker blev udviklet. Det moderne kvarter skjuler næsten vejen, men broen afslører stadig dens retning.*
+
+### Kort
+
+1. `broen-001.jpg` — Foran jer ligger en gammel bro. I dag er den en del af et fredeligt stisystem.  For mere end 200 år siden førte vejen her videre mellem Vejle og Horsens.  En budbringer kom fra Vejle. Han red gennem landskabet med en vigtig besked.  Da han nåede broen, brød et uvejr løs. Regnen ødelagde hans kort.  Kun broen husker stadig, hvilken vej han skulle fortsætte.
+
+### Kilder
+
+- [Gammel bro fra 1700-tallet er fundet i nybyggerkvarter](https://vafo.dk/vejle/gammel-bro-fra-1700-tallet-er-fundet-i-nybyggerkvarter) — Vejle Amts Folkeblad
+
+## Medier og rettigheder
+
+| Fil | Slags | Ejer | Licens |
+|---|---|---|---|
+| `boelgen-000.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `boelgen-001.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `boelgen-002.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `boelgen-003.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `broen-000.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `broen-001.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `fjordenhus-000.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `fjordenhus-001.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `fjordenhus-002.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `fjordenhus-003.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `narration-boelgen.m4a` | aiGenerated | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `narration-broen.m4a` | aiGenerated | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `narration-fjordenhus.m4a` | aiGenerated | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `narration-vera.m4a` | aiGenerated | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `vera-000.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `vera-001.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `vera-002.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `vera-003.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+| `vera-004.jpg` | enhanced | Jesper Hyldenbrandt Bjerre | Eget materiale — Byens Gåder ejer rettighederne |
+
+## Hele pakken
+
+Til fuldstændighed. Det er denne, der ligger i blob.
+
+```json
+{
+  "contentVersion": "2026-07-28.1",
+  "locale": "da-DK",
+  "locations": [
+    {
+      "accessibility": {
+        "distanceFromAccessMetres": null,
+        "incline": "Fladt hele vejen",
+        "notes": "Standpunktet er endnu ikke opmålt i felten. Underlag, hældninger og afstand fra nærmeste offentlige adgang skal registreres ved feltbesøget, før opgaven kan erklæres publiceringsklar.",
+        "steps": false,
+        "stroller": "unknown",
+        "surface": "Fast, jævn belægning på promenaden",
+        "wheelchair": "unknown"
+      },
+      "accuracyProfile": "urbanCanyon",
+      "activationRadiusMetres": 45,
+      "address": "Havneøen, 7100 Vejle",
+      "dwellSeconds": 20,
+      "fieldVerified": false,
+      "id": "loc.vejle-havn.boelgen",
+      "lastPhysicallyVerified": null,
+      "latitude": 55.710503,
+      "longitude": 9.557547,
+      "maxAcceptableAccuracyMetres": 40,
+      "name": "Bølgen",
+      "postalCode": "7100",
+      "publicAccess": true,
+      "safety": {
+        "flags": [
+          "water",
+          "cyclePath",
+          "darkness"
+        ],
+        "notes": "Der er åben vandkant langs promenaden, og cyklister kommer hurtigt. Stå med ryggen til vandet, hold jer samlet væk fra kanten, og gå aldrig ud på cykelstien for at få et bedre kig. Kig op fra telefonen, når I flytter jer."
+      }
+    },
+    {
+      "accessibility": {
+        "distanceFromAccessMetres": null,
+        "incline": "Fladt",
+        "notes": "Standpunktet er endnu ikke opmålt i felten. Underlag, kanter og kørestolsadgang skal registreres ved feltbesøget, før opgaven kan erklæres publiceringsklar.",
+        "steps": false,
+        "stroller": "unknown",
+        "surface": "Fast belægning på kajen",
+        "wheelchair": "unknown"
+      },
+      "accuracyProfile": "urbanCanyon",
+      "activationRadiusMetres": 40,
+      "address": "Havneøen 1, 7100 Vejle",
+      "dwellSeconds": 20,
+      "fieldVerified": false,
+      "id": "loc.vejle-havn.fjordenhus",
+      "lastPhysicallyVerified": null,
+      "latitude": 55.706393,
+      "longitude": 9.55436,
+      "maxAcceptableAccuracyMetres": 35,
+      "name": "Fjordenhus",
+      "postalCode": "7100",
+      "publicAccess": true,
+      "safety": {
+        "flags": [
+          "water",
+          "crowding"
+        ],
+        "notes": "Opgaven løses fra kajen, hvor der er åbent vand tæt på. Hold god afstand til kanten, bloker ikke broen eller indgangen, og rør ikke bygningen eller kunstværkerne."
+      }
+    },
+    {
+      "accessibility": {
+        "distanceFromAccessMetres": null,
+        "incline": "Ikke registreret",
+        "notes": "Tilgængelighed skal registreres ved felttest.",
+        "steps": false,
+        "stroller": "unknown",
+        "surface": "Ikke registreret",
+        "wheelchair": "unknown"
+      },
+      "accuracyProfile": "standard",
+      "activationRadiusMetres": 10,
+      "address": "Tirsbæk Bakker, 7120 Vejle",
+      "dwellSeconds": 5,
+      "fieldVerified": false,
+      "id": "loc.vejle-oest.tirsbaek-broen",
+      "lastPhysicallyVerified": null,
+      "latitude": 55.7261,
+      "longitude": 9.63084,
+      "maxAcceptableAccuracyMetres": 10,
+      "name": "Den gamle bro i Tirsbæk Bakker",
+      "postalCode": "7120",
+      "publicAccess": true,
+      "safety": {
+        "flags": [],
+        "notes": "Sikkerheden er ikke fysisk kontrolleret endnu. Opgaven er researchklar og vises ikke i appen."
+      }
+    },
+    {
+      "accessibility": {
+        "distanceFromAccessMetres": null,
+        "incline": "Fladt",
+        "notes": "Testopgave på privat adresse. Tilgængelighed er ikke registreret.",
+        "steps": false,
+        "stroller": "unknown",
+        "surface": "Indendørs gulv",
+        "wheelchair": "unknown"
+      },
+      "accuracyProfile": "standard",
+      "activationRadiusMetres": 45,
+      "address": "Frydenlund 98, 7120 Vejle",
+      "dwellSeconds": 5,
+      "fieldVerified": false,
+      "id": "loc.vejle-oest.frydenlund98-vera",
+      "lastPhysicallyVerified": null,
+      "latitude": 55.734797,
+      "longitude": 9.620308,
+      "maxAcceptableAccuracyMetres": 40,
+      "name": "Frydenlund 98 – kaninburet",
+      "postalCode": "7120",
+      "publicAccess": false,
+      "safety": {
+        "flags": [
+          "privateProperty"
+        ],
+        "notes": "Privat adresse. Testopgave — ikke til offentlig brug."
+      }
+    }
+  ],
+  "media": [
+    {
+      "altText": "Bølgen ved Vejle Fjord: hvide, bølgeformede boligblokke langs vandet.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "boelgen-000.jpg",
+      "id": "media.boelgen.000",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Bølgen ved Vejle Fjord. De bølgeformede boligblokke står side om side langs vandet, hvor den glemte besked gemmer sig.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "boelgen-001.jpg",
+      "id": "media.boelgen.001",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Bølgen ved fjorden. Tre spor peger på koden: øjet, etagerne og byggepausen.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "boelgen-002.jpg",
+      "id": "media.boelgen.002",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Bølgens hvide bølgetoppe set fra siden — de toppe, spilleren skal tælle.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "boelgen-003.jpg",
+      "id": "media.boelgen.003",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Fortællerstemme, der læser introduktionen til Bølgen – Den femte besked op.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "narration-boelgen.m4a",
+      "id": "media.narration.boelgen",
+      "kind": "aiGenerated",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003).",
+      "mediaType": "audio",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Fjordenhus på Vejle Havn: husets buede murstenstårne står ude i vandet.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "fjordenhus-000.jpg",
+      "id": "media.fjordenhus.000",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Fjordenhus set fra kajen. Huset skal læses som form, vand og højde — ikke gennem vinduerne.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "fjordenhus-001.jpg",
+      "id": "media.fjordenhus.001",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Fjordenhus i nærbillede. Husets højde bærer det sidste ciffer i koden.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "fjordenhus-002.jpg",
+      "id": "media.fjordenhus.002",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Fjordenhus' cylindriske hoveddele set som en samlet form, med fjordens vand omkring.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "fjordenhus-003.jpg",
+      "id": "media.fjordenhus.003",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Fortællerstemme, der læser introduktionen til Fjordenhus – Vandets tromler op.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "narration-fjordenhus.m4a",
+      "id": "media.narration.fjordenhus",
+      "kind": "aiGenerated",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003).",
+      "mediaType": "audio",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Kaninen Vera i haven ved Frydenlund 98.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "vera-000.jpg",
+      "id": "media.vera.000",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Haven ved Frydenlund 98 om natten, hvor fire kaniner har gravet hvert sit hul.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "vera-001.jpg",
+      "id": "media.vera.001",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Kaninerne Vera, Plet, Sne og Skygge, som hver bor i sit hul.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "vera-002.jpg",
+      "id": "media.vera.002",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Hullerne i haven, nummereret fra venstre mod højre.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "vera-003.jpg",
+      "id": "media.vera.003",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Opslagstavlen til gåden: de fire kaniner, de fire nummererede huller og spørgsmålet om, hvilket hul Vera bor i.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "vera-004.jpg",
+      "id": "media.vera.004",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Fortællerstemme, der læser introduktionen til Vera og de fire huller op.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "narration-vera.m4a",
+      "id": "media.narration.vera",
+      "kind": "aiGenerated",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003).",
+      "mediaType": "audio",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Den gamle bro i Tirsbæk Bakker, omgivet af skov.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "broen-000.jpg",
+      "id": "media.broen.000",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Den gamle bro i Tirsbæk Bakker. I dag en del af et stisystem, men engang en del af landevejen mellem Vejle og Horsens.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "broen-001.jpg",
+      "id": "media.broen.001",
+      "kind": "enhanced",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Bearbejdet for stemningens skyld. Motivet og stedet er ægte, og intet, opgaven skal løses med, er ændret (ADR 0003).",
+      "mediaType": "image",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    },
+    {
+      "altText": "Fortællerstemme, der læser introduktionen til Den forsvundne landevej op.",
+      "credit": "Byens Gåder",
+      "creditLine": null,
+      "expiresAt": null,
+      "filename": "narration-broen.m4a",
+      "id": "media.narration.broen",
+      "kind": "aiGenerated",
+      "licence": "Eget materiale — Byens Gåder ejer rettighederne",
+      "manipulation": "Syntetisk fortællerstemme. Sætter stemningen og uddyber — alt nødvendigt for at løse opgaven står som tekst på skærmen (ADR 0003).",
+      "mediaType": "audio",
+      "owner": "Jesper Hyldenbrandt Bjerre",
+      "restrictions": null
+    }
+  ],
+  "missions": [
+    {
+      "basePoints": 100,
+      "cards": [
+        {
+          "id": "card.boelgen-den-femte-besked.1",
+          "mediaId": "media.boelgen.003",
+          "order": 1,
+          "text": "I 2009 stod kun begyndelsen af Bølgen færdig.\n\nEn glemt besked fortæller, at den først kan åbnes, når alle bølger er rejst ved fjorden."
+        },
+        {
+          "id": "card.boelgen-den-femte-besked.2",
+          "mediaId": "media.boelgen.001",
+          "order": 2,
+          "text": "Tre symboler viser vejen:\nØjet → Etagerne → Pausen."
+        },
+        {
+          "id": "card.boelgen-den-femte-besked.3",
+          "mediaId": "media.boelgen.002",
+          "order": 3,
+          "text": "Hvilken trecifret kode åbner beskeden?"
+        }
+      ],
+      "chapterId": null,
+      "completion": {
+        "headline": "Beskeden er åben",
+        "historyFact": "Fem toppe rejser sig ved fjorden. De spejler det bakkede landskab omkring Vejle og fortæller om byen mellem landskab og hav. De første to bølger stod færdige i 2009. Efter en lang pause blev de sidste tre bygget, og hele Bølgen stod færdig i 2018.",
+        "message": "Beskeden kunne først åbnes, når alle fem bølger var rejst ved fjorden. Nu står de der alle sammen – og du læste bygningen, som den skulle læses.",
+        "messageLabel": "Den skjulte besked",
+        "subheadline": "Du samlede den skjulte besked"
+      },
+      "description": "En glemt besked ved fjorden kunne først åbnes, når alle bølger stod færdige.",
+      "difficulty": 3,
+      "estimatedMinutes": 10,
+      "fictionLabel": "Fiktiv mission baseret på Bølgens dokumenterede bygge- og arkitekturhistorie.",
+      "heroMediaId": null,
+      "hints": [
+        {
+          "id": "hint.boelgen.1",
+          "order": 1,
+          "penaltyPercent": 3,
+          "text": "Det første tal findes ved at se på hele byggeriet. Tæl de store hvide toppe – ikke vinduer eller altaner.",
+          "title": "Hvor"
+        },
+        {
+          "id": "hint.boelgen.2",
+          "order": 2,
+          "penaltyPercent": 4,
+          "text": "Koden følger rækkefølgen: antal bølger i dag → etager i hver bølge.",
+          "title": "Hvordan"
+        },
+        {
+          "id": "hint.boelgen.3",
+          "order": 3,
+          "penaltyPercent": 5,
+          "text": "Du skal bruge fem bølger, ni etager og to bølger før pausen. Sæt tallene i den viste rækkefølge.",
+          "title": "Næsten løsningen"
+        }
+      ],
+      "id": "mission.boelgen.den-femte-besked",
+      "locationId": "loc.vejle-havn.boelgen",
+      "moodMediaId": "media.boelgen.001",
+      "narrationMediaId": "media.narration.boelgen",
+      "nextChapterId": null,
+      "placeMediaId": null,
+      "shortTitle": "Den skjulte besked",
+      "slug": "boelgen-den-femte-besked",
+      "sourceIds": [
+        "source.visitvejle.boelgen",
+        "source.henninglarsen.boelgen"
+      ],
+      "status": "fieldTestReady",
+      "steps": [
+        {
+          "answerRule": {
+            "acceptedAnswers": [
+              "592",
+              "5 9 2",
+              "5-9-2"
+            ],
+            "canonicalAnswer": "592",
+            "kind": "digitsOnly",
+            "nearMissResponses": [
+              {
+                "answer": "529",
+                "feedback": "Du har sandsynligvis de rigtige tal, men rækkefølgen er forkert."
+              },
+              {
+                "answer": "952",
+                "feedback": "Begynd med det, du selv kan se ved fjorden."
+              },
+              {
+                "answer": "593",
+                "feedback": "De sidste tre bølger blev bygget efter pausen. Sporet spørger efter dem, der allerede stod færdige før pausen."
+              },
+              {
+                "answer": "5918",
+                "feedback": "Det tredje spor spørger ikke efter året, hvor hele byggeriet stod færdigt. Det spørger efter antallet af bølger før pausen."
+              },
+              {
+                "answer": "492",
+                "feedback": "Tæl kun de store, hvide bølgeformede hoveddele. Ignorér vinduer, altaner, boliger, master og refleksioner."
+              }
+            ]
+          },
+          "hintIds": [
+            "hint.boelgen.1",
+            "hint.boelgen.2",
+            "hint.boelgen.3"
+          ],
+          "id": "step.boelgen.koden",
+          "kind": "numericCode",
+          "length": 3,
+          "order": 1,
+          "question": "Hvilken trecifret kode åbner beskeden?",
+          "title": "Den skjulte besked"
+        }
+      ],
+      "storyId": null,
+      "tags": [
+        "arkitektur",
+        "observation",
+        "havn",
+        "familie"
+      ],
+      "thumbnailMediaId": "media.boelgen.000",
+      "title": "Bølgen – Den skjulte besked"
+    },
+    {
+      "basePoints": 100,
+      "cards": [
+        {
+          "id": "card.fjordenhus-vandets-tromler.1",
+          "mediaId": "media.fjordenhus.001",
+          "order": 1,
+          "text": "Fjorden har gemt en besked i huset.\n\nMen huset skal ikke læses gennem vinduerne eller de mange åbninger. Det skal læses som tre enkle spor:\nForm. Vand. Højde."
+        },
+        {
+          "id": "card.fjordenhus-vandets-tromler.2",
+          "mediaId": "media.fjordenhus.002",
+          "order": 2,
+          "text": "Find de tre tal, og åbn beskeden.\n\nHvilken trecifret kode åbner beskeden?"
+        },
+        {
+          "id": "card.fjordenhus-vandets-tromler.3",
+          "mediaId": "media.fjordenhus.003",
+          "order": 3,
+          "text": "Først det, der bærer huset.\n\nSå det, fjorden får lov at løbe igennem.\n\nTil sidst det sidste ciffer i husets højde."
+        }
+      ],
+      "chapterId": null,
+      "completion": {
+        "headline": "Beskeden er åben",
+        "historyFact": "Fjordenhus består af fire sammenhængende cylindriske former. Bygningen rejser sig 28 meter over vandet, mens fjorden løber gennem to rum i stueetagen. Huset står ikke bare ved vandet – vandet er en del af selve arkitekturen.",
+        "message": "Du læste ikke huset gennem vinduerne, men som form, vand og højde – præcis som noten bad om. Fjorden havde gemt sin besked i selve bygningens opbygning.",
+        "messageLabel": "Arkitektens note",
+        "subheadline": "Du læste huset gennem fjorden"
+      },
+      "description": "Fjorden har gemt en besked i huset. Men huset skal ikke læses gennem vinduerne – det skal læses som form, vand og højde.",
+      "difficulty": 3,
+      "estimatedMinutes": 7,
+      "fictionLabel": "Fiktiv mission baseret på Fjordenhus' dokumenterede arkitektur.",
+      "heroMediaId": null,
+      "hints": [
+        {
+          "id": "hint.fjordenhus.1",
+          "order": 1,
+          "penaltyPercent": 3,
+          "text": "Du skal ikke tælle vinduer eller åbninger. Se i stedet på de store, runde hovedformer, som huset er bygget af (hovedcylindre).",
+          "title": "Hvor"
+        },
+        {
+          "id": "hint.fjordenhus.2",
+          "order": 2,
+          "penaltyPercent": 4,
+          "text": "Det andet ciffer handler om vandet i stueetagen. Antal vandgennemstrømmede rum.",
+          "title": "Hvordan"
+        },
+        {
+          "id": "hint.fjordenhus.3",
+          "order": 3,
+          "penaltyPercent": 5,
+          "text": "Det tredje er sidste ciffer er noget med højde at gøre.",
+          "title": "Næsten løsningen"
+        }
+      ],
+      "id": "mission.fjordenhus.vandets-tromler",
+      "locationId": "loc.vejle-havn.fjordenhus",
+      "moodMediaId": "media.fjordenhus.001",
+      "narrationMediaId": "media.narration.fjordenhus",
+      "nextChapterId": null,
+      "placeMediaId": null,
+      "shortTitle": "Vandets tromler",
+      "slug": "fjordenhus-vandets-tromler",
+      "sourceIds": [
+        "source.fjordenhus.officiel",
+        "source.visitvejle.fjordenhus"
+      ],
+      "status": "fieldTestReady",
+      "steps": [
+        {
+          "answerRule": {
+            "acceptedAnswers": [
+              "428",
+              "4 2 8",
+              "4-2-8"
+            ],
+            "canonicalAnswer": "428",
+            "kind": "digitsOnly",
+            "nearMissResponses": [
+              {
+                "answer": "482",
+                "feedback": "Du har sandsynligvis de rigtige tal, men rækkefølgen er forkert. Følg arkitektens note: form → vand → højde."
+              },
+              {
+                "answer": "4280",
+                "feedback": "Højden skal kun give ét tal. Brug det sidste ciffer i 28."
+              },
+              {
+                "answer": "4228",
+                "feedback": "Højden skal kun give ét tal. Brug det sidste ciffer i 28."
+              },
+              {
+                "answer": "2228",
+                "feedback": "Første spor handler om husets samlede form – ikke om rummene eller åbningerne."
+              },
+              {
+                "answer": "528",
+                "feedback": "Tæl kun husets store cylindriske hoveddele. Ignorér åbninger, vinduer, buer og gangbroen."
+              }
+            ]
+          },
+          "hintIds": [
+            "hint.fjordenhus.1",
+            "hint.fjordenhus.2",
+            "hint.fjordenhus.3"
+          ],
+          "id": "step.fjordenhus.koden",
+          "kind": "numericCode",
+          "length": 3,
+          "order": 1,
+          "question": "Hvilken trecifret kode åbner beskeden?",
+          "title": "Vandets tromler"
+        }
+      ],
+      "storyId": null,
+      "tags": [
+        "arkitektur",
+        "observation",
+        "havn",
+        "familie"
+      ],
+      "thumbnailMediaId": "media.fjordenhus.000",
+      "title": "Fjordenhus – Vandets tromler"
+    },
+    {
+      "basePoints": 50,
+      "cards": [
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.1",
+          "mediaId": "media.vera.001",
+          "order": 1,
+          "text": "I haven bor kaninen Vera. Men i nat har 3 andre kaniner også gravet huller."
+        },
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.2",
+          "mediaId": "media.vera.003",
+          "order": 2,
+          "text": "Kaninerne hedder Vera, Plet, Sne og Skygge.\n\nSpor 1: Vera bor hverken i hul 1 eller hul 4."
+        },
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.3",
+          "mediaId": "media.vera.002",
+          "order": 3,
+          "text": "Spor 2: Plet bor i hullet lige til venstre for Vera.\n\nSpor 3: Sne bor i hul 4.\n\nSpor 4: Skygge bor til venstre for Plet."
+        },
+        {
+          "id": "card.frydenlund98-veras-hemmelige-snack.4",
+          "mediaId": "media.vera.004",
+          "order": 4,
+          "text": "Hvilket hul bor Vera i?"
+        }
+      ],
+      "chapterId": null,
+      "completion": {
+        "headline": "I fandt Veras hul!",
+        "historyFact": "Kaniner graver gange og huler under jorden. Et sammenhængende system af gange kaldes en grav, og der kan bo flere kaniner i den samme.",
+        "message": "Skygge bor i hul 1, Plet i hul 2 og Sne i hul 4. Alle fire kaniner har nu fundet hjem.",
+        "messageLabel": "Veras gåde",
+        "subheadline": "Vera bor i hul 3"
+      },
+      "description": "I haven bor kaninen Vera. Kan du finde Vera's hul?",
+      "difficulty": 2,
+      "estimatedMinutes": 5,
+      "fictionLabel": "Fiktiv gåde. Kaninen Vera er virkelig.",
+      "heroMediaId": null,
+      "hints": [
+        {
+          "id": "hint.vera.1",
+          "order": 1,
+          "penaltyPercent": 3,
+          "text": "Én kanin har allerede fået et bestemt hul. Placer Sne først.",
+          "title": "Start med det sikre"
+        },
+        {
+          "id": "hint.vera.2",
+          "order": 2,
+          "penaltyPercent": 4,
+          "text": "Plet skal bo lige til venstre for Vera. De to står altså ved siden af hinanden.",
+          "title": "Find parret"
+        },
+        {
+          "id": "hint.vera.3",
+          "order": 3,
+          "penaltyPercent": 5,
+          "text": "Vera kan ikke bo i hul 1 eller hul 4. Undersøg, om hul 2 kan passe med Skygges spor.",
+          "title": "Næsten løsningen"
+        }
+      ],
+      "id": "mission.frydenlund98.veras-hemmelige-snack",
+      "locationId": "loc.vejle-oest.frydenlund98-vera",
+      "moodMediaId": "media.vera.001",
+      "narrationMediaId": "media.narration.vera",
+      "nextChapterId": null,
+      "placeMediaId": null,
+      "shortTitle": "Vera's hul",
+      "slug": "frydenlund98-veras-hemmelige-snack",
+      "sourceIds": [
+        "source.frydenlund98.vera"
+      ],
+      "status": "fieldTestReady",
+      "steps": [
+        {
+          "answerRule": {
+            "acceptedAnswers": [
+              "Hul 3",
+              "hul 3",
+              "3"
+            ],
+            "canonicalAnswer": "Hul 3",
+            "kind": "exact",
+            "nearMissResponses": [
+              {
+                "answer": "Hul 2",
+                "feedback": "Tæt på. Hvis Vera boede i hul 2, skulle Plet bo i hul 1 — og så er der ikke plads til Skygge til venstre for Plet."
+              }
+            ]
+          },
+          "hintIds": [
+            "hint.vera.1",
+            "hint.vera.2",
+            "hint.vera.3"
+          ],
+          "id": "step.vera.hullet",
+          "kind": "singleChoice",
+          "options": [
+            {
+              "id": "opt.vera.hul1",
+              "label": "Hul 1"
+            },
+            {
+              "id": "opt.vera.hul2",
+              "label": "Hul 2"
+            },
+            {
+              "id": "opt.vera.hul3",
+              "label": "Hul 3"
+            },
+            {
+              "id": "opt.vera.hul4",
+              "label": "Hul 4"
+            }
+          ],
+          "order": 1,
+          "question": "Hvilket hul bor Vera i?",
+          "title": "Veras hul"
+        }
+      ],
+      "storyId": null,
+      "tags": [
+        "test",
+        "gåde",
+        "børn",
+        "dyr"
+      ],
+      "thumbnailMediaId": "media.vera.000",
+      "title": "Vera's hul"
+    },
+    {
+      "basePoints": 100,
+      "cards": [
+        {
+          "id": "card.den-forsvundne-landevej.1",
+          "mediaId": "media.broen.001",
+          "order": 1,
+          "text": "Foran jer ligger en gammel bro. I dag er den en del af et fredeligt stisystem.\n\nFor mere end 200 år siden førte vejen her videre mellem Vejle og Horsens.\n\nEn budbringer kom fra Vejle. Han red gennem landskabet med en vigtig besked.\n\nDa han nåede broen, brød et uvejr løs. Regnen ødelagde hans kort.\n\nKun broen husker stadig, hvilken vej han skulle fortsætte."
+        }
+      ],
+      "chapterId": null,
+      "completion": {
+        "headline": "Den gamle vej er fundet",
+        "historyFact": "Broen stammer efter det foreløbige kildegrundlag fra 1700-tallet og blev fundet, da boligområdet Tirsbæk Bakker blev udviklet. Det moderne kvarter skjuler næsten vejen, men broen afslører stadig dens retning.",
+        "message": "Broen blev ikke bygget som et monument. Den var en del af hverdagen for mennesker, dyr og vogne på rejsen mellem Vejle og Horsens.",
+        "messageLabel": "Landevejens besked",
+        "subheadline": "Svaret er nord"
+      },
+      "description": "En gammel bro gemmer på en hemmelighed.",
+      "difficulty": 3,
+      "estimatedMinutes": 10,
+      "fictionLabel": "Fiktiv mission baseret på broens dokumenterede historie som del af den gamle vej mellem Vejle og Horsens.",
+      "heroMediaId": null,
+      "hints": [
+        {
+          "id": "hint.broen.1",
+          "order": 1,
+          "penaltyPercent": 3,
+          "text": "Zoom ud på kortet.",
+          "title": "Hvor er byerne?"
+        },
+        {
+          "id": "hint.broen.2",
+          "order": 2,
+          "penaltyPercent": 4,
+          "text": "Budbringeren forlod Vejle.",
+          "title": "Hvilken vej gik rejsen?"
+        },
+        {
+          "id": "hint.broen.3",
+          "order": 3,
+          "penaltyPercent": 5,
+          "text": "Horsens ligger cirka 28 kilometer fra Vejle.",
+          "title": "Næsten der"
+        }
+      ],
+      "id": "mission.broen.den-forsvundne-landevej",
+      "locationId": "loc.vejle-oest.tirsbaek-broen",
+      "moodMediaId": "media.broen.001",
+      "narrationMediaId": "media.narration.broen",
+      "nextChapterId": null,
+      "placeMediaId": null,
+      "shortTitle": "Landevejen",
+      "slug": "den-forsvundne-landevej",
+      "sourceIds": [
+        "source.vafo.tirsbaek-broen"
+      ],
+      "status": "fieldTestReady",
+      "steps": [
+        {
+          "answerRule": {
+            "acceptedAnswers": [
+              "Nord",
+              "nord",
+              "mod nord"
+            ],
+            "canonicalAnswer": "Nord",
+            "kind": "exact",
+            "nearMissResponses": [
+              {
+                "answer": "Syd",
+                "feedback": "Syd er tilbage mod Vejle — dér kom budbringeren fra. Hvor skulle han hen?"
+              }
+            ]
+          },
+          "hintIds": [
+            "hint.broen.1",
+            "hint.broen.2",
+            "hint.broen.3"
+          ],
+          "id": "step.broen.retningen",
+          "kind": "singleChoice",
+          "options": [
+            {
+              "id": "opt.broen.nord",
+              "label": "Nord"
+            },
+            {
+              "id": "opt.broen.syd",
+              "label": "Syd"
+            },
+            {
+              "id": "opt.broen.oest",
+              "label": "Øst"
+            },
+            {
+              "id": "opt.broen.vest",
+              "label": "Vest"
+            }
+          ],
+          "order": 1,
+          "question": "Hvilken vej fortsatte budbringeren fra broen?",
+          "title": "Budbringerens retning"
+        }
+      ],
+      "storyId": null,
+      "tags": [
+        "orientering",
+        "historie",
+        "landskab"
+      ],
+      "thumbnailMediaId": "media.broen.000",
+      "title": "Den forsvundne landevej"
+    }
+  ],
+  "schemaVersion": "1.0",
+  "sources": [
+    {
+      "id": "source.visitvejle.boelgen",
+      "kind": "officialTourism",
+      "publisher": "VisitVejle",
+      "title": "Bølgen",
+      "url": "https://www.visitvejle.dk/vejle/planlaeg-ferien/boelgen-gdk724987"
+    },
+    {
+      "id": "source.henninglarsen.boelgen",
+      "kind": "architectPrimary",
+      "publisher": "Henning Larsen",
+      "title": "The Wave in Vejle",
+      "url": "https://www.henninglarsen.com/projects/the-wave-in-vejle"
+    },
+    {
+      "id": "source.fjordenhus.officiel",
+      "kind": "architectPrimary",
+      "publisher": "Fjordenhus",
+      "title": "Fjordenhus",
+      "url": "https://www.fjordenhus.dk/dk/fjordenhus/"
+    },
+    {
+      "id": "source.visitvejle.fjordenhus",
+      "kind": "officialTourism",
+      "publisher": "VisitVejle",
+      "title": "Fjordenhus",
+      "url": "https://www.visitvejle.dk/vejle/planlaeg-ferien/fjordenhus-gdk1101859"
+    },
+    {
+      "id": "source.frydenlund98.vera",
+      "kind": "other",
+      "publisher": "Byens Gåder",
+      "title": "Kaninen Vera på Frydenlund 98",
+      "url": "https://byensgaader.dk/kilder/frydenlund98-vera"
+    },
+    {
+      "id": "source.vafo.tirsbaek-broen",
+      "kind": "other",
+      "publisher": "Vejle Amts Folkeblad",
+      "title": "Gammel bro fra 1700-tallet er fundet i nybyggerkvarter",
+      "url": "https://vafo.dk/vejle/gammel-bro-fra-1700-tallet-er-fundet-i-nybyggerkvarter"
+    }
+  ]
+}
+```

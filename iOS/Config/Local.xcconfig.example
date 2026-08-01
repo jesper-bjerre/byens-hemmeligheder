@@ -15,3 +15,15 @@
 // Team-id'et er `OU`-feltet i certifikatets subject — ti tegn, fx `A1B2C3D4E5`.
 // Det kan også ses under Xcode ▸ Settings ▸ Accounts.
 DEVELOPMENT_TEAM = <indsæt lokalt, commit aldrig>
+
+// Hvor appen henter opgaver og medier fra.
+//
+// Der er intet bundlet indhold i appen (ADR 0004, forfatningens princip V).
+// Mangler denne linje, stopper appen ved opstart frem for at vise en tom
+// skærm, ingen ved hvorfor er tom.
+//
+// Den udrullede backend:
+BH_CONTENT_BASE_URL = https:/$()/byensgaader-api-p.azurewebsites.net
+//
+// En lokal backend i stedet — kræver `./backend/run.sh`:
+// BH_CONTENT_BASE_URL = http:/$()/localhost:5199
