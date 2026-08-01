@@ -28,7 +28,6 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: produktion
     steps:
       - uses: actions/checkout@v4
 
@@ -62,9 +61,9 @@ jobs:
       # af de tre der mangler — uden at afsløre nogen af dem.
       - name: Kontrollér at de tre secrets findes
         env:
-          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          CLIENT_ID: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B9D566BBDA294AA2938B7D6C22202713 }}
+          TENANT_ID: ${{ secrets.AZUREAPPSERVICE_TENANTID_8C3788C75A2141DC8F151FE1367B6BF0 }}
+          SUBSCRIPTION_ID: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E99D9924A1B746E89A161398EDAB5234 }}
         run: |
           mangler=0
           for navn in CLIENT_ID TENANT_ID SUBSCRIPTION_ID; do
@@ -83,16 +82,16 @@ jobs:
           done
 
           if [ "$mangler" = "1" ]; then
-            echo "::error::Ret dem under Settings → Environments → produktion → Environment secrets."
+            echo "::error::De oprettes af Deployment Center i Azure-portalen. Kør den igen."
             exit 1
           fi
 
       - name: Log ind i Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B9D566BBDA294AA2938B7D6C22202713 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8C3788C75A2141DC8F151FE1367B6BF0 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E99D9924A1B746E89A161398EDAB5234 }}
 
       # `az webapp deploy` frem for `azure/webapps-deploy`.
       #
