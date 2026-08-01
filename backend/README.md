@@ -29,12 +29,17 @@ administratorrettigheder, fordi Homebrews cask kræver `sudo`:
 curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 10.0
 ```
 
-Læg det i din PATH — fx i `~/.zshrc`:
+Læg det i PATH via `~/.zshenv` — **ikke** `~/.zshrc`:
 
 ```bash
 export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$PATH"
 ```
+
+Zsh læser kun `.zshrc` i *interaktive* shells. Står linjerne der, virker
+`dotnet` i terminalen, men ikke i scripts, byggeværktøjer eller noget, der
+kalder `zsh -c` — og fejlen ser ud som "dotnet er ikke installeret". Det samme
+gælder Homebrew og dermed `az`.
 
 Derefter:
 
@@ -88,12 +93,66 @@ Mapperne følger **funktion**, ikke lag. `Features/Health/` indeholder alt om
 sundhedstjekket. Der kommer ingen `Controllers/`, `Services/`, `Models/` —
 den opdeling spreder én ændring ud over fire mapper.
 
+## Lageret
+
+Der er to implementeringer af `IContentStore`, og de er dækket af **den samme**
+testsuite (`ContentStoreContractTests`). Grænsefladen findes for at kunne skifte
+lager uden at røre endepunkterne, og det løfte holder kun, hvis de to opfører
+sig ens.
+
+| | `FileSystem` | `Blob` |
+|---|---|---|
+| Bruges | lokalt | i Azure |
+| Samtidighed | læs, sammenlign, skriv — ikke atomisk | `If-Match` på blobbens ETag |
+| Sporet | `FileMode.Append` | append blob |
+| Adgang | mappen | managed identity |
+
+Skiftes med `ContentStore:Provider`.
+
+### ETag'en er to ting
+
+Klienterne får en **indholdshash**, så en pakke, der migreres eller genskabes
+uændret, beholder sin ETag og alle apps får `304` frem for at hente alt igen.
+Blobbens egen ETag ændrer sig ved hver skrivning, også når indholdet er det
+samme — den kan ikke bruges til det.
+
+Til gengæld er blobbens ETag det eneste, der gør en skrivning atomisk. Derfor
+bæres begge: hashen ligger som metadata på blobben, så en skrivning kun behøver
+at hente egenskaberne for at se, om klienten skrev oven på den udgave, hen troede.
+
+### Kør mod en DEV-konto
+
+Opret i portalen eller med `az`:
+
+- en storage-konto, fx `byensgaaderd`
+- en container ved navn `content`
+- rollen **Storage Blob Data Contributor** til dig selv på kontoen
+
+Derefter:
+
+```bash
+az login
+dotnet user-secrets set "ContentStore:Provider" "Blob"
+dotnet user-secrets set "ContentStore:StorageAccountUri" "https://byensgaaderd.blob.core.windows.net"
+```
+
+`DefaultAzureCredential` bruger dit `az login` lokalt og managed identity i
+Azure. Der er ingen nøgle at lække og intet at rotere, hvis repoet er public.
+
+Kontrakttestene mod Azure køres sådan — de er ellers markeret som oversprunget:
+
+```bash
+BH_TEST_BLOB_URI="https://byensgaaderd.blob.core.windows.net" dotnet test
+```
+
+> De skriver og sletter. Kør dem aldrig mod produktion.
+
 ## Hemmeligheder
 
 Ingen nøgler i `appsettings.json`. Den fil er sporet og ligger i et **public**
 repo.
 
-- **Lokalt:** `dotnet user-secrets set "Azure:StorageAccountUri" "..."` —
+- **Lokalt:** `dotnet user-secrets set "ContentStore:StorageAccountUri" "..."` —
   gemmer uden for repoet.
 - **I Azure:** managed identity. Ingen nøgle at lække.
 
@@ -118,13 +177,56 @@ til noget andet, end der stod i koden. Hvert endepunkt angiver sin fulde rute.
 
 Versionering tilføjes, når der findes et endepunkt, der skal versioneres.
 
+## Endepunkter
+
+| | | |
+|---|---|---|
+| `GET` | `/health` | Sundhedstjek |
+| `GET` | `/content/{locale}/pack` | Indholdspakken. ETag og `304` |
+| `GET` | `/content/{locale}/media` | Hvilke medier der ligger |
+| `GET` | `/content/{locale}/media/{fil}` | Ét billede eller én lydfil |
+| `GET` | `/content/{locale}/audit` | Sporet over ændringer. Nyeste først |
+| `PUT` | `/content/{locale}/pack` | Gemmer pakken. Kræver `If-Match` og `X-Quizmaster` |
+| `POST` | `/content/{locale}/media/{fil}` | Lægger et medie op. `409` på et kendt navn |
+| `DELETE` | `/content/{locale}/media/{fil}` | Fjerner et medie |
+
+`PUT` bruger **optimistisk samtidighed**: klienten sender den ETag, pakken blev
+hentet med. Har en anden gemt i mellemtiden, svares `412`, og klienten skal
+hente igen. Alle quizmastere kan rette i alt, så uden det taber den, der gemmer
+sidst, den andens arbejde uden at nogen opdager det.
+
+Serveren kontrollerer, at kroppen er gyldig JSON med `contentVersion` og
+`missions` — ikke kontrakten i dybden. Den grænse er bevidst: serveren beskytter
+mod ulæselige filer, ikke mod dårligt indhold. En server, der kender kontrakten,
+skal udrulles hver gang den udvides.
+
+## Sporet over ændringer
+
+Hver gemning skriver en linje i `{locale}/audit.jsonl`: hvem, hvornår, hvilken
+opgave og fra og til hvilken status (FR-111). Filen kan kun tilføjes til, og der
+findes intet endepunkt, der kan rette i den — et revisionsspor, der kan
+redigeres af dem, det holder øje med, beviser ingenting.
+
+Navnet står i `X-Quizmaster`, og mangler det, afvises gemningen med `400`. Det
+er ikke godtgørelse; der er ingen adgangskontrol endnu. Men et spor, klienten
+kan springe over, mangler netop de gemninger, hvor nogen havde travlt — og det
+er dem, man spørger til bagefter.
+
+Sporet er det eneste sted, serveren kigger ned i pakken, og den læser kun tre
+feltnavne: `contentVersion`, `missions[].id` og `missions[].status`. Skifter de
+navn, står der ingenting i sporet; pakken gemmes stadig.
+
 ## Endnu ikke besluttet
 
-Skelettet indeholder med vilje kun et sundhedstjek. Tre spørgsmål skal besvares,
-før der bygges endepunkter:
+To af de tre oprindelige spørgsmål er besvaret i `specs/002-quizmaster-app`:
+quizmaster-værktøjet er sin **egen app**, så spillerne ikke arver hver
+hastværksudgivelse, og der er **ingen godkendelsesgang** — alle quizmastere kan
+flytte enhver opgave mellem statusser, og sporet står i stedet for godkendelsen.
 
-1. Er quizmaster-værktøjet en del af Byens Gåder eller en selvstændig app?
-2. Skal spillere have konti? Hi-scores kræver det; ellers forbliver læsevejen
+Tilbage står:
+
+1. Skal spillere have konti? Hi-scores kræver det; ellers forbliver læsevejen
    anonym og gratis.
-3. Hvem godkender en opgave, før den bliver synlig? En godkendelsesgang ændrer
-   datamodellen — kladde, indsendt, godkendt, publiceret.
+2. Hvordan godtgøres en quizmaster? `X-Quizmaster` er i dag et navn, klienten
+   selv skriver. Det er nok til at spore, men ikke til at nægte adgang, og
+   admin-rollen i specs/002 styrer brugere, der endnu ikke findes.

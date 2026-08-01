@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using ByensGaader.Api.Storage;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -8,7 +9,35 @@ builder.Services
     .Configure<ContentStoreOptions>(builder.Configuration.GetSection(ContentStoreOptions.Section));
 
 // Filbaseret i udvikling, blob i Azure. Endepunkterne kender kun grænsefladen.
-builder.Services.AddSingleton<IContentStore, FileSystemContentStore>();
+//
+// Valget er eksplicit og ikke udledt af, om der står en adresse i
+// konfigurationen: en tastefejl ville ellers falde tilbage til filsystemet, og
+// API'et ville se ud til at virke, mens det skrev et sted, ingen læser.
+var storage = builder.Configuration.GetSection(ContentStoreOptions.Section)
+    .Get<ContentStoreOptions>() ?? new ContentStoreOptions();
+
+if (storage.Provider is ContentStoreProvider.Blob)
+{
+    if (!Uri.TryCreate(storage.StorageAccountUri, UriKind.Absolute, out var account))
+    {
+        throw new InvalidOperationException(
+            "ContentStore:Provider er Blob, men ContentStore:StorageAccountUri er ikke en "
+            + "adresse. Sæt den med `dotnet user-secrets` lokalt eller som app-indstilling "
+            + "i Azure.");
+    }
+
+    // `DefaultAzureCredential` er `az login` lokalt og managed identity i
+    // Azure. Ingen nøgle at lække — og intet at rotere, hvis repoet er public.
+    builder.Services.AddSingleton(
+        new BlobServiceClient(account, new Azure.Identity.DefaultAzureCredential()));
+    builder.Services.AddSingleton<IContentStore, BlobContentStore>();
+}
+else
+{
+    builder.Services.AddSingleton<IContentStore, FileSystemContentStore>();
+}
+
+builder.Services.AddSingleton<ByensGaader.Api.Features.Content.AuditTrail>();
 
 builder.Services
     .AddFastEndpoints()

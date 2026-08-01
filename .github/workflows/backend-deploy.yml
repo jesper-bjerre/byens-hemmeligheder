@@ -1,0 +1,88 @@
+name: Backend — udrul
+
+# Manuelt **og** på main. Manuelt, fordi B1 ikke har deployment slots: en
+# udrulning går direkte i luften, og det skal være en beslutning og ikke en
+# bivirkning af en rettet stavefejl i en README.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['backend/**', '.github/workflows/backend-deploy.yml']
+
+concurrency:
+  # To udrulninger på én gang efterlader app'en i en tilstand, ingen har valgt.
+  group: backend-deploy
+  cancel-in-progress: false
+
+permissions:
+  # OIDC frem for en publish profile. En publish profile er en adgangskode, der
+  # skal ligge i GitHub-secrets og roteres i hånden; en federated credential er
+  # en tillidsrelation, der ikke kan lækkes ud af en logfil.
+  id-token: write
+  contents: read
+
+env:
+  APP_NAME: byensgaader-api-p
+  RESOURCE_GROUP: Gulvet
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: produktion
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # Testene køres igen her og ikke kun i CI. En udrulning, der ikke selv
+      # har set testene være grønne, er en udrulning på tillid.
+      - name: Test
+        run: dotnet test --configuration Release
+        working-directory: backend
+
+      # Framework-dependent: App Service Linux har DOTNETCORE|10.0, så
+      # runtimen behøver ikke pakkes med. Det halverer artefaktet og lader
+      # Azure holde runtimen opdateret.
+      - name: Publicér
+        run: >
+          dotnet publish src/ByensGaader.Api
+          --configuration Release
+          --output ${{ runner.temp }}/publish
+        working-directory: backend
+
+      - name: Log ind i Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Udrul
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.APP_NAME }}
+          package: ${{ runner.temp }}/publish
+
+      # Uden dette kan en udrulning være "lykkedes", mens app'en svarer 503 —
+      # det gjorde den i ugevis, før nogen kiggede.
+      - name: Kontrollér at den svarer
+        run: |
+          host=$(az webapp show -n "$APP_NAME" -g "$RESOURCE_GROUP" \
+            --query defaultHostName -o tsv)
+          echo "Prøver https://$host/health"
+
+          for attempt in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "https://$host/health" || true)
+            if [ "$code" = "200" ]; then
+              echo "Sund efter $attempt forsøg."
+              curl -s "https://$host/health"
+              exit 0
+            fi
+            echo "  forsøg $attempt: $code"
+            sleep 15
+          done
+
+          echo "::error::/health svarede aldrig 200. Udrulningen er i luften, men app'en er ikke sund."
+          exit 1
