@@ -52,6 +52,10 @@ jobs:
           --output ${{ runner.temp }}/publish
         working-directory: backend
 
+      - name: Pak
+        run: zip -r "${{ runner.temp }}/app.zip" .
+        working-directory: ${{ runner.temp }}/publish
+
       - name: Log ind i Azure
         uses: azure/login@v2
         with:
@@ -59,11 +63,25 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # `az webapp deploy` frem for `azure/webapps-deploy`.
+      #
+      # Azure slår SCM-basisgodkendelse fra på nye web apps, og den action
+      # kræver den — udrulningen fejler med "Basic authentication is disabled".
+      # Den nemme udvej er at slå den til igen, men så er der en adgangskode
+      # til app'en, som skal opbevares og roteres. Det var præcis dét, OIDC
+      # skulle gøre overflødigt.
+      #
+      # `az webapp deploy` bruger i stedet den bearer-token, `azure/login` lige
+      # har hentet, og den rolle service principalen har på app'en. Ingen
+      # adgangskode nogen steder.
       - name: Udrul
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.APP_NAME }}
-          package: ${{ runner.temp }}/publish
+        run: >
+          az webapp deploy
+          --name "$APP_NAME"
+          --resource-group "$RESOURCE_GROUP"
+          --src-path "${{ runner.temp }}/app.zip"
+          --type zip
+          --async false
 
       # Uden dette kan en udrulning være "lykkedes", mens app'en svarer 503 —
       # det gjorde den i ugevis, før nogen kiggede.
