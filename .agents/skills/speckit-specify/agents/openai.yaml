@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specificér Spec Kit-feature"
+  short_description: "Omsæt en idé til klare featurekrav"
+  default_prompt: "Brug $speckit-specify til at skrive en feature-specifikation ud fra min beskrivelse."

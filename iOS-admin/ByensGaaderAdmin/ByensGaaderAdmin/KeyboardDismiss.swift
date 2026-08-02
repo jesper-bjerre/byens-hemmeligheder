@@ -5,8 +5,7 @@ import UIKit
 ///
 /// Beskrivelsen og de fleste andre felter er flerlinjede, så retur laver et
 /// linjeskift i stedet for at lukke tastaturet. Uden dette dækker det
-/// fanebladslinjen, og quizmasteren kan ikke skifte faneblad uden at lukke
-/// appen.
+/// fanebladslinjen, og quizmasteren kan ikke skifte faneblad.
 ///
 /// To veje ud, fordi den ene ikke altid er der: en **Færdig**-knap over
 /// tastaturet, og et træk ned i formularen.

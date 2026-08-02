@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import Testing
 
 @testable import BHLocationKit
@@ -74,6 +75,33 @@ struct DevToolsTests {
         #expect(ScriptedLocationProvider.Pace.standingStill.metresPerSecond == 0)
         #expect(ScriptedLocationProvider.Pace.walking.metresPerSecond == 1.4)
         #expect(ScriptedLocationProvider.Pace.running.metresPerSecond == 4.0)
+    }
+
+    @Test("Skift til simuleret position opdaterer den åbne visning")
+    @MainActor
+    func simulationSwitchIsObservable() async {
+        let defaults = UserDefaults(suiteName: #function)!
+        defaults.removePersistentDomain(forName: #function)
+
+        let provider = SwitchableLocationProvider(
+            real: ScriptedLocationProvider(),
+            scripted: ScriptedLocationProvider(),
+            defaults: defaults,
+            defaultsToSimulation: false
+        )
+
+        await confirmation("Den observerede tilstand ændres") { didObserveChange in
+            withObservationTracking {
+                _ = provider.isSimulating
+            } onChange: {
+                didObserveChange()
+            }
+
+            provider.setSimulating(true)
+        }
+
+        #expect(provider.isSimulating)
+        defaults.removePersistentDomain(forName: #function)
     }
 
     #endif

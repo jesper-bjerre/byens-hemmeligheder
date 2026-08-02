@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lav Spec Kit-tjekliste"
+  short_description: "Test kvaliteten af kravteksten"
+  default_prompt: "Brug $speckit-checklist til at lave en fokuseret kvalitetstjekliste for kravene."

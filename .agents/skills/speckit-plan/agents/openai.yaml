@@ -1,0 +1,4 @@
+interface:
+  display_name: "Planlæg Spec Kit-feature"
+  short_description: "Skab plan og designartefakter"
+  default_prompt: "Brug $speckit-plan til at planlægge implementeringen af den aktuelle feature."

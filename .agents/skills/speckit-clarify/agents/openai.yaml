@@ -1,0 +1,4 @@
+interface:
+  display_name: "Afklar Spec Kit-feature"
+  short_description: "Afklar tvetydige krav før planlægning"
+  default_prompt: "Brug $speckit-clarify til at afklare de vigtigste åbne spørgsmål i feature-specifikationen."

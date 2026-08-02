@@ -56,7 +56,7 @@ struct HintSheet: View {
         BHCard {
             VStack(alignment: .leading, spacing: BHSpacing.tight) {
                 HStack {
-                    Text("Hint \(hint.order) · \(hint.title)")
+                    Text("Hint \(hint.order)")
                         .font(BHFont.heading)
                         .foregroundStyle(BHColor.ink)
                         .fixedSize(horizontal: false, vertical: true)

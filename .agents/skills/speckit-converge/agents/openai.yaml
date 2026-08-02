@@ -1,0 +1,4 @@
+interface:
+  display_name: "Konvergér Spec Kit-feature"
+  short_description: "Find og tilføj resterende arbejde"
+  default_prompt: "Brug $speckit-converge til at sammenholde kode og feature-artefakter og tilføje resterende opgaver."

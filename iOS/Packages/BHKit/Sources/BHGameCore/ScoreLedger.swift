@@ -156,7 +156,7 @@ public struct ScoreLedger: Sendable {
                     reason: .hintUsed,
                     points: -deduction,
                     hintId: used.hint.id,
-                    explanation: "Hint \(used.hint.order): \(used.hint.title)"
+                    explanation: "Hint \(used.hint.order)"
                 )
             )
         }

@@ -8,6 +8,32 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .Configure<ContentStoreOptions>(builder.Configuration.GetSection(ContentStoreOptions.Section));
 
+// Webadminen kører på en anden origin end API'et — lokalt på port 4200 og
+// senere som Azure Static Web App. Listen er konfiguration, så den fremtidige
+// Azure-adresse kan tilføjes som `Cors__AllowedOrigins__3` uden en kodeændring.
+// Der bruges ikke wildcard: skrive-API'et er stadig anonymt under den interne
+// test, og en åben CORS-politik ville gøre det kaldeligt fra enhver webside.
+var webAdminOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("WebAdmin", policy =>
+    {
+        if (webAdminOrigins.Length > 0)
+        {
+            policy
+                .WithOrigins(webAdminOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                // Browserklienten skal læse ETag for at undgå, at to
+                // quizmastere overskriver hinanden.
+                .WithExposedHeaders("ETag");
+        }
+    });
+});
+
 // Filbaseret i udvikling, blob i Azure. Endepunkterne kender kun grænsefladen.
 //
 // Valget er eksplicit og ikke udledt af, om der står en adresse i
@@ -54,6 +80,8 @@ builder.Services
     });
 
 var app = builder.Build();
+
+app.UseCors("WebAdmin");
 
 // Ingen globalt rutepræfiks og ingen versionering endnu.
 //

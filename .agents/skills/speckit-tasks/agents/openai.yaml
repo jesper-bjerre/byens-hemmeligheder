@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lav Spec Kit-opgaver"
+  short_description: "Generér afhængighedsordnede opgaver"
+  default_prompt: "Brug $speckit-tasks til at generere konkrete opgaver fra feature-planen."

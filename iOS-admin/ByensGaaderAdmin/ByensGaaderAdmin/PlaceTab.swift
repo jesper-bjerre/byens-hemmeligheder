@@ -75,6 +75,7 @@ struct PlaceTab: View {
             area(index)
             position(index)
         }
+        .dismissableKeyboard()
     }
 
     // MARK: - Hvor opgaven hører til

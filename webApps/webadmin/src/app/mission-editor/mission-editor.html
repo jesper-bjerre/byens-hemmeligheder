@@ -1,0 +1,629 @@
+@if (mission(); as mission) {
+  <div class="editor-shell">
+    <header class="editor-header">
+      <button
+        class="icon-button back"
+        type="button"
+        (click)="close()"
+        aria-label="Tilbage til opgaver"
+      >
+        <span aria-hidden="true">←</span>
+      </button>
+      <div class="editor-title">
+        <span class="eyebrow">Rediger opgave</span>
+        <h1>{{ mission.title || 'Ny opgave' }}</h1>
+      </div>
+      <div class="save-state" [class.dirty]="store.isDirty()">
+        <span class="state-dot"></span>
+        {{ store.saving() ? 'Gemmer…' : store.isDirty() ? 'Ikke gemt' : 'Gemt' }}
+      </div>
+      <button
+        class="button primary save"
+        type="button"
+        (click)="save()"
+        [disabled]="store.saving() || !store.isDirty()"
+      >
+        {{ store.saving() ? 'Gemmer…' : 'Gem ændringer' }}
+      </button>
+    </header>
+
+    <nav class="tabs" aria-label="Opgavens afsnit">
+      @for (tab of tabs; track tab.id) {
+        <button
+          type="button"
+          [class.active]="activeTab() === tab.id"
+          [attr.aria-selected]="activeTab() === tab.id"
+          (click)="activeTab.set(tab.id)"
+        >
+          <span class="tab-icon" aria-hidden="true">{{ tab.icon }}</span>
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
+
+    <main class="editor-content">
+      @if (activeTab() === 'opgaven') {
+        <div class="content-heading">
+          <div>
+            <span class="eyebrow">Grundoplysninger</span>
+            <h2>Hvad går opgaven ud på?</h2>
+          </div>
+          <p>Det er disse oplysninger, spilleren møder først.</p>
+        </div>
+
+        <div class="form-grid two-columns">
+          <section class="panel span-2">
+            <div class="field">
+              <label for="mission-title">Titel</label>
+              <input
+                id="mission-title"
+                [ngModel]="mission.title"
+                (ngModelChange)="titleChanged($event)"
+                placeholder="Opgavens titel"
+              />
+            </div>
+            <div class="field">
+              <label for="mission-description">Beskrivelse</label>
+              <textarea
+                id="mission-description"
+                rows="4"
+                [(ngModel)]="mission.description"
+                (ngModelChange)="changed()"
+              ></textarea>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Status</span>
+                <h3>Hvor langt er opgaven?</h3>
+              </div>
+              @if (mission.status === 'fieldTestReady') {
+                <span class="badge ready">Frigivet</span>
+              }
+            </div>
+            <div class="field">
+              <label for="mission-status">Status</label>
+              <select id="mission-status" [(ngModel)]="mission.status" (ngModelChange)="changed()">
+                @for (status of choices(mission.status); track status) {
+                  <option [value]="status">{{ name(status) }}</option>
+                }
+              </select>
+            </div>
+            <p class="help">Frigivne opgaver bliver tilgængelige for feltprøven.</p>
+          </section>
+
+          <section class="panel">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Spillet</span>
+                <h3>Sværhedsgrad og point</h3>
+              </div>
+            </div>
+            <div class="compact-fields">
+              <div class="field">
+                <label for="difficulty">Sværhedsgrad</label>
+                <input
+                  id="difficulty"
+                  type="number"
+                  min="1"
+                  max="5"
+                  [(ngModel)]="mission.difficulty"
+                  (ngModelChange)="changed()"
+                />
+              </div>
+              <div class="field">
+                <label for="points">Point</label>
+                <input
+                  id="points"
+                  type="number"
+                  min="1"
+                  max="1000"
+                  step="10"
+                  [(ngModel)]="mission.basePoints"
+                  (ngModelChange)="changed()"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section class="panel span-2 accent-panel">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Hvad er digtet?</span>
+                <h3>Fiktionsmarkering</h3>
+              </div>
+            </div>
+            <textarea
+              rows="3"
+              aria-label="Fiktionsmarkering"
+              [(ngModel)]="mission.fictionLabel"
+              (ngModelChange)="changed()"
+            ></textarea>
+            <p class="help">
+              Spilleren skal kunne skelne den opdigtede ramme fra dokumenterede steder, former og
+              årstal.
+            </p>
+          </section>
+        </div>
+      }
+
+      @if (activeTab() === 'stedet') {
+        <div class="content-heading">
+          <div>
+            <span class="eyebrow">Placering</span>
+            <h2>Hvor begynder opgaven?</h2>
+          </div>
+          <p>Kortet er en kontrol af koordinatet og kan ikke flytte startstedet.</p>
+        </div>
+
+        @if (location(); as location) {
+          <div class="location-layout">
+            <div class="location-fields">
+              <section class="panel">
+                <div class="section-title">
+                  <div>
+                    <span class="eyebrow">På listen</span>
+                    <h3>Landsdel og postnummer</h3>
+                  </div>
+                </div>
+                <div class="compact-fields">
+                  <div class="field">
+                    <label for="region">Landsdel</label>
+                    <select id="region" [(ngModel)]="region" (ngModelChange)="regionChanged()">
+                      @for (value of regions; track value) {
+                        <option [value]="value">{{ name(value) }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="postal-code">Postnummer</label>
+                    <select
+                      id="postal-code"
+                      [(ngModel)]="location.postalCode"
+                      (ngModelChange)="changed()"
+                    >
+                      @for (place of placesInRegion(); track place.code) {
+                        <option [value]="place.code">{{ place.label }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+                <div class="readout">
+                  <span>By</span>
+                  <strong>{{
+                    postcodes.place(location.postalCode)?.city || 'Ukendt postnummer'
+                  }}</strong>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="section-title">
+                  <div>
+                    <span class="eyebrow">Startsted</span>
+                    <h3>GPS-koordinat</h3>
+                  </div>
+                </div>
+                <div class="compact-fields">
+                  <div class="field">
+                    <label for="latitude">Breddegrad</label>
+                    <input
+                      id="latitude"
+                      type="number"
+                      step="0.000001"
+                      [(ngModel)]="location.latitude"
+                      (ngModelChange)="changed()"
+                      placeholder="55.7105"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="longitude">Længdegrad</label>
+                    <input
+                      id="longitude"
+                      type="number"
+                      step="0.000001"
+                      [(ngModel)]="location.longitude"
+                      (ngModelChange)="changed()"
+                      placeholder="9.5575"
+                    />
+                  </div>
+                </div>
+                <button
+                  class="button secondary full"
+                  type="button"
+                  (click)="useCurrentPosition()"
+                  [disabled]="locating()"
+                >
+                  <span aria-hidden="true">⌖</span>
+                  {{ locating() ? 'Finder position…' : 'Brug min position' }}
+                </button>
+                @if (lastAccuracy(); as accuracy) {
+                  <p
+                    class="help"
+                    [class.warning-text]="accuracy > location.maxAcceptableAccuracyMetres"
+                  >
+                    Sidste aflæsning var på ±{{ accuracy | number: '1.0-0' }} m.
+                    @if (accuracy > location.maxAcceptableAccuracyMetres) {
+                      Stå stille et øjeblik, og prøv igen.
+                    }
+                  </p>
+                } @else {
+                  <p class="help">
+                    Stå på stedet, når du trykker. Browseren spørger om adgang til din position.
+                  </p>
+                }
+                @if (locationError()) {
+                  <p class="inline-error">{{ locationError() }}</p>
+                }
+              </section>
+            </div>
+
+            <section class="panel map-panel">
+              @if (location.latitude !== null && location.longitude !== null) {
+                <app-location-map
+                  [latitude]="location.latitude"
+                  [longitude]="location.longitude"
+                  [radius]="location.activationRadiusMetres"
+                />
+                <div class="map-caption">
+                  <span class="marker-key"></span> Startsted · cirklen viser
+                  {{ location.activationRadiusMetres }} m
+                </div>
+              } @else {
+                <div class="empty-map">
+                  <span aria-hidden="true">⌖</span><strong>Intet startsted endnu</strong>
+                  <p>Brug din position eller indtast koordinatet.</p>
+                </div>
+              }
+            </section>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <h2>Stedet mangler</h2>
+            <p>Opgavens locationId peger ikke på et sted i pakken.</p>
+          </div>
+        }
+      }
+
+      @if (activeTab() === 'detaljer') {
+        <div class="content-heading">
+          <div>
+            <span class="eyebrow">Fortællingen</span>
+            <h2>Billeder og detaljer</h2>
+          </div>
+          <p>Den første detalje bærer introduktionen. Billede og tekst flyttes sammen.</p>
+        </div>
+
+        <div class="cards-list">
+          @for (card of mission.cards; track card.id; let index = $index) {
+            <section class="panel detail-card">
+              <div class="detail-order">
+                <span>{{ index + 1 }}</span
+                ><strong>Detalje {{ index + 1 }}</strong>
+              </div>
+              <button class="media-slot" type="button" (click)="openUpload(index)">
+                @if (mediaFor(card); as media) {
+                  <img [src]="api.mediaUrl(media.filename)" [alt]="media.altText" />
+                  <span class="media-action">Erstat billede</span>
+                } @else {
+                  <span class="photo-placeholder" aria-hidden="true">▧</span>
+                  <span class="media-action">Vælg billede</span>
+                }
+              </button>
+              <div class="field card-text">
+                <label [for]="'card-' + index">Tekst</label>
+                <textarea
+                  [id]="'card-' + index"
+                  rows="5"
+                  [(ngModel)]="card.text"
+                  (ngModelChange)="changed()"
+                ></textarea>
+              </div>
+              <div class="card-actions">
+                <button
+                  class="icon-button"
+                  type="button"
+                  (click)="moveCard(index, -1)"
+                  [disabled]="index === 0"
+                  [attr.aria-label]="'Flyt detalje ' + (index + 1) + ' op'"
+                >
+                  ↑
+                </button>
+                <button
+                  class="icon-button"
+                  type="button"
+                  (click)="moveCard(index, 1)"
+                  [disabled]="index === mission.cards.length - 1"
+                  [attr.aria-label]="'Flyt detalje ' + (index + 1) + ' ned'"
+                >
+                  ↓
+                </button>
+                <button class="text-button danger push" type="button" (click)="removeCard(index)">
+                  Fjern
+                </button>
+              </div>
+            </section>
+          } @empty {
+            <div class="empty-state compact">
+              <span aria-hidden="true">▤</span>
+              <h3>Ingen detaljer endnu</h3>
+              <p>Tilføj den første del af spillerens fortælling.</p>
+            </div>
+          }
+        </div>
+        <button class="button secondary add-button" type="button" (click)="addCard()">
+          <span aria-hidden="true">＋</span> Tilføj detalje
+        </button>
+      }
+
+      @if (activeTab() === 'spoergsmaal') {
+        <div class="content-heading">
+          <div>
+            <span class="eyebrow">Facit</span>
+            <h2>Hvad skal spilleren svare?</h2>
+          </div>
+          <p>
+            Det første accepterede svar bliver facit. Varianter nedenunder tæller også som rigtige.
+          </p>
+        </div>
+
+        @if (assessedStep(); as step) {
+          <div class="form-grid two-columns question-grid">
+            <section class="panel">
+              <div class="field">
+                <label for="answer-type">Svartype</label>
+                <select
+                  id="answer-type"
+                  [ngModel]="step.kind"
+                  (ngModelChange)="changeStepKind($event)"
+                >
+                  <option value="singleChoice">Vælg blandt svar</option>
+                  <option value="numericCode">Talkode</option>
+                  <option value="freeText">Fritekst</option>
+                </select>
+              </div>
+              <p class="help">
+                @switch (step.kind) {
+                  @case ('singleChoice') {
+                    Mindst to svarmuligheder. Facit skal stå blandt dem.
+                  }
+                  @case ('numericCode') {
+                    Foranstillede nuller er betydende. Facit gemmes som tekst.
+                  }
+                  @default {
+                    Alle former, spilleren kan skrive rigtigt, skal stå under svar.
+                  }
+                }
+              </p>
+            </section>
+
+            <section class="panel">
+              <div class="field">
+                <label for="question">Spørgsmålet</label>
+                <textarea
+                  id="question"
+                  rows="3"
+                  [ngModel]="step.question"
+                  (ngModelChange)="step.question = $event; changed()"
+                ></textarea>
+              </div>
+              @if (step.kind === 'freeText') {
+                <div class="field">
+                  <label for="placeholder">Vejledende tekst i feltet</label>
+                  <input
+                    id="placeholder"
+                    [ngModel]="step.placeholder"
+                    (ngModelChange)="step.placeholder = $event; changed()"
+                  />
+                </div>
+              }
+            </section>
+
+            @if (step.kind === 'singleChoice') {
+              <section class="panel">
+                <div class="section-title">
+                  <div>
+                    <span class="eyebrow">Valg</span>
+                    <h3>Svarmuligheder</h3>
+                  </div>
+                </div>
+                <div class="editable-list">
+                  @for (option of step.options ?? []; track option.id; let index = $index) {
+                    <div class="list-row">
+                      <input
+                        [(ngModel)]="option.label"
+                        (ngModelChange)="changed()"
+                        aria-label="Svarmulighed"
+                      /><button
+                        class="icon-button danger"
+                        type="button"
+                        (click)="removeOption(step, index)"
+                        aria-label="Fjern svarmulighed"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  }
+                </div>
+                <button class="text-button" type="button" (click)="addOption(step)">
+                  ＋ Tilføj svarmulighed
+                </button>
+                @if ((step.options?.length ?? 0) < 2) {
+                  <p class="inline-error">Der skal være mindst to svarmuligheder.</p>
+                }
+              </section>
+            }
+
+            <section class="panel" [class.span-2]="step.kind !== 'singleChoice'">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Svar</span>
+                  <h3>Facit og accepterede former</h3>
+                </div>
+              </div>
+              <div class="editable-list numbered">
+                @for (answer of step.answerRule.acceptedAnswers; track $index; let index = $index) {
+                  <div class="list-row">
+                    <span>{{ index + 1 }}</span
+                    ><input
+                      [(ngModel)]="step.answerRule.acceptedAnswers[index]"
+                      (ngModelChange)="changed()"
+                      [attr.aria-label]="index === 0 ? 'Facit' : 'Accepteret svar'"
+                      placeholder="fx 592"
+                    /><button
+                      class="icon-button danger"
+                      type="button"
+                      (click)="removeAnswer(step, index)"
+                      aria-label="Fjern svar"
+                    >
+                      ×
+                    </button>
+                  </div>
+                }
+              </div>
+              <button class="text-button" type="button" (click)="addAnswer(step)">
+                ＋ Tilføj accepteret svar
+              </button>
+              @if (step.answerRule.acceptedAnswers.length === 0) {
+                <p class="inline-error">Opgaven kan ikke løses uden mindst ét svar.</p>
+              }
+            </section>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <h2>Opgaven har ingen trin</h2>
+            <p>Kontrakten kræver mindst ét trin.</p>
+          </div>
+        }
+      }
+
+      @if (activeTab() === 'hints') {
+        <div class="content-heading">
+          <div>
+            <span class="eyebrow">Hjælp i tre trin</span>
+            <h2>Hints</h2>
+          </div>
+          <p>
+            Hints åbnes i rækkefølge. Fradragene 3, 4 og 5 procent giver 88 point med fuld hjælp.
+          </p>
+        </div>
+        @if (mission.hints.length !== 3) {
+          <p class="inline-error prominent">
+            Opgaven har {{ mission.hints.length }} hints, ikke tre. Pakken er ugyldig.
+          </p>
+        }
+        <div class="hint-grid">
+          @for (hint of mission.hints; track hint.id; let index = $index) {
+            <section class="panel hint-card">
+              <div class="hint-number">{{ index + 1 }}</div>
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Trin {{ index + 1 }}</span>
+                  <h3>Hint {{ index + 1 }}</h3>
+                </div>
+                <span class="badge">−{{ hint.penaltyPercent }} %</span>
+              </div>
+              <div class="field">
+                <label [for]="'hint-' + index">Selve hintet</label
+                ><textarea
+                  [id]="'hint-' + index"
+                  rows="6"
+                  [(ngModel)]="hint.text"
+                  (ngModelChange)="changed()"
+                ></textarea>
+              </div>
+              <div class="field compact-number">
+                <label [for]="'penalty-' + index">Fradrag i procent</label
+                ><input
+                  [id]="'penalty-' + index"
+                  type="number"
+                  min="0"
+                  max="100"
+                  [(ngModel)]="hint.penaltyPercent"
+                  (ngModelChange)="changed()"
+                />
+              </div>
+              <p class="help">
+                @switch (index) {
+                  @case (0) {
+                    Peger på, hvor spilleren skal kigge — ikke på hvad hen skal se.
+                  }
+                  @case (1) {
+                    Forklarer fremgangsmåden. Stadig uden tal og uden facit.
+                  }
+                  @default {
+                    Næsten løsningen. Efter dette skal opgaven kunne løses.
+                  }
+                }
+              </p>
+            </section>
+          }
+        </div>
+      }
+    </main>
+  </div>
+
+  @if (uploadCardIndex() !== null) {
+    <div class="modal-backdrop" (click)="closeUpload()">
+      <section
+        class="modal upload-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upload-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">Detalje {{ uploadCardIndex()! + 1 }}</span>
+            <h2 id="upload-title">Nyt billede</h2>
+          </div>
+          <button class="icon-button" type="button" (click)="closeUpload()" aria-label="Luk">
+            ×
+          </button>
+        </div>
+        <div class="upload-dropzone" [class.has-preview]="uploadPreview()">
+          @if (uploadPreview()) {
+            <img [src]="uploadPreview()" alt="Forhåndsvisning af det valgte billede" />
+          } @else {
+            <span class="photo-placeholder" aria-hidden="true">▧</span
+            ><strong>Vælg eller tag et billede</strong>
+            <p>JPEG eller PNG. Billedet skaleres automatisk.</p>
+          }
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            (change)="chooseFile($event)"
+            aria-label="Vælg eller tag et billede"
+          />
+        </div>
+        <div class="field">
+          <label for="alt-text">Hvad ser man på billedet?</label
+          ><textarea
+            id="alt-text"
+            rows="3"
+            [ngModel]="uploadAltText()"
+            (ngModelChange)="uploadAltText.set($event)"
+            placeholder="Skriv en præcis beskrivelse til den, der ikke kan se billedet"
+          ></textarea>
+          <p class="help">Beskrivelsen læses højt af skærmlæsere.</p>
+        </div>
+        @if (uploadError()) {
+          <p class="inline-error">{{ uploadError() }}</p>
+        }
+        <div class="modal-actions">
+          <button class="button ghost" type="button" (click)="closeUpload()">Fortryd</button
+          ><button
+            class="button primary"
+            type="button"
+            (click)="upload()"
+            [disabled]="!uploadFile() || !uploadAltText().trim() || uploading()"
+          >
+            {{ uploading() ? 'Lægger op…' : 'Læg op' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+}

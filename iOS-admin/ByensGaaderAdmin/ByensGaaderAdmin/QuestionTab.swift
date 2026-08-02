@@ -75,6 +75,7 @@ struct QuestionTab: View {
 
             answerRule(path)
         }
+        .dismissableKeyboard()
     }
 
     private func hint(for kind: String) -> String {

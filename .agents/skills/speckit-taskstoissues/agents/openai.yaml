@@ -1,0 +1,4 @@
+interface:
+  display_name: "Opret issues fra Spec Kit"
+  short_description: "Omsæt feature-opgaver til GitHub-issues"
+  default_prompt: "Brug $speckit-taskstoissues til at omsætte de eksisterende feature-opgaver til GitHub-issues."

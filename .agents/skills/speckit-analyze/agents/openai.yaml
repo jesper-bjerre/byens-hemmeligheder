@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analyser Spec Kit-artefakter"
+  short_description: "Find konflikter før implementering"
+  default_prompt: "Brug $speckit-analyze til at kontrollere spec, plan og opgaver for konflikter."

@@ -9,6 +9,7 @@ Byens Hemmeligheder. Find spor. Løs gåder. Oplev historien.
 |---|---|
 | `iOS/` | Spillerappen og `BHKit` |
 | `iOS-admin/` | Quizmaster-appen |
+| `webApps/webadmin/` | Angular-udgaven af quizmaster-appen — se [README](./webApps/webadmin/README.md) |
 | `backend/` | ASP.NET Core-API'et — se [backend/README.md](./backend/README.md) |
 | `contracts/` | Skema, golden-filer, testvektorer og en fixtur af indholdet |
 | `docs/` | Beslutninger, drift og arkiv |

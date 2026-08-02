@@ -1,0 +1,356 @@
+@if (selectedMissionIndex() !== null) {
+  <app-mission-editor [missionIndex]="selectedMissionIndex()!" (closed)="closeEditor()" />
+} @else {
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" (click)="$event.preventDefault()" aria-label="Byens Gåder, opgaver">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><strong>Byens Gåder</strong><small>Quizmaster</small></span>
+      </a>
+      <div class="top-actions">
+        <span class="server"><span></span>{{ store.api.host() }}</span>
+        <button
+          class="icon-button"
+          type="button"
+          (click)="openAudit()"
+          aria-label="Hvem har rettet hvad"
+          title="Hvem har rettet hvad"
+        >
+          ↺
+        </button>
+        <button class="profile-button" type="button" (click)="showSettings.set(true)">
+          <span class="avatar">{{ (store.quizmaster() || '?').slice(0, 1).toUpperCase() }}</span>
+          <span
+            ><small>Quizmaster</small
+            ><strong>{{ store.quizmaster() || 'Sæt dit navn' }}</strong></span
+          >
+          <span aria-hidden="true">⌄</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="home">
+      <section class="hero">
+        <div>
+          <span class="eyebrow">Indholdsredaktion</span>
+          <h1>Opgaver</h1>
+          <p>Opret, afprøv og frigiv gåder dér, hvor historien bor.</p>
+        </div>
+        <div class="hero-actions">
+          <button
+            class="button ghost"
+            type="button"
+            (click)="reload()"
+            [disabled]="store.loading()"
+          >
+            ↻ {{ store.loading() ? 'Henter…' : 'Genindlæs' }}
+          </button>
+          <button class="button primary" type="button" (click)="createMission()">
+            ＋ Ny opgave
+          </button>
+        </div>
+      </section>
+
+      @if (store.availableDraft(); as draft) {
+        <aside class="notice draft-notice">
+          <div class="notice-icon" aria-hidden="true">✎</div>
+          <div>
+            <strong>Du har uafsluttede rettelser</strong>
+            <p>
+              Gemt lokalt {{ draft.savedAt | date: 'd. MMM y, HH:mm' }}. De er ikke sendt til
+              serveren.
+            </p>
+          </div>
+          <div class="notice-actions">
+            <button class="button ghost small" type="button" (click)="store.discardDraft()">
+              Kassér</button
+            ><button class="button secondary small" type="button" (click)="store.restoreDraft()">
+              Genopret
+            </button>
+          </div>
+        </aside>
+      }
+
+      @if (store.error()) {
+        <aside class="notice error-notice">
+          <div class="notice-icon" aria-hidden="true">!</div>
+          <div>
+            <strong>Noget gik galt</strong>
+            <p>{{ store.error() }}</p>
+          </div>
+          <button class="button ghost small" type="button" (click)="reload()">Prøv igen</button>
+        </aside>
+      }
+
+      @if (store.status()) {
+        <div class="save-banner" [class.dirty]="store.isDirty()">
+          <span></span>{{ store.status() }}
+        </div>
+      }
+
+      @if (store.loading() && !store.pack()) {
+        <div class="loading-state">
+          <span class="loader"></span><strong>Henter opgaver…</strong>
+          <p>Forbinder til {{ store.api.host() }}</p>
+        </div>
+      } @else if (store.pack()) {
+        <div class="overview-strip">
+          <div>
+            <strong>{{ store.pack()!.missions.length }}</strong
+            ><span>opgaver i alt</span>
+          </div>
+          <div>
+            <strong>{{ releasedCount() }}</strong
+            ><span>frigivet til test</span>
+          </div>
+          <div>
+            <strong>{{ store.pack()!.contentVersion }}</strong
+            ><span>indholdsversion</span>
+          </div>
+        </div>
+
+        <div class="region-list">
+          @for (region of hierarchy(); track region.region) {
+            <section class="region-section">
+              <div class="region-heading">
+                <span class="region-line"></span>
+                <h2>{{ region.title }}</h2>
+                <span
+                  >{{ region.places.length }}
+                  {{ region.places.length === 1 ? 'sted' : 'steder' }}</span
+                >
+              </div>
+              @for (place of region.places; track place.postalCode) {
+                <details class="place-group" open>
+                  <summary>
+                    <div class="place-pin" aria-hidden="true">⌖</div>
+                    <div>
+                      <strong>{{ place.title }}</strong
+                      ><span
+                        >{{ place.missions.length }}
+                        {{ place.missions.length === 1 ? 'opgave' : 'opgaver' }}</span
+                      >
+                    </div>
+                    <span class="chevron">⌄</span>
+                  </summary>
+                  <div class="mission-grid">
+                    @for (mission of place.missions; track mission.id) {
+                      <article
+                        class="mission-card"
+                        [class.released]="mission.status === 'fieldTestReady'"
+                      >
+                        <button class="mission-main" type="button" (click)="openMission(mission)">
+                          <div class="mission-icon" aria-hidden="true">
+                            {{ mission.status === 'fieldTestReady' ? '✓' : '✎' }}
+                          </div>
+                          <div class="mission-copy">
+                            <div class="mission-title-row">
+                              <h3>{{ mission.title || 'Ny opgave' }}</h3>
+                              <span
+                                class="badge"
+                                [class.ready]="mission.status === 'fieldTestReady'"
+                                >{{ statusName(mission.status) }}</span
+                              >
+                            </div>
+                            <p>{{ mission.description }}</p>
+                            <div class="mission-meta">
+                              <span>▤ {{ mission.cards.length }} detaljer</span
+                              ><span>◆ {{ mission.basePoints }} point</span
+                              ><span>◒ Niveau {{ mission.difficulty }}</span>
+                            </div>
+                          </div>
+                          <span class="open-arrow" aria-hidden="true">→</span>
+                        </button>
+                        <button
+                          class="delete-button"
+                          type="button"
+                          (click)="removeMission(mission)"
+                          [attr.aria-label]="'Slet ' + (mission.title || 'opgaven')"
+                          title="Slet opgaven"
+                        >
+                          ×
+                        </button>
+                      </article>
+                    }
+                  </div>
+                </details>
+              }
+            </section>
+          } @empty {
+            <div class="loading-state">
+              <span class="empty-symbol">◇</span><strong>Ingen opgaver endnu</strong>
+              <p>Opret den første opgave for at begynde.</p>
+              <button class="button primary" type="button" (click)="createMission()">
+                ＋ Ny opgave
+              </button>
+            </div>
+          }
+        </div>
+      } @else if (!store.loading()) {
+        <div class="loading-state">
+          <span class="empty-symbol">⌁</span><strong>Kunne ikke hente opgaver</strong>
+          <p>Start den lokale backend, og prøv igen.</p>
+          <button class="button primary" type="button" (click)="reload()">Genindlæs opgaver</button>
+        </div>
+      }
+    </main>
+  </div>
+
+  @if (showQuizmaster()) {
+    <div class="modal-backdrop" (click)="store.quizmaster() && showQuizmaster.set(false)">
+      <section
+        class="modal compact-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="name-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-illustration" aria-hidden="true">✦</div>
+        <span class="eyebrow">Velkommen</span>
+        <h2 id="name-title">Hvem retter?</h2>
+        <p>Navnet følger hver gemning, så de andre quizmastere kan se, hvem der ændrede hvad.</p>
+        <div class="field">
+          <label for="quizmaster-name">Dit navn</label
+          ><input
+            id="quizmaster-name"
+            [(ngModel)]="quizmasterDraft"
+            autocomplete="name"
+            autofocus
+            (keyup.enter)="saveQuizmaster()"
+          />
+        </div>
+        <button
+          class="button primary full"
+          type="button"
+          (click)="saveQuizmaster()"
+          [disabled]="!quizmasterDraft.trim()"
+        >
+          Fortsæt
+        </button>
+      </section>
+    </div>
+  }
+
+  @if (showSettings()) {
+    <div class="modal-backdrop" (click)="showSettings.set(false)">
+      <section
+        class="modal settings-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">Indstillinger</span>
+            <h2 id="settings-title">Quizmaster</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            (click)="showSettings.set(false)"
+            aria-label="Luk"
+          >
+            ×
+          </button>
+        </div>
+        <div class="field">
+          <label for="settings-name">Dit navn</label
+          ><input
+            id="settings-name"
+            [ngModel]="store.quizmaster()"
+            (ngModelChange)="store.setQuizmaster($event)"
+          />
+        </div>
+        <div class="field">
+          <label for="backend">Server</label
+          ><select
+            id="backend"
+            [ngModel]="store.api.backend()"
+            (ngModelChange)="changeBackend($event)"
+          >
+            <option value="lokal">Lokal maskine</option>
+            <option value="drift">Drift</option>
+          </select>
+          <p class="help">
+            Lokal kræver <code>./backend/run.sh</code>. Drift er quizmasternes fælles indhold.
+          </p>
+        </div>
+        <div class="server-card">
+          <span class="server"><span></span>{{ store.api.host() }}</span>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (showAudit()) {
+    <div class="modal-backdrop" (click)="showAudit.set(false)">
+      <section
+        class="modal audit-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="audit-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">Revisionsspor</span>
+            <h2 id="audit-title">Hvem har rettet hvad</h2>
+          </div>
+          <button class="icon-button" type="button" (click)="showAudit.set(false)" aria-label="Luk">
+            ×
+          </button>
+        </div>
+        @if (auditLoading()) {
+          <div class="mini-loading"><span class="loader"></span>Henter sporet…</div>
+        } @else if (auditError()) {
+          <p class="inline-error">{{ auditError() }}</p>
+        } @else {
+          <div class="audit-list">
+            @for (
+              entry of auditEntries();
+              track entry.at + (entry.missionId ?? '') + entry.change
+            ) {
+              <article>
+                <span class="audit-dot"></span>
+                <div>
+                  <strong>{{ auditHeadline(entry) }}</strong>
+                  @if (auditDetail(entry); as detail) {
+                    <p>{{ detail }}</p>
+                  }
+                  <time [attr.datetime]="entry.at">{{ entry.at | date: 'd. MMM y, HH:mm' }}</time>
+                </div>
+              </article>
+            } @empty {
+              <div class="empty-state compact"><strong>Intet er rettet endnu</strong></div>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+
+  @if (store.conflicts().length) {
+    <div class="modal-backdrop">
+      <section
+        class="modal compact-modal"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="conflict-title"
+      >
+        <div class="modal-illustration warning" aria-hidden="true">!</div>
+        <span class="eyebrow">Flettet og gemt</span>
+        <h2 id="conflict-title">Begge rettede det samme</h2>
+        <p>Dine værdier står i pakken. Gennemgå disse felter:</p>
+        <ul>
+          @for (conflict of store.conflicts().slice(0, 8); track conflict) {
+            <li>{{ conflict }}</li>
+          }
+        </ul>
+        <button class="button primary full" type="button" (click)="store.conflicts.set([])">
+          Forstået
+        </button>
+      </section>
+    </div>
+  }
+}

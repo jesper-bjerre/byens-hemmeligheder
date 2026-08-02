@@ -43,7 +43,6 @@ struct MissionEditorView: View {
                 HintsTab(document: document, index: mission.index)
             }
         }
-        .dismissableKeyboard()
         .navigationTitle(document.string(at: .mission(mission.index, .key("title"))))
         .navigationBarTitleDisplayMode(.inline)
         // Ingen Gem-knap. Der gemmes, når editoren forlades — en knap, man kan
@@ -118,6 +117,7 @@ struct MissionTab: View {
                      + "årstallene er det ikke — og det er dem, facit hviler på.")
             }
         }
+        .dismissableKeyboard()
     }
 
     // MARK: - Titlen

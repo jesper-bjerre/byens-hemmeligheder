@@ -1,5 +1,6 @@
 import BHGameCore
 import Foundation
+import Observation
 
 /// Én positionskilde, der kan skifte mellem rigtig GPS og et manuskript.
 ///
@@ -26,6 +27,7 @@ import Foundation
 /// Launch-argumenter er input udefra og bliver i Debug (FR-051). Dette er en
 /// knap, quizmasteren selv trykker på, og valget huskes mellem opstarter.
 @MainActor
+@Observable
 public final class SwitchableLocationProvider: LocationProviding {
 
     public let snapshots: AsyncStream<LocationSnapshot>

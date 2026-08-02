@@ -1,0 +1,21 @@
+.map {
+  min-height: 280px;
+  height: 100%;
+  width: 100%;
+  background: #dce8e4;
+}
+
+:host ::ng-deep .start-marker {
+  background: transparent;
+}
+
+:host ::ng-deep .start-marker span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 4px solid white;
+  border-radius: 50% 50% 50% 0;
+  background: #e76f3d;
+  box-shadow: 0 5px 18px rgb(33 47 44 / 28%);
+  transform: rotate(-45deg);
+}

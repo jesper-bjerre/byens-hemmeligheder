@@ -1,0 +1,4 @@
+interface:
+  display_name: "Opdatér Spec Kit-forfatning"
+  short_description: "Vedligehold principper og governance"
+  default_prompt: "Brug $speckit-constitution til at opdatere projektets principper og afhængige skabeloner."

@@ -253,7 +253,9 @@ struct ScoreLedgerTests {
         // Én for gennemførelsen plus én pr. hint.
         #expect(transactions.count == 4)
         #expect(transactions.allSatisfy { !$0.explanation.isEmpty })
-        #expect(transactions.filter { $0.reason == .hintUsed }.map(\.points) == [-3, -4, -5])
+        let hintTransactions = transactions.filter { $0.reason == .hintUsed }
+        #expect(hintTransactions.map(\.points) == [-3, -4, -5])
+        #expect(hintTransactions.map(\.explanation) == ["Hint 1", "Hint 2", "Hint 3"])
     }
 
     @Test("Genåbning af et hint koster ikke igen")

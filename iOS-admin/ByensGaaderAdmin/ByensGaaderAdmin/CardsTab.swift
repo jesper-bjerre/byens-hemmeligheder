@@ -47,6 +47,7 @@ struct CardsTab: View {
                 Text("Den første detalje bærer introduktionen.")
             }
         }
+        .dismissableKeyboard()
         .sheet(item: Binding(
             get: { uploadingInto.map(CardSlot.init(index:)) },
             set: { uploadingInto = $0?.index }
@@ -95,17 +96,6 @@ struct CardsTab: View {
                       axis: .vertical)
                 .lineLimit(3...)
 
-            // Beskrivelsen læses højt for den, der ikke kan se billedet. Den
-            // skrives ved oplægningen og hører til her, hvor billedet er.
-            if let mediaId, let index = document.mediaAssetIndex(id: mediaId) {
-                TextField(
-                    "Beskrivelse af billedet",
-                    text: document.text([.key("media"), .index(index), .key("altText")]),
-                    axis: .vertical)
-                    .font(.footnote)
-                    .lineLimit(2...)
-            }
-
             controls(at: position)
         } header: {
             Text("Detalje \(position + 1)")
@@ -144,7 +134,7 @@ struct CardsTab: View {
 
     // MARK: - Handlinger
 
-    /// Bytter to detaljer om — billede, tekst og beskrivelse under ét.
+    /// Bytter to detaljer om — billede og tekst under ét.
     private func move(_ from: Int, to destination: Int) {
         guard cards.indices.contains(from), cards.indices.contains(destination) else { return }
         // `toOffset` tælles i listen *før* flytningen, så et skridt ned er to

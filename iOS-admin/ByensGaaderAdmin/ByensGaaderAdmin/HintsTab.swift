@@ -28,6 +28,7 @@ struct HintsTab: View {
                 hint(at: position)
             }
         }
+        .dismissableKeyboard()
     }
 
     @ViewBuilder
@@ -35,9 +36,8 @@ struct HintsTab: View {
         let path = hintsPath + [.index(position)]
 
         Section {
-            // Kun ét felt. Overskriften vises for spilleren som "Hint 1 · Hvor",
-            // men den er den samme for alle opgaver — så den skrives af sig
-            // selv efter hintets nummer og er ikke noget, nogen skal opfinde.
+            // Quizmasteren skriver kun selve hintet. Kontraktens tekniske
+            // titel er ikke en del af redigeringen eller den synlige tekst.
             TextField("Hint", text: document.text(path + [.key("text")]), axis: .vertical)
                 .lineLimit(3...)
 
@@ -46,7 +46,7 @@ struct HintsTab: View {
                 value: document.integer(path + [.key("penaltyPercent")], default: 0),
                 in: 0...100)
         } header: {
-            Text("Hint \(position + 1) · \(document.string(at: path + [.key("title")]))")
+            Text("Hint \(position + 1)")
         } footer: {
             Text(Self.purpose(position))
         }

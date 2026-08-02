@@ -179,6 +179,13 @@ Enhedsforskellen har skjult en rigtig fejl før.
 
 ## Sådan arbejdes der her
 
+- **Planfiler hører hjemme i `docs/plans/`.** Det gælder planer, der skal
+  bevares i repoet; Codex' midlertidige planvisning behøver ikke blive skrevet
+  til en fil.
+- **Spec Kit-skills findes i klienternes native mapper.** Codex-versionerne er
+  i `.agents/skills/`, og Claude Code-versionerne er i `.claude/skills/`.
+  Ændres eller geninstalleres Spec Kit, SKAL begge sæt holdes funktionelt
+  ens; invocation-syntaksen er `$speckit-*` i Codex og `/speckit-*` i Claude.
 - **Beslutninger skrives ned.** En begrundelse, der kun findes i en chat, er
   tabt. Nye arkitekturvalg bliver en ADR i `docs/ADR/` med formen
   Kontekst → Beslutning → Begrundelse → Konsekvenser → Alternativer.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implementér Spec Kit-feature"
+  short_description: "Udfør feature-opgaverne systematisk"
+  default_prompt: "Brug $speckit-implement til at implementere de planlagte opgaver for den aktuelle feature."

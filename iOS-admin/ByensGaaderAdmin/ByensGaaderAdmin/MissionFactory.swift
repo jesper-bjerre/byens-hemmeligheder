@@ -218,7 +218,8 @@ extension PackDocument {
         }
     }
 
-    /// Hintenes overskrifter. Vises som "Hint 1 · Hvor".
+    /// Faste tekniske hinttitler, som den nuværende kontrakt kræver.
+    /// De vises ikke i quizmaster- eller spillerappen.
     static func hintTitle(order: Int) -> String {
         switch order {
         case 1: "Hvor"
