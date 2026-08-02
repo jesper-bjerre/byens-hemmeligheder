@@ -67,6 +67,35 @@ az webapp deploy --name byensgaader-api-p --resource-group Gulvet \
   --src-path /tmp/app.zip --type zip
 ```
 
+## Webadmin på Azure Static Web Apps
+
+Quizmasterens Angular-app er udrullet som en separat Static Web App:
+
+| | Værdi |
+|---|---|
+| Ressource | `byensgaader-admin-p` |
+| Ressourcegruppe | `byensgaader-d_rg` |
+| Plan og region | Free, West Europe |
+| Adresse | `https://salmon-grass-0b3946003.7.azurestaticapps.net` |
+| Kilde | `webApps/webadmin/` på `main` |
+| Workflow | `azure-static-web-apps-salmon-grass-0b3946003.yml` |
+
+Workflowet installerer med Node 22, kører enhedstest og produktionsbuild og
+uploader derefter det færdige `dist/webadmin/browser`-artefakt. Azure må ikke
+forsøge at detektere og bygge monorepoet med Oryx; portalens første automatisk
+genererede workflow valgte både en forkert kildemappe og en outputmappe fra et
+andet projekt.
+
+API'ets App Service har denne app-indstilling, så browseren må kalde skrivevejen
+og læse dens `ETag`-header:
+
+```text
+Cors__AllowedOrigins__3=https://salmon-grass-0b3946003.7.azurestaticapps.net
+```
+
+Der er fortsat ingen authentication eller authorization. Webadressen er
+offentlig, og dette er kun accepteret under den interne test.
+
 ## To fælder, der kostede en halv dag
 
 ### GitHubs emne bærer uforanderlige id'er
