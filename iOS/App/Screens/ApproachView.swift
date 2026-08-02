@@ -16,6 +16,10 @@ struct ApproachView: View {
     @Environment(Router.self) private var router
     @Environment(\.openURL) private var openURL
 
+    @State private var visualDwellCredit = 0.0
+    @State private var visualDwellUpdatedAt = Date()
+    @State private var visualDwellIsActive = false
+
     private var location: Location? { engine.location(for: mission) }
     private var problem: PresenceProblemContent? { PresenceProblemContent.forState(engine.presence) }
 
@@ -32,6 +36,17 @@ struct ApproachView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             engine.startLocationUpdates()
+        }
+        .task {
+            syncVisualDwell(with: engine.presence)
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(250))
+                guard !Task.isCancelled else { break }
+                advanceVisualDwell()
+            }
+        }
+        .onChange(of: engine.presence) { _, state in
+            syncVisualDwell(with: state)
         }
         // Bevidst ingen `onDisappear`-stop. Positionen skal blive ved med at
         // komme: kortet bruger den, og strømmen kan ikke åbnes igen, når den
@@ -50,7 +65,7 @@ struct ApproachView: View {
                 HStack(spacing: BHSpacing.regular) {
                     directionArrow
                     VStack(alignment: .leading, spacing: BHSpacing.hairline) {
-                        Text(problem?.title ?? "Du er fremme")
+                        Text(statusTitle)
                             .font(BHFont.heading)
                             .foregroundStyle(BHColor.ink)
                         Text(distanceText)
@@ -58,18 +73,18 @@ struct ApproachView: View {
                             .foregroundStyle(BHColor.inkMuted)
                     }
                 }
-                if let message = problem?.message {
-                    Text(message)
+                if let statusMessage {
+                    Text(statusMessage)
                         .font(BHFont.body)
                         .foregroundStyle(BHColor.inkMuted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                dwellCountdown
+                locationProgress
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(problem?.title ?? "Du er fremme"). \(distanceText). \(problem?.message ?? "")")
+        .accessibilityLabel("\(statusTitle). \(distanceText). \(statusMessage ?? "")")
     }
 
     private var directionArrow: some View {
@@ -84,35 +99,74 @@ struct ApproachView: View {
             .accessibilityHidden(true)
     }
 
-    /// Nedtællingen, mens gaten venter på, at spilleren står stille.
+    /// Synlig aktivitet fra første satellitsøgning og en jævn nedtælling, når
+    /// spilleren er fremme.
     ///
-    /// Tallene fandtes hele tiden i ``PresenceState/dwelling(creditSeconds:requiredSeconds:)``
-    /// — der stod bare "Bliv stående et øjeblik". Et øjeblik er ikke en enhed,
-    /// og uden at kunne se, at der sker noget, ligner ventetiden en app, der har
-    /// hængt sig.
+    /// GPS-gaten kan stå på samme kredit i nogle sekunder, mens den samler nok
+    /// målinger til en konsensus. Den kosmetiske kredit bevæger sig imens, men
+    /// stopper ved ét sekund; den kan aldrig åbne opgaven før den rigtige gate.
     @ViewBuilder
-    private var dwellCountdown: some View {
-        if case .dwelling(let credit, let required) = engine.presence, required > 0 {
-            let remaining = max(0, Int((required - credit).rounded(.up)))
-            ZStack {
-                Circle()
-                    .stroke(BHColor.separator, lineWidth: 8)
-                Circle()
-                    .trim(from: 0, to: min(1, credit / required))
-                    .stroke(BHColor.accent, style: StrokeStyle(lineWidth: 8, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 0.3), value: credit)
-                Text("\(remaining)")
-                    .font(BHFont.display)
-                    .foregroundStyle(BHColor.ink)
-                    .monospacedDigit()
+    private var locationProgress: some View {
+        switch engine.presence {
+        case .idle, .acquiring:
+            VStack(alignment: .leading, spacing: BHSpacing.hairline) {
+                Label("Kalder på satellitterne…", systemImage: "satellite")
+                    .font(BHFont.caption)
+                    .foregroundStyle(BHColor.inkMuted)
+                ProgressView()
+                    .progressViewStyle(.linear)
+                    .tint(BHColor.accent)
+                    .accessibilityLabel("Leder efter satellitter")
             }
-            .frame(width: 96, height: 96)
-            .frame(maxWidth: .infinity)
-            // Ringen er dekoration; tallet står allerede i statusteksten.
-            .accessibilityHidden(true)
+
+        case .dwelling(let credit, let required) where required > 0:
+            let displayedCredit = min(required, max(credit, visualDwellCredit))
+            VStack(alignment: .leading, spacing: BHSpacing.hairline) {
+                HStack {
+                    Label("Satellitkontakt", systemImage: "satellite.fill")
+                    Spacer()
+                    Text("\(visualDwellRemaining) sek.")
+                        .monospacedDigit()
+                }
+                .font(BHFont.caption)
+                .foregroundStyle(BHColor.inkMuted)
+
+                ProgressView(value: displayedCredit, total: required)
+                    .progressViewStyle(.linear)
+                    .tint(BHColor.accent)
+                    .animation(.linear(duration: 0.25), value: displayedCredit)
+                    .accessibilityLabel("Bekræfter position")
+                    .accessibilityValue("\(visualDwellRemaining) sekunder tilbage")
+            }
             .accessibilityIdentifier("approach.countdown")
+
+        default:
+            EmptyView()
         }
+    }
+
+    private var statusTitle: String {
+        switch engine.presence {
+        case .idle, .acquiring: "Satellitterne leger gemmeleg"
+        case .dwelling: "Vi har fået øje på jer"
+        default: problem?.title ?? "Du er fremme"
+        }
+    }
+
+    private var statusMessage: String? {
+        switch engine.presence {
+        case .idle, .acquiring:
+            "Hold telefonen i ro med lidt fri himmel. Vi kalder på satellitterne."
+        case .dwelling:
+            "Bliv stående — vi dobbelttjekker positionen, så en forbipasserende ikke løber med gåden."
+        default:
+            problem?.message
+        }
+    }
+
+    private var visualDwellRemaining: Int {
+        guard case .dwelling(let credit, let required) = engine.presence else { return 0 }
+        return max(1, Int((required - max(credit, visualDwellCredit)).rounded(.up)))
     }
 
     private var bearing: Double? {
@@ -127,8 +181,8 @@ struct ApproachView: View {
         switch engine.presence {
         case .tooFar(let distance, _), .approaching(let distance, _):
             "Cirka \(max(1, Int(distance.rounded()))) meter tilbage"
-        case .dwelling(let credit, let required):
-            "Bliv stående — \(max(0, Int((required - credit).rounded(.up)))) sekunder tilbage"
+        case .dwelling:
+            "Bliv stående — \(max(1, visualDwellRemaining)) sekunder tilbage"
         case .verified:
             "Du står på stedet"
         default:
@@ -187,5 +241,31 @@ struct ApproachView: View {
             .accessibilityIdentifier("approach.action")
             .accessibilityHint(problem.message)
         }
+    }
+
+    private func syncVisualDwell(with state: PresenceState) {
+        guard case .dwelling(let credit, _) = state else {
+            visualDwellCredit = 0
+            visualDwellIsActive = false
+            return
+        }
+        if !visualDwellIsActive {
+            visualDwellCredit = credit
+            visualDwellIsActive = true
+        } else {
+            visualDwellCredit = max(visualDwellCredit, credit)
+        }
+        visualDwellUpdatedAt = Date()
+    }
+
+    private func advanceVisualDwell() {
+        guard case .dwelling(let credit, let required) = engine.presence else { return }
+        let now = Date()
+        let elapsed = max(0, now.timeIntervalSince(visualDwellUpdatedAt))
+        visualDwellUpdatedAt = now
+        // Det sidste sekund tilhører den faktiske GPS-gate. UI'et lover aldrig,
+        // at opgaven er åben, før tilstedeværelsen er verificeret.
+        let ceiling = max(0, required - 1)
+        visualDwellCredit = min(ceiling, max(credit, visualDwellCredit + elapsed))
     }
 }

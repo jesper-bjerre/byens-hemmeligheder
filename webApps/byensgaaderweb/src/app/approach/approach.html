@@ -13,9 +13,36 @@
       <h1>{{ place()?.name }}</h1>
       <strong class="distance">{{ state() === 'ready' ? 'Du er fremme' : distanceLabel() }}</strong>
       <p class="message">{{ message() }}</p>
-      @if (state() === 'dwelling') {
-        <div class="progress">
-          <span [style.width.%]="(credit() / (place()?.dwellSeconds || 1)) * 100"></span>
+      @if (state() === 'position') {
+        <div class="satellite-progress" aria-live="polite">
+          <div class="progress-heading">
+            <span aria-hidden="true">🛰️</span>
+            <strong>Kalder på satellitterne…</strong>
+          </div>
+          <div class="progress searching" role="progressbar" aria-label="Leder efter satellitter">
+            <span></span>
+          </div>
+          <small>De plejer at svare hurtigere under åben himmel.</small>
+        </div>
+      } @else if (state() === 'dwelling') {
+        <div class="satellite-progress" aria-live="polite">
+          <div class="progress-heading">
+            <span aria-hidden="true">🛰️</span>
+            <strong>Satellitkontakt</strong>
+            <b>{{ remaining() }} sek.</b>
+          </div>
+          <div
+            class="progress"
+            role="progressbar"
+            aria-label="Bekræfter position"
+            [attr.aria-valuemin]="0"
+            [attr.aria-valuemax]="place()?.dwellSeconds"
+            [attr.aria-valuenow]="credit()"
+            [attr.aria-valuetext]="remaining() + ' sekunder tilbage'"
+          >
+            <span [style.width.%]="(credit() / (place()?.dwellSeconds || 1)) * 100"></span>
+          </div>
+          <small>Vi har fået øje på jer — nu dobbelttjekker vi bare.</small>
         </div>
       }
       @if (state() === 'problem') {

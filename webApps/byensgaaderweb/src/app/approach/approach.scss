@@ -64,9 +64,35 @@
   color: var(--muted);
   line-height: 1.6;
 }
+.satellite-progress {
+  display: grid;
+  gap: 9px;
+  margin: 22px 0;
+  padding: 15px 17px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--sage) 48%, var(--paper));
+  text-align: left;
+}
+.progress-heading {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--forest);
+}
+.progress-heading span {
+  font-size: 1.2rem;
+}
+.progress-heading b {
+  margin-left: auto;
+  color: var(--amber-deep);
+  font-variant-numeric: tabular-nums;
+}
+.satellite-progress small {
+  color: var(--muted);
+}
 .progress {
   height: 8px;
-  margin: 22px 0;
   border-radius: 99px;
   background: var(--sage);
   overflow: hidden;
@@ -76,7 +102,20 @@
   height: 100%;
   border-radius: inherit;
   background: var(--success);
-  transition: width 0.5s;
+  transition: width 0.25s linear;
+}
+.progress.searching span {
+  width: 42%;
+  background: linear-gradient(90deg, transparent, var(--success), transparent);
+  animation: satellite-search 1.25s ease-in-out infinite;
+}
+@keyframes satellite-search {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(340%);
+  }
 }
 .start {
   width: 100%;

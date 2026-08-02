@@ -36,7 +36,9 @@ export class Approach implements OnInit, OnDestroy {
     const mission = this.mission();
     if (mission && this.game.session()?.missionId !== mission.id) this.game.startMission(mission);
     this.locationService.start();
-    this.timer = setInterval(() => this.tick(), 1000);
+    // Fire opdateringer i sekundet gør fremdriften synlig med det samme, også
+    // mens browseren leverer GPS-fixes langsommere.
+    this.timer = setInterval(() => this.tick(), 250);
     this.tick();
     const place = this.place();
     if (mission && (place?.latitude == null || place.longitude == null)) {
@@ -96,13 +98,13 @@ export class Approach implements OnInit, OnDestroy {
       case 'approaching':
         return 'I er tæt på. Find et sikkert sted at stå.';
       case 'dwelling':
-        return `Bliv stående et øjeblik — ${this.remaining()} sek.`;
+        return 'Bliv stående — vi dobbelttjekker positionen, så en forbipasserende ikke løber med gåden.';
       case 'ready':
         return 'I er fremme. Gåden er klar.';
       case 'problem':
         return 'Browseren har ikke adgang til din position.';
       default:
-        return 'Vi finder jer på kortet. Det kan tage et øjeblik.';
+        return 'Satellitterne leger gemmeleg. Hold telefonen i ro med lidt fri himmel.';
     }
   }
   acceptOverride(): void {
