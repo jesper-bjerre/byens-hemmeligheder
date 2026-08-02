@@ -1,6 +1,8 @@
 # byens-hemmeligheder
 Byens Hemmeligheder. Find spor. Løs gåder. Oplev historien.
 
+**Hvad der arbejdes på nu:** [docs/plans/koereplan.md](./docs/plans/koereplan.md)
+
 ## Hvor tingene ligger
 
 | Mappe | Hvad |
@@ -30,10 +32,13 @@ den.
 4. [Serverbåret indhold](./docs/ADR/0004-serverbaaret-indhold.md)
 5. [Blob er kilden til indholdet](./docs/ADR/0005-blob-er-kilden-til-indholdet.md)
 6. [Kontrakten forenklet](./docs/ADR/0006-kontrakten-forenklet.md)
+7. [Blob nu, relationelt når der er konti](./docs/ADR/0007-blob-nu-relationelt-naar-der-er-konti.md) — *foreslået*
 
 **Features**
 
 - 001 — [Fundament og lodret snit](./specs/001-fundament-og-lodret-snit/plan.md)
 - 002 — [Quizmaster-appen](./specs/002-quizmaster-app/plan.md)
+- 003 — [Indholdslageret](./specs/003-indholdslager/spec.md) — *foreslået*,
+  med [analysen af blob, Table Storage og Azure SQL](./specs/003-indholdslager/research.md)
 
 **Drift** — [Udrulning af backenden](./docs/drift/udrulning.md)

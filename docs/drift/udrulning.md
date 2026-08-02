@@ -116,16 +116,24 @@ Workflowet bruger derfor `az webapp deploy`, som bruger den bearer-token,
 køres igennem mod en rigtig server uden noget at ødelægge. Skiftet til en
 PROD-konto er én app-indstilling.
 
-### Fase 5 er ikke lavet, og det skal besluttes
+### Fase 5 — planlagt, ikke lavet
 
 **Der er ingen adgangskontrol.** Hvert endepunkt står med `AllowAnonymous()` —
 også `PUT` og `DELETE`. Enhver, der finder adressen, kan omskrive
 indholdspakken eller slette billederne. `X-Quizmaster` er et navn, klienten selv
 skriver; det er et spor, ikke en spærring.
 
-Det er accepteret, mens quizmasterne tester, og skal lukkes, før de for alvor
-begynder at oprette opgaver. Den mindste løsning, der virker for fem personer:
-en delt nøgle i `Info.plist` sendt som header. Rigtige brugerkonti er større.
+**`httpsOnly` står på `false`.** En forespørgsel over almindelig HTTP bliver
+besvaret. Det skal rettes, *før* der indføres en nøgle — ellers kan nøglen
+sendes i klartekst.
+
+**Blob-versionering er slået fra.** Soft delete dækker 7 dage.
+
+Løsningen er skrevet ud i [køreplanens mål 1](../plans/koereplan.md) med de
+kommandoer, der mangler at blive kørt. Kort: en delt nøgle som header på alt
+andet end `GET`, som en spærring mod tilfældige — ikke som en rettighedsmodel.
+Rigtige konti og roller håndhævet server-side følger forfatningens princip IV og
+venter på [ADR 0007](../ADR/0007-blob-nu-relationelt-naar-der-er-konti.md).
 
 ## Testene mod Azure
 
