@@ -58,6 +58,7 @@ export interface Mission {
   hints: Hint[];
   completion: Completion;
   thumbnailMediaId: string | null;
+  narrationMediaId: string | null;
   [key: string]: unknown;
 }
 

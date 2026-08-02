@@ -196,6 +196,7 @@ Versionering tilføjes, når der findes et endepunkt, der skal versioneres.
 | `GET` | `/content/{locale}/audit` | Sporet over ændringer. Nyeste først |
 | `PUT` | `/content/{locale}/pack` | Gemmer pakken. Kræver `If-Match` og `X-Quizmaster` |
 | `POST` | `/content/{locale}/media/{fil}` | Lægger et medie op. `409` på et kendt navn |
+| `POST` | `/content/{locale}/narration/{fil}.mp3` | Konverterer en lydfil til kompakt MP3 og lægger den op |
 | `DELETE` | `/content/{locale}/media/{fil}` | Fjerner et medie |
 
 `PUT` bruger **optimistisk samtidighed**: klienten sender den ETag, pakken blev
@@ -207,6 +208,21 @@ Serveren kontrollerer, at kroppen er gyldig JSON med `contentVersion` og
 `missions` — ikke kontrakten i dybden. Den grænse er bevidst: serveren beskytter
 mod ulæselige filer, ikke mod dårligt indhold. En server, der kender kontrakten,
 skal udrulles hver gang den udvides.
+
+## Indtalte fortællinger
+
+`POST /content/{locale}/narration/{fil}.mp3` modtager lydfilens rå bytes.
+Headeren `X-Source-Format` angiver kildens filendelse, for eksempel `m4a` eller
+`wav`. MP3, M4A, AAC, WAV, AIFF, CAF, OGG, Opus og FLAC accepteres; FFmpeg
+konverterer dem til MP3 med mono, 44,1 kHz og 64 kbit/s. Input må fylde 25 MB,
+og det færdige medie højst 10 MB.
+
+Ved lokal kørsel skal `ffmpeg` ligge på `PATH`, eller stien sættes i
+`AudioTranscoding:FfmpegPath`. Udrulnings-workflowet pakker en fastlåst
+FFmpeg-binær og dens licens med API'et. Buildet og dets byggescripts ligger hos
+[BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds/commit/a99e823),
+og FFmpegs tilsvarende kildekode ligger i
+[FFmpeg/FFmpeg](https://github.com/FFmpeg/FFmpeg/commit/a7e72069f1).
 
 ## Sporet over ændringer
 

@@ -64,6 +64,9 @@ else
 }
 
 builder.Services.AddSingleton<ByensGaader.Api.Features.Content.AuditTrail>();
+builder.Services.AddSingleton<
+    ByensGaader.Api.Features.Content.IAudioTranscoder,
+    ByensGaader.Api.Features.Content.FfmpegAudioTranscoder>();
 
 builder.Services
     .AddFastEndpoints()

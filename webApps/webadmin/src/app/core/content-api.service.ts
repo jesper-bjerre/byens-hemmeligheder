@@ -85,12 +85,24 @@ export class ContentApiService {
     );
   }
 
+  async uploadNarration(filename: string, source: File): Promise<void> {
+    const extension = source.name.split('.').pop()?.toLowerCase() ?? '';
+    await firstValueFrom(
+      this.http.post(`${this.contentUrl()}/narration/${encodeURIComponent(filename)}`, source, {
+        headers: new HttpHeaders({
+          'Content-Type': source.type || 'application/octet-stream',
+          'X-Source-Format': extension,
+        }),
+        responseType: 'text',
+      }),
+    );
+  }
+
   describe(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 0)
         return 'Kunne ikke få forbindelse til serveren. Er backenden startet?';
-      if (error.status === 409)
-        return 'Filnavnet er allerede brugt. Prøv at lægge billedet op igen.';
+      if (error.status === 409) return 'Filnavnet er allerede brugt. Prøv at lægge mediet op igen.';
       const detail = error.error?.detail ?? error.error?.title;
       return detail || `Serveren svarede ${error.status}.`;
     }

@@ -127,6 +127,44 @@ struct PackClient {
         }
     }
 
+    /// Lægger quizmasterens lydfil op til konvertering. Outputnavnet er MP3;
+    /// headeren fortæller serveren, hvilket format de rå bytes kommer fra.
+    func uploadNarration(
+        _ data: Data, filename: String, sourceExtension: String
+    ) async throws {
+        let url = base
+            .appending(path: "content")
+            .appending(path: locale)
+            .appending(path: "narration")
+            .appending(path: filename)
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+        request.setValue(sourceExtension, forHTTPHeaderField: "X-Source-Format")
+        request.httpBody = data
+
+        let (_, response) = try await Self.session.data(for: request)
+        let http = try Self.http(response)
+
+        switch http.statusCode {
+        case 200, 201:
+            return
+        case 409:
+            throw AdminError.message(
+                "Filnavnet \(filename) er brugt. Medier overskrives aldrig — prøv igen.")
+        case 413:
+            throw AdminError.message("Lydfilen er for stor. Vælg en fil på højst 25 MB.")
+        case 415:
+            throw AdminError.message(
+                "Lydformatet kunne ikke læses. Prøv MP3, M4A, WAV, AAC, AIFF, CAF, OGG, Opus eller FLAC.")
+        case 429:
+            throw AdminError.message(
+                "Serveren gør allerede en anden fortælling klar. Prøv igen om et øjeblik.")
+        default:
+            throw AdminError.message("Fortællingen blev afvist med \(http.statusCode).")
+        }
+    }
+
     func deleteMedia(filename: String) async throws {
         var request = URLRequest(url: mediaURL.appending(path: filename))
         request.httpMethod = "DELETE"
