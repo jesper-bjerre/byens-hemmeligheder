@@ -22,10 +22,10 @@ import Foundation
 /// Det er stadig en konfiguration og ikke et skærmbillede, og linjen findes
 /// ikke i Release.
 ///
-/// > Vigtigt: `BH_BACKEND_URL` peger i dag på `localhost` i **begge**
-/// > konfigurationer, fordi backenden endnu ikke er udrullet. Den skal rettes i
-/// > Release, før appen lægges på TestFlight — ellers står den og henter fra en
-/// > server, der ikke findes på telefonen.
+/// `BH_BACKEND_URL` peger på drift i **begge** konfigurationer. Debug starter
+/// altså også mod drift; skal den et andet sted hen, vælges det i appen eller
+/// med argumentet ovenfor. `AssetTests` holder værdien op mod ``Backend``, så en
+/// adresse, der kun står i bygningen, får testene til at fejle.
 enum AdminConfiguration {
 
     private static let backendKey = "BHBackendURL"

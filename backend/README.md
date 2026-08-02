@@ -147,6 +147,14 @@ BH_TEST_BLOB_URI="https://byensgaaderd.blob.core.windows.net" dotnet test
 
 > De skriver og sletter. Kør dem aldrig mod produktion.
 
+### Udrulning
+
+Hvad der kører i Azure, hvordan det kommer derop, og de to fælder, der kostede
+en halv dag: [`docs/drift/udrulning.md`](../docs/drift/udrulning.md).
+
+Indholdet i blob ejes ikke af dette repo — se
+[ADR 0005](../docs/ADR/0005-blob-er-kilden-til-indholdet.md).
+
 ## Hemmeligheder
 
 Ingen nøgler i `appsettings.json`. Den fil er sporet og ligger i et **public**
