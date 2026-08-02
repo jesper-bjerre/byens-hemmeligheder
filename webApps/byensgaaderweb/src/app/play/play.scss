@@ -1,0 +1,291 @@
+.play-page {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: 32px clamp(16px, 4vw, 40px) 90px;
+}
+.play-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.play-heading .back-link {
+  position: absolute;
+  top: 94px;
+}
+.play-heading > div {
+  margin-top: 54px;
+}
+.play-heading h1 {
+  margin: 0;
+  font-size: clamp(2.1rem, 5vw, 4rem);
+}
+.hint-trigger {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--forest);
+  font-weight: 750;
+  cursor: pointer;
+}
+.hint-trigger span {
+  margin-left: 8px;
+  color: var(--muted);
+}
+.narration {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+}
+.narration > span {
+  font-size: 28px;
+  color: var(--amber-deep);
+}
+.narration div {
+  flex: 1;
+}
+.narration strong,
+.narration small {
+  display: block;
+}
+.narration small {
+  margin-top: 3px;
+  color: var(--muted);
+}
+.narration audio {
+  max-width: 300px;
+  height: 38px;
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.story-card {
+  overflow: hidden;
+}
+.story-card p {
+  min-height: 115px;
+  margin: 0;
+  padding: 22px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.08rem;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+.challenge {
+  position: relative;
+  width: min(760px, 100%);
+  margin: 36px auto 0;
+  padding: clamp(25px, 5vw, 48px);
+  overflow: hidden;
+}
+.challenge-number {
+  position: absolute;
+  top: -21px;
+  right: 22px;
+  color: rgba(23, 63, 58, 0.06);
+  font-family: var(--serif);
+  font-size: 150px;
+  line-height: 1;
+}
+.challenge h2 {
+  position: relative;
+  margin-bottom: 26px;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.choices button {
+  min-height: 62px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+.choices button:hover,
+.choices button.selected {
+  border-color: var(--forest);
+  background: var(--sage);
+}
+.choices b {
+  color: var(--forest);
+}
+.challenge form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+.challenge label {
+  grid-column: 1/-1;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.challenge input {
+  min-width: 0;
+  height: 56px;
+  padding: 0 17px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: white;
+  color: var(--ink);
+  font-size: 1.15rem;
+}
+.feedback {
+  position: relative;
+  margin-top: 20px;
+  padding: 18px;
+  border-left: 4px solid var(--danger);
+  border-radius: 12px;
+  background: #f8e6e2;
+}
+.feedback.correct {
+  border-color: var(--success);
+  background: #e1efe8;
+}
+.feedback.malformed {
+  border-color: var(--amber-deep);
+  background: #f8edda;
+}
+.feedback p {
+  margin: 6px 0 0;
+  line-height: 1.55;
+}
+.feedback .button {
+  margin-top: 14px;
+}
+.narrative {
+  position: relative;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.safety-symbol {
+  display: grid;
+  place-items: center;
+  width: 65px;
+  height: 65px;
+  border-radius: 22px;
+  background: var(--amber);
+  color: var(--forest);
+  font-size: 34px;
+}
+.safety-modal h2,
+.hints-modal h2 {
+  font-size: 2.25rem;
+}
+.safety-modal > p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.safety-note {
+  margin: 20px 0;
+  padding: 17px;
+  border-radius: 15px;
+  background: var(--sage);
+}
+.safety-note p {
+  margin: 7px 0 0;
+  line-height: 1.5;
+}
+.hints-modal header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+.hints-modal header button {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 28px;
+  cursor: pointer;
+}
+.hints-modal > p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+.hint-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+.hint-list article {
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+}
+.hint-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.hint-list span,
+.hint-list small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.hint-list p {
+  margin: 14px 0 0;
+  line-height: 1.6;
+}
+.hint-list .button {
+  min-height: 42px;
+  margin-top: 14px;
+}
+.hint-list .locked {
+  opacity: 0.65;
+}
+@media (max-width: 680px) {
+  .play-heading {
+    align-items: start;
+  }
+  .play-heading h1 {
+    font-size: 2.2rem;
+  }
+  .hint-trigger {
+    margin-top: 54px;
+  }
+  .narration {
+    align-items: start;
+    flex-wrap: wrap;
+  }
+  .narration audio {
+    width: 100%;
+    max-width: none;
+  }
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .choices {
+    grid-template-columns: 1fr;
+  }
+  .challenge form {
+    grid-template-columns: 1fr;
+  }
+  .challenge form .button {
+    width: 100%;
+  }
+  .story-card p {
+    min-height: auto;
+  }
+}

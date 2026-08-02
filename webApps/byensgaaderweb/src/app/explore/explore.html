@@ -1,0 +1,98 @@
+<section class="map-stage">
+  <app-explore-map (missionSelected)="selected.set($event)" />
+  <div class="map-intro">
+    <p class="eyebrow">Gåder i nærheden</p>
+    <h1>
+      Byen gemmer på mere,<br />
+      end man ser ved første blik.
+    </h1>
+    <p>Find et sted på kortet. Gå derhen sammen. Løs det, som kun kan ses lige dér.</p>
+  </div>
+  <div class="map-tools">
+    @if (!location.hasFix()) {
+      <button type="button" class="map-tool" (click)="location.start()">◎ Vis hvor jeg er</button>
+    }
+  </div>
+
+  @if (selected(); as mission) {
+    <article class="mission-preview card">
+      <button class="preview-close" type="button" aria-label="Luk" (click)="selected.set(null)">
+        ×
+      </button>
+      <div>
+        <span class="chip">{{ game.isCompleted(mission) ? '✓ Løst' : 'Gåde' }}</span>
+        <h2>{{ mission.title }}</h2>
+        <p>{{ mission.description || content.locationFor(mission)?.name }}</p>
+        <div class="preview-meta">
+          <span>◷ {{ mission.estimatedMinutes }} min.</span
+          ><span>✦ {{ mission.basePoints }} point</span><span>⌖ {{ distanceLabel(mission) }}</span>
+        </div>
+      </div>
+      <div class="preview-actions">
+        <a class="button" [routerLink]="['/opgave', mission.id]">Se opgaven</a>
+        @if (location.isLocal) {
+          <button class="button ghost" type="button" (click)="simulate(mission)">Test her</button>
+        }
+      </div>
+    </article>
+  }
+</section>
+
+<section class="page mission-list">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Vælg jeres næste spor</p>
+      <h2>{{ content.playableMissions().length }} gåder venter</h2>
+    </div>
+    <span>{{ solvedCount() }} løst</span>
+  </div>
+  <div class="mission-grid">
+    @for (mission of content.playableMissions(); track mission.id; let index = $index) {
+      <a class="mission-card card" [routerLink]="['/opgave', mission.id]">
+        <span class="mission-number">{{ missionNumber(index) }}</span>
+        <div class="mission-copy">
+          <div class="chips">
+            <span class="chip">{{
+              game.isCompleted(mission) ? '✓ Løst' : difficulty(mission.difficulty)
+            }}</span
+            ><span>{{ distanceLabel(mission) }}</span>
+          </div>
+          <h3>{{ mission.title }}</h3>
+          <p>{{ mission.description || content.locationFor(mission)?.name }}</p>
+          <footer>
+            <span>◷ {{ mission.estimatedMinutes }} min.</span
+            ><span>✦ {{ mission.basePoints }} point</span><b>→</b>
+          </footer>
+        </div>
+      </a>
+    }
+  </div>
+</section>
+
+@if (primer()) {
+  <div class="modal-backdrop">
+    <section
+      class="modal permission-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-title"
+    >
+      <span class="permission-symbol" aria-hidden="true">⌖</span>
+      <p class="eyebrow">Position på din enhed</p>
+      <h2 id="location-title">Stedet er spillet</h2>
+      <p>
+        Gåderne kan ikke løses hjemmefra. Webappen bruger din position til at se, at du står det
+        rigtige sted — og til intet andet.
+      </p>
+      <ul>
+        <li>Positionen behandles kun i browseren</li>
+        <li>Vi gemmer ikke, hvor du har gået</li>
+        <li>Du kan fortsætte uden at give adgang nu</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="button" type="button" (click)="allowLocation()">Ja, brug min position</button
+        ><button class="button ghost" type="button" (click)="dismissPrimer()">Ikke nu</button>
+      </div>
+    </section>
+  </div>
+}

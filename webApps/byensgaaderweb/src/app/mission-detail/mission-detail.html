@@ -1,0 +1,107 @@
+@if (mission(); as mission) {
+  <article class="detail-page">
+    <div class="hero">
+      <app-mission-image [mediaId]="heroMediaId()" [hero]="true" />
+      <div class="hero-shade"></div>
+      <a class="back-link" routerLink="/">← Tilbage til kortet</a>
+      <div class="hero-copy">
+        <p class="eyebrow">{{ location()?.name }}</p>
+        <h1>{{ mission.title }}</h1>
+        <p>{{ mission.description }}</p>
+      </div>
+    </div>
+    <div class="detail-content page">
+      <section class="facts card">
+        <div>
+          <span>◷</span><small>Tid</small><strong>{{ mission.estimatedMinutes }} min.</strong>
+        </div>
+        <div>
+          <span>◇</span><small>Sværhedsgrad</small
+          ><strong>{{ difficulty(mission.difficulty) }}</strong>
+        </div>
+        <div>
+          <span>✦</span><small>Point</small><strong>{{ mission.basePoints }}</strong>
+        </div>
+      </section>
+
+      <div class="columns">
+        <div>
+          <section class="fiction card">
+            <span aria-hidden="true">◐</span>
+            <div>
+              <h2>Fiktion</h2>
+              <p>{{ mission.fictionLabel }}</p>
+            </div>
+          </section>
+          @if (location(); as place) {
+            <section class="info-section">
+              <p class="eyebrow">Godt at vide</p>
+              <h2>Sikkerhed på stedet</h2>
+              <div class="info-card card">
+                <span>△</span>
+                <div>
+                  <h3>{{ place.name }}</h3>
+                  <p>{{ place.safety.notes }}</p>
+                </div>
+              </div>
+            </section>
+            <section class="info-section">
+              <h2>Adgang</h2>
+              <div class="access-grid">
+                <div class="card">
+                  <small>Underlag</small><strong>{{ place.accessibility.surface }}</strong>
+                </div>
+                <div class="card">
+                  <small>Hældning</small><strong>{{ place.accessibility.incline }}</strong>
+                </div>
+                <div class="card">
+                  <small>Kørestol</small
+                  ><strong>{{ wheelchair(place.accessibility.wheelchair) }}</strong>
+                </div>
+                <div class="card">
+                  <small>Barnevogn</small
+                  ><strong>{{ wheelchair(place.accessibility.stroller) }}</strong>
+                </div>
+              </div>
+              <p class="access-note">{{ place.accessibility.notes }}</p>
+            </section>
+          }
+          @if (sources().length) {
+            <section class="sources">
+              <h2>Kilder</h2>
+              @for (source of sources(); track source.id) {
+                <a [href]="source.url" target="_blank" rel="noopener"
+                  >{{ source.title }} — {{ source.publisher }} ↗</a
+                >
+              }
+            </section>
+          }
+        </div>
+        <aside class="start-card card">
+          <p class="eyebrow">Næste skridt</p>
+          <h2>{{ game.isCompleted(mission) ? 'Gåden er løst' : 'Klar til at gå?' }}</h2>
+          <p>
+            {{
+              game.isCompleted(mission)
+                ? 'Se jeres point og historien bag gåden.'
+                : 'Webappen viser vej og åbner først gåden, når I står ved stedet.'
+            }}
+          </p>
+          <button class="button" type="button" (click)="go()">
+            {{ game.isCompleted(mission) ? 'Se resultatet' : 'Tag afsted' }} →
+          </button>
+          @if (location(); as place) {
+            <small>⌖ {{ place.address }}</small>
+          }
+        </aside>
+      </div>
+    </div>
+  </article>
+} @else if (!content.loading()) {
+  <div class="empty-state">
+    <div>
+      <h1>Opgaven findes ikke</h1>
+      <a class="button" routerLink="/">Tilbage til kortet</a>
+    </div>
+  </div>
+}

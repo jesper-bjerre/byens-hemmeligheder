@@ -1,0 +1,137 @@
+.scoreboard-page {
+  max-width: 850px;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.heading h1 {
+  font-size: clamp(2.7rem, 7vw, 5rem);
+}
+.heading > span {
+  color: var(--amber);
+  font-size: 72px;
+}
+.total {
+  padding: clamp(24px, 5vw, 42px);
+  color: white;
+  background: var(--forest);
+}
+.total small,
+.total strong {
+  display: block;
+}
+.total small {
+  color: rgba(255, 255, 255, 0.68);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+.total strong {
+  margin-top: 5px;
+  color: var(--amber);
+  font-family: var(--serif);
+  font-size: 4.5rem;
+}
+.total p {
+  color: rgba(255, 255, 255, 0.72);
+}
+.bar {
+  height: 8px;
+  border-radius: 99px;
+  background: #ffffff22;
+  overflow: hidden;
+}
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--amber);
+}
+.section {
+  margin-top: 45px;
+}
+.section h2 {
+  font-size: 2rem;
+}
+.empty,
+.example > p,
+.privacy p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.solved-list {
+  display: grid;
+  gap: 10px;
+}
+.solved-list a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 17px;
+  color: inherit;
+  text-decoration: none;
+}
+.solved-list a > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: white;
+  background: var(--success);
+}
+.solved-list a div {
+  flex: 1;
+}
+.solved-list strong,
+.solved-list small {
+  display: block;
+}
+.solved-list small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+.solved-list b {
+  color: var(--amber-deep);
+  font-size: 1.35rem;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-title h2 {
+  margin: 0;
+}
+.example ol {
+  display: grid;
+  gap: 9px;
+  padding: 0;
+  list-style: none;
+}
+.example li {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px;
+}
+.example li span {
+  width: 28px;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 1.3rem;
+}
+.example li strong {
+  flex: 1;
+}
+.example li b {
+  color: var(--muted);
+}
+.privacy {
+  margin-top: 55px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.privacy h2 {
+  font-size: 1.35rem;
+}

@@ -1,0 +1,141 @@
+.reward-page {
+  width: min(730px, 100%);
+  margin: 0 auto;
+  padding: clamp(42px, 8vw, 90px) 18px 100px;
+  text-align: center;
+}
+.seal {
+  width: 86px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 22px;
+  border: 7px double var(--success);
+  border-radius: 50%;
+  color: white;
+  background: var(--success);
+  font-size: 42px;
+  box-shadow: 0 15px 35px #26725d44;
+}
+.reward-page h1 {
+  margin-bottom: 8px;
+  font-size: clamp(2.7rem, 8vw, 5rem);
+}
+.subheadline {
+  margin-bottom: 30px;
+  color: var(--muted);
+  font-size: 1.15rem;
+}
+.message {
+  padding: 25px;
+  text-align: left;
+}
+.message small {
+  color: var(--muted);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.message p {
+  margin: 10px 0 0;
+  font-family: var(--serif);
+  font-size: 1.12rem;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+.score-card {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  align-items: center;
+  margin-top: 18px;
+  padding: 22px;
+  text-align: left;
+}
+.score-card > div:first-child {
+  padding-right: 22px;
+  border-right: 1px solid var(--line);
+}
+.score-card small,
+.score-card strong {
+  display: block;
+}
+.score-card small {
+  color: var(--muted);
+}
+.score-card strong {
+  margin-top: 5px;
+  color: var(--amber-deep);
+  font-family: var(--serif);
+  font-size: 3.3rem;
+}
+.transactions {
+  padding-left: 22px;
+}
+.transactions p {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+.transactions b {
+  color: var(--success);
+}
+.transactions b.minus {
+  color: var(--danger);
+}
+.presence-note {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.history,
+.sources {
+  margin-top: 48px;
+  text-align: left;
+}
+.history h2 {
+  font-size: 2rem;
+}
+.history > p:last-child {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+.sources a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--forest);
+  text-decoration: none;
+}
+.sources small,
+.sources strong {
+  display: block;
+}
+.sources small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 48px;
+}
+@media (max-width: 540px) {
+  .score-card {
+    grid-template-columns: 1fr;
+  }
+  .score-card > div:first-child {
+    padding: 0 0 15px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+  }
+  .transactions {
+    padding: 12px 0 0;
+  }
+  .actions {
+    flex-direction: column;
+  }
+}

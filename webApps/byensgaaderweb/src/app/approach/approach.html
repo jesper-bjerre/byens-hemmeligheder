@@ -1,0 +1,47 @@
+@if (mission(); as mission) {
+  <section class="approach-page">
+    <a class="back-link" [routerLink]="['/opgave', mission.id]">← Opgaven</a>
+    <div class="approach-card card">
+      <div
+        class="compass"
+        [style.--bearing]="bearing() + 'deg'"
+        [class.ready]="state() === 'ready'"
+      >
+        <span>{{ state() === 'ready' ? '✓' : '↑' }}</span>
+      </div>
+      <p class="eyebrow">Find stedet</p>
+      <h1>{{ place()?.name }}</h1>
+      <strong class="distance">{{ state() === 'ready' ? 'Du er fremme' : distanceLabel() }}</strong>
+      <p class="message">{{ message() }}</p>
+      @if (state() === 'dwelling') {
+        <div class="progress">
+          <span [style.width.%]="(credit() / (place()?.dwellSeconds || 1)) * 100"></span>
+        </div>
+      }
+      @if (state() === 'problem') {
+        <button class="button secondary" type="button" (click)="locationService.start()">
+          Prøv position igen
+        </button>
+      }
+      @if (state() === 'ready') {
+        <button class="button start" type="button" (click)="play()">Start opgaven →</button>
+      }
+      @if (waited() > 90 && state() !== 'ready') {
+        <button class="button ghost" type="button" (click)="acceptOverride()">
+          Jeg står på stedet
+        </button>
+      }
+      @if (locationService.isLocal && state() !== 'ready') {
+        <button class="test-link" type="button" (click)="simulate()">
+          Simulér position ved stedet
+        </button>
+      }
+    </div>
+    <aside>
+      <span>△</span>
+      <p>
+        <strong>Se op fra skærmen, når I går.</strong><br />Hold jer samlet og følg områdets stier.
+      </p>
+    </aside>
+  </section>
+}

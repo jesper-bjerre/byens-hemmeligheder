@@ -1,0 +1,13 @@
+{
+  "name": "Byens Gåder",
+  "short_name": "Byens Gåder",
+  "description": "Stedsbaserede gåder for hele familien.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf7ed",
+  "theme_color": "#173f3a",
+  "lang": "da",
+  "icons": [
+    { "src": "/icons/app-icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

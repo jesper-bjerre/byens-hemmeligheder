@@ -1,0 +1,68 @@
+<section class="page scoreboard-page">
+  <a class="back-link" routerLink="/">← Tilbage til kortet</a>
+  <div class="heading">
+    <div>
+      <p class="eyebrow">Jeres opdagelser</p>
+      <h1>Dine point</h1>
+    </div>
+    <span aria-hidden="true">✦</span>
+  </div>
+  <section class="total card">
+    <div>
+      <small>Point i alt</small><strong>{{ game.totalPoints() }}</strong>
+    </div>
+    <p>{{ solved().length }} af {{ content.playableMissions().length }} gåder løst</p>
+    <div class="bar">
+      <span
+        [style.width.%]="
+          content.playableMissions().length
+            ? (solved().length / content.playableMissions().length) * 100
+            : 0
+        "
+      ></span>
+    </div>
+  </section>
+  <section class="section">
+    <h2>Løste gåder</h2>
+    @if (!solved().length) {
+      <p class="empty">I har ikke løst nogen gåder endnu. Find en på kortet og gå derhen.</p>
+    } @else {
+      <div class="solved-list">
+        @for (mission of solved(); track mission.id) {
+          <a class="card" [routerLink]="['/opgave', mission.id, 'loest']"
+            ><span>✓</span>
+            <div>
+              <strong>{{ mission.shortTitle || mission.title }}</strong
+              ><small>{{ content.locationFor(mission)?.name }}</small>
+            </div>
+            <b>{{ game.pointsFor(mission) }}</b></a
+          >
+        }
+      </div>
+    }
+  </section>
+  <section class="section example">
+    <div class="section-title">
+      <h2>Bedste i Vejle</h2>
+      <span class="chip">Eksempel</span>
+    </div>
+    <p>
+      Ranglisten er opdigtet og viser, hvordan den kommer til at se ud. Der er endnu ingen konti
+      eller andre spillere.
+    </p>
+    <ol>
+      @for (entry of example; track entry[0]; let i = $index) {
+        <li class="card">
+          <span>{{ i + 1 }}</span
+          ><strong>{{ entry[0] }}</strong
+          ><b>{{ entry[1] }}</b>
+        </li>
+      }
+    </ol>
+  </section>
+  <section class="privacy">
+    <h2>Dine data på denne enhed</h2>
+    <p>Progressionen ligger kun i denne browser. Positioner gemmes ikke.</p>
+    <button class="button ghost" type="button" (click)="reset()">Slet min progression</button>
+  </section>
+</section>

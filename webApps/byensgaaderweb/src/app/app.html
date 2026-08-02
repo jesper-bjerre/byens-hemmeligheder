@@ -1,0 +1,28 @@
+<header class="app-header">
+  <a class="brand" routerLink="/" aria-label="Byens Gåder, gå til kortet">
+    <span class="brand-mark" aria-hidden="true">⌖</span>
+    <span><strong>Byens Gåder</strong><small>Se byen med nye øjne</small></span>
+  </a>
+  <nav aria-label="Appfunktioner">
+    <button
+      class="icon-button"
+      type="button"
+      (click)="audio.toggle()"
+      [attr.aria-label]="audio.enabled() ? 'Slå stemningslyd fra' : 'Slå stemningslyd til'"
+    >
+      {{ audio.enabled() ? '♪' : '♩' }}
+    </button>
+    <a class="score-pill" routerLink="/point" aria-label="Se dine point">
+      <span aria-hidden="true">✦</span><strong>{{ game.totalPoints() }}</strong>
+    </a>
+  </nav>
+</header>
+
+@if (content.error()) {
+  <div class="connection-banner">
+    <span>{{ content.error() }}</span>
+    <button type="button" (click)="content.load()">Prøv igen</button>
+  </div>
+}
+
+<main><router-outlet /></main>

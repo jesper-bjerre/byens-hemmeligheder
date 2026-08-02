@@ -1,0 +1,54 @@
+@if (mission(); as mission) {
+  <section class="reward-page">
+    <div class="seal" aria-hidden="true">✓</div>
+    <p class="eyebrow">Gåden er løst</p>
+    <h1>{{ mission.completion?.headline || 'Godt set!' }}</h1>
+    <p class="subheadline">{{ mission.completion?.subheadline || mission.title }}</p>
+    @if (mission.completion?.message) {
+      <section class="message card">
+        <small>{{ mission.completion?.messageLabel }}</small>
+        <p>{{ mission.completion?.message }}</p>
+      </section>
+    }
+    <section class="score-card card">
+      <div>
+        <small>Jeres point</small><strong>{{ game.pointsFor(mission) }}</strong>
+      </div>
+      <div class="transactions">
+        @for (item of game.transactionsFor(mission); track item.id) {
+          <p>
+            <span>{{ item.explanation }}</span
+            ><b [class.minus]="item.points < 0">{{ signed(item.points) }}</b>
+          </p>
+        }
+      </div>
+    </section>
+    @if (presenceNote(mission.id); as note) {
+      <p class="presence-note">ⓘ {{ note }}</p>
+    }
+    @if (mission.completion?.historyFact) {
+      <section class="history">
+        <p class="eyebrow">Sådan hænger det sammen</p>
+        <h2>Historien bag</h2>
+        <p>{{ mission.completion?.historyFact }}</p>
+      </section>
+    }
+    @if (sources().length) {
+      <section class="sources">
+        <p class="eyebrow">Hvor ved vi det fra?</p>
+        @for (source of sources(); track source.id) {
+          <a [href]="source.url" target="_blank" rel="noopener"
+            ><span
+              ><strong>{{ source.title }}</strong
+              ><small>{{ source.publisher }}</small></span
+            ><b>↗</b></a
+          >
+        }
+      </section>
+    }
+    <div class="actions">
+      <a class="button" routerLink="/">Tilbage til kortet</a
+      ><a class="button secondary" routerLink="/point">Se alle point</a>
+    </div>
+  </section>
+}

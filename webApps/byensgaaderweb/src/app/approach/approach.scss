@@ -1,0 +1,131 @@
+.approach-page {
+  min-height: calc(100dvh - 72px);
+  display: grid;
+  place-items: center;
+  padding: 32px 16px 70px;
+  background: radial-gradient(
+    circle at 50% 12%,
+    #6e9c8f 0,
+    var(--forest) 43%,
+    var(--forest-deep) 100%
+  );
+  color: white;
+}
+.back-link {
+  position: absolute;
+  top: 100px;
+  left: max(20px, 5vw);
+  color: white;
+}
+.approach-card {
+  width: min(570px, 100%);
+  padding: clamp(28px, 6vw, 52px);
+  text-align: center;
+  color: var(--ink);
+  background: rgba(255, 253, 248, 0.97);
+}
+.compass {
+  width: 132px;
+  height: 132px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 28px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--sage);
+  box-shadow: inset 0 0 0 13px var(--paper);
+}
+.compass span {
+  display: block;
+  color: var(--forest);
+  font-size: 64px;
+  transform: rotate(var(--bearing));
+  transition: transform 0.5s ease;
+}
+.compass.ready {
+  background: #d7eadf;
+}
+.compass.ready span {
+  transform: none;
+  color: var(--success);
+}
+.approach-card h1 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  margin-bottom: 12px;
+}
+.distance {
+  display: block;
+  color: var(--amber-deep);
+  font-size: 1.25rem;
+}
+.message {
+  max-width: 39ch;
+  margin: 12px auto 24px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.progress {
+  height: 8px;
+  margin: 22px 0;
+  border-radius: 99px;
+  background: var(--sage);
+  overflow: hidden;
+}
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--success);
+  transition: width 0.5s;
+}
+.start {
+  width: 100%;
+}
+.button.ghost {
+  width: 100%;
+  margin-top: 9px;
+}
+.test-link {
+  margin-top: 18px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.approach-page > aside {
+  position: absolute;
+  bottom: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.82rem;
+}
+.approach-page > aside p {
+  margin: 0;
+}
+.approach-page > aside span {
+  font-size: 24px;
+}
+@media (max-width: 520px) {
+  .back-link {
+    top: 84px;
+  }
+  .approach-page > aside {
+    position: static;
+    margin-top: 20px;
+  }
+  .approach-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .compass {
+    width: 105px;
+    height: 105px;
+  }
+  .compass span {
+    font-size: 50px;
+  }
+}

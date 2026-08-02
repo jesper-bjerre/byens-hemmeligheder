@@ -1,0 +1,183 @@
+@if (mission(); as mission) {
+  <div class="play-page">
+    <header class="play-heading">
+      <a class="back-link" routerLink="/">← Afslut til kortet</a>
+      <div>
+        <p class="eyebrow">{{ content.locationFor(mission)?.name }}</p>
+        <h1>{{ mission.shortTitle || mission.title }}</h1>
+      </div>
+      @if (hintsForStep().length) {
+        <button class="hint-trigger" type="button" (click)="hintsOpen.set(true)">
+          ✦ Få et hint <span>{{ game.revealedHintIds(mission).size }}/{{ allHints().length }}</span>
+        </button>
+      }
+    </header>
+
+    @if (mission.narrationMediaId && content.mediaUrl(mission.narrationMediaId); as narrationUrl) {
+      <section class="narration card">
+        <span aria-hidden="true">◖</span>
+        <div>
+          <strong>Hør fortællingen</strong><small>Teksten nedenfor bærer de samme spor</small>
+        </div>
+        <audio controls [src]="narrationUrl"></audio>
+      </section>
+    }
+
+    <section class="cards-grid" aria-label="Opgavens fortællekort">
+      @for (card of cards(); track card.id) {
+        <article class="story-card card">
+          @if (card.mediaId) {
+            <app-mission-image [mediaId]="card.mediaId" />
+          }
+          <p>{{ card.text }}</p>
+        </article>
+      }
+    </section>
+
+    @if (step(); as step) {
+      <section class="challenge card">
+        <div class="challenge-number">{{ step.order }}</div>
+        @if (step.kind === 'narrative') {
+          <p class="eyebrow">Fortælling</p>
+          <h2>{{ step.title }}</h2>
+          @if (step.mediaId) {
+            <app-mission-image [mediaId]="step.mediaId" />
+          }
+          <p class="narrative">{{ step.body }}</p>
+          <button class="button" type="button" (click)="continue()">
+            {{ step.continueLabel || 'Fortsæt' }} →
+          </button>
+        } @else if (isChallenge(step)) {
+          <p class="eyebrow">Jeres svar</p>
+          <h2>{{ step.question || step.title }}</h2>
+          @if (step.kind === 'singleChoice') {
+            <div class="choices">
+              @for (option of step.options || []; track option.id) {
+                <button
+                  type="button"
+                  [class.selected]="selectedChoice === option.label"
+                  [disabled]="answerOutcome()?.kind === 'correct'"
+                  (click)="choose(option.label)"
+                >
+                  <span>{{ option.label }}</span
+                  ><b>{{ selectedChoice === option.label ? '✓' : '→' }}</b>
+                </button>
+              }
+            </div>
+          } @else {
+            <form (ngSubmit)="submit()">
+              <label [for]="step.id">{{
+                step.kind === 'numericCode' ? 'Indtast koden' : 'Skriv jeres svar'
+              }}</label
+              ><input
+                [id]="step.id"
+                [(ngModel)]="answer"
+                name="answer"
+                [inputMode]="step.kind === 'numericCode' ? 'numeric' : 'text'"
+                [maxlength]="step.kind === 'numericCode' ? step.length || 20 : 120"
+                [placeholder]="step.placeholder || ''"
+                autocomplete="off"
+                [disabled]="answerOutcome()?.kind === 'correct'"
+              /><button class="button" type="submit" [disabled]="!answer">Tjek svar</button>
+            </form>
+          }
+          @if (answerOutcome(); as outcome) {
+            <div
+              class="feedback"
+              [class.correct]="outcome.kind === 'correct'"
+              [class.malformed]="outcome.kind === 'malformed'"
+            >
+              <strong>{{
+                outcome.kind === 'correct'
+                  ? 'Det er rigtigt!'
+                  : outcome.kind === 'malformed'
+                    ? 'Næsten klar'
+                    : 'Prøv igen'
+              }}</strong>
+              @if (outcome.feedback) {
+                <p>{{ outcome.feedback }}</p>
+              }
+              @if (outcome.kind === 'correct') {
+                <button class="button" type="button" (click)="continue()">Fortsæt →</button>
+              }
+            </div>
+          }
+        } @else {
+          <h2>Dette trin kræver en nyere version</h2>
+          <p>Du kan fortsætte til næste trin imens.</p>
+          <button class="button" type="button" (click)="continue()">Fortsæt</button>
+        }
+      </section>
+    }
+  </div>
+
+  @if (safetyOpen()) {
+    <div class="modal-backdrop">
+      <section
+        class="modal safety-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="safety-title"
+      >
+        <span class="safety-symbol">♧</span>
+        <p class="eyebrow">Inden I går i gang</p>
+        <h2 id="safety-title">Se op fra telefonen</h2>
+        <p>
+          Opgaven løses udendørs. Stå samlet et sikkert sted, og se op fra skærmen, når I bevæger
+          jer.
+        </p>
+        @if (content.locationFor(mission); as place) {
+          <div class="safety-note">
+            <strong>Om {{ place.name }}</strong>
+            <p>{{ place.safety.notes }}</p>
+          </div>
+        }
+        <button class="button" type="button" (click)="closeSafety()">Det er forstået</button>
+      </section>
+    </div>
+  }
+  @if (hintsOpen()) {
+    <div class="modal-backdrop">
+      <section
+        class="modal hints-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="hints-title"
+      >
+        <header>
+          <div>
+            <p class="eyebrow">Lidt hjælp undervejs</p>
+            <h2 id="hints-title">Hints</h2>
+          </div>
+          <button type="button" aria-label="Luk hints" (click)="hintsOpen.set(false)">×</button>
+        </header>
+        <p>Hints åbnes i rækkefølge. Hvert koster point, men I kan altid læse et igen gratis.</p>
+        <div class="hint-list">
+          @for (hint of allHints(); track hint.id) {
+            <article [class.revealed]="isRevealed(hint)" [class.locked]="!isUnlocked(hint)">
+              <div>
+                <strong>Hint {{ hint.order }}</strong
+                ><span>{{
+                  isRevealed(hint)
+                    ? 'Åbnet'
+                    : isUnlocked(hint)
+                      ? '-' + hintPenalty(hint) + ' point'
+                      : 'Låst'
+                }}</span>
+              </div>
+              @if (isRevealed(hint)) {
+                <p>{{ hint.text }}</p>
+              } @else if (isUnlocked(hint)) {
+                <button class="button secondary" type="button" (click)="reveal(hint)">
+                  Vis hint — {{ hintPenalty(hint) }} point
+                </button>
+              } @else {
+                <small>Åbn hint {{ hint.order - 1 }} først</small>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    </div>
+  }
+}
