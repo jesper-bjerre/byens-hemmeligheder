@@ -96,6 +96,31 @@ Cors__AllowedOrigins__3=https://salmon-grass-0b3946003.7.azurestaticapps.net
 Der er fortsat ingen authentication eller authorization. Webadressen er
 offentlig, og dette er kun accepteret under den interne test.
 
+## Byens Gåder web på Azure Static Web Apps
+
+Spillerens Angular-app er udrullet som sin egen Static Web App:
+
+| | Værdi |
+|---|---|
+| Ressource | `byensgaader` |
+| Ressourcegruppe | `byensgaader-d_rg` |
+| Plan og region | Free, West Europe |
+| Adresse | `https://agreeable-island-016468f03.7.azurestaticapps.net` |
+| Kilde | `webApps/byensgaaderweb/` på `main` |
+| Workflow | `azure-static-web-apps-agreeable-island-016468f03.yml` |
+
+Workflowet følger samme model som webadminen: Node 22, test og produktionsbuild
+før upload af `dist/byensgaaderweb/browser`. API'ets App Service tillader
+spillerappens origin via:
+
+```text
+Cors__AllowedOrigins__4=https://agreeable-island-016468f03.7.azurestaticapps.net
+```
+
+Spillerprogression ligger fortsat kun i browserens `localStorage`, og GPS-data
+skrives ikke til lagring. Authentication og authorization er som aftalt
+udskudt under den interne test.
+
 ## To fælder, der kostede en halv dag
 
 ### GitHubs emne bærer uforanderlige id'er

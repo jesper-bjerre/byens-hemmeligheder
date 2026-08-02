@@ -51,10 +51,14 @@ npm run check
 
 Produktionsfilerne lander i `dist/byensgaaderweb/browser/`.
 
-## Senere: Azure Static Web Apps
+## Azure Static Web Apps
 
 `public/staticwebapp.config.json` indeholder Angular-fallback og tillader
-browserens geolocation. Når webadressen er kendt, skal den føjes til backendens
-`Cors:AllowedOrigins`, før browseren kan hente indholdspakken.
+browserens geolocation. Produktionsadressen er:
+
+<https://agreeable-island-016468f03.7.azurestaticapps.net>
+
+Push til `main`, der ændrer denne mappe, tester, bygger og udruller automatisk.
+Backendens CORS-konfiguration tillader produktionsadressen.
 
 Authentication og authorization er bevidst udskudt under den interne test.

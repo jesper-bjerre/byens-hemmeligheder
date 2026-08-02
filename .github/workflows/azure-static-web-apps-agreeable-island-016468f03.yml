@@ -1,45 +1,67 @@
-name: Azure Static Web Apps CI/CD
+name: Byens Gåder web — udrul
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - "webApps/byensgaaderweb/**"
+      - ".github/workflows/azure-static-web-apps-agreeable-island-016468f03.yml"
   pull_request:
     types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - "webApps/byensgaaderweb/**"
+      - ".github/workflows/azure-static-web-apps-agreeable-island-016468f03.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: byensgaaderweb-${{ github.event.pull_request.number || 'produktion' }}
+  cancel-in-progress: true
 
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: Byg og udrul
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          submodules: true
-          lfs: false
-      - name: Build And Deploy
-        id: builddeploy
+          node-version: "22.22.3"
+          cache: npm
+          cache-dependency-path: webApps/byensgaaderweb/package-lock.json
+
+      - name: Installér afhængigheder
+        run: npm ci
+        working-directory: webApps/byensgaaderweb
+
+      - name: Test og byg
+        run: npm run check
+        working-directory: webApps/byensgaaderweb
+
+      # Angular er allerede bygget og testet ovenfor. Azure-actionen uploader
+      # kun artefaktet, så Oryx ikke skal gætte monorepoets opsætning.
+      - name: Udrul
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_ISLAND_016468F03 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "./webApps" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "dist/poster-creation-app.client" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          app_location: "webApps/byensgaaderweb/dist/byensgaaderweb/browser"
+          api_location: ""
+          output_location: ""
+          skip_app_build: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
-    name: Close Pull Request Job
+    name: Luk preview-miljø
     steps:
-      - name: Close Pull Request
-        id: closepullrequest
+      - name: Luk preview-miljø
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_ISLAND_016468F03 }}
