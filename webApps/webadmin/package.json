@@ -10,6 +10,9 @@
     "check": "ng test --watch=false && ng build"
   },
   "private": true,
+  "engines": {
+    "node": "^22.22.3"
+  },
   "packageManager": "npm@11.17.0",
   "dependencies": {
     "@angular/common": "^22.1.0",
