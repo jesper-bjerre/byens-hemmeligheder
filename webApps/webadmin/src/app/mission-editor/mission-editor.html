@@ -489,6 +489,26 @@
                 <p class="inline-error">Opgaven kan ikke løses uden mindst ét svar.</p>
               }
             </section>
+
+            <section class="panel span-2">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Efter korrekt svar</span>
+                  <h3>Historisk forklaring</h3>
+                </div>
+              </div>
+              <div class="field">
+                <label for="history-fact">Det, spilleren lærer om stedet</label>
+                <textarea
+                  id="history-fact"
+                  rows="5"
+                  [(ngModel)]="mission.completion.historyFact"
+                  (ngModelChange)="changed()"
+                  placeholder="Skriv den historiske forklaring, der vises efter et korrekt svar"
+                ></textarea>
+                <p class="help">Teksten vises på spillerens belønningsskærm, når gåden er løst.</p>
+              </div>
+            </section>
           </div>
         } @else {
           <div class="empty-state">

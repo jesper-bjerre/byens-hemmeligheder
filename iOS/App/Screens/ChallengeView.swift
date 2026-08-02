@@ -199,6 +199,15 @@ struct ChallengeView: View {
 
     private func textField(_ step: FreeTextStep) -> some View {
         VStack(alignment: .leading, spacing: BHSpacing.snug) {
+            if let question = step.question,
+               !question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text(question)
+                    .font(BHFont.heading)
+                    .foregroundStyle(BHColor.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("challenge.question")
+            }
+
             TextField(step.placeholder ?? "", text: $typedText)
                 .font(BHFont.heading)
                 .textInputAutocapitalization(.never)

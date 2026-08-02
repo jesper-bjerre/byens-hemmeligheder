@@ -74,6 +74,7 @@ struct QuestionTab: View {
             }
 
             answerRule(path)
+            completion
         }
         .dismissableKeyboard()
     }
