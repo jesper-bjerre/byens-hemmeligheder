@@ -308,7 +308,58 @@
           <p>Den første detalje bærer introduktionen. Billede og tekst flyttes sammen.</p>
         </div>
 
-        <div class="cards-list">
+        <section class="panel narration-panel">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Lyd</span>
+              <h3>Indtalt fortælling</h3>
+            </div>
+            @if (narrationMedia()) {
+              <span class="badge ready">Klar</span>
+            }
+          </div>
+
+          @if (narrationMedia(); as narration) {
+            <audio controls preload="metadata" [src]="api.mediaUrl(narration.filename)"></audio>
+            <p class="help">{{ narration.filename }}</p>
+          }
+
+          <div class="narration-actions">
+            <label class="button secondary file-button">
+              <span aria-hidden="true">♫</span>
+              {{
+                narrationFile()?.name || (narrationMedia() ? 'Vælg en ny lydfil' : 'Vælg lydfil')
+              }}
+              <input
+                type="file"
+                accept=".mp3,.m4a,.aac,.wav,.aif,.aiff,.caf,.ogg,.opus,.flac,audio/*"
+                (change)="chooseNarration($event)"
+              />
+            </label>
+            <button
+              class="button primary"
+              type="button"
+              (click)="uploadNarration()"
+              [disabled]="!narrationFile() || narrationUploading()"
+            >
+              {{ narrationUploading() ? 'Gør fortællingen klar…' : 'Læg fortælling op' }}
+            </button>
+            @if (narrationMedia()) {
+              <button class="text-button danger" type="button" (click)="removeNarration()">
+                Fjern fra opgaven
+              </button>
+            }
+          </div>
+          <p class="help">
+            MP3, M4A, AAC, WAV, AIFF, CAF, OGG, Opus og FLAC understøttes. Serveren gør filen til en
+            kompakt MP3, som virker i både appen og browseren.
+          </p>
+          @if (narrationError()) {
+            <p class="inline-error">{{ narrationError() }}</p>
+          }
+        </section>
+
+        <div class="cards-list narration-spacing">
           @for (card of mission.cards; track card.id; let index = $index) {
             <section class="panel detail-card">
               <div class="detail-order">

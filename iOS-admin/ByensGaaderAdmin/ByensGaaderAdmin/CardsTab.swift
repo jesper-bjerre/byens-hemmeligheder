@@ -33,6 +33,8 @@ struct CardsTab: View {
 
     var body: some View {
         Form {
+            NarrationUploadSection(document: document, missionIndex: missionIndex)
+
             ForEach(Array(cards.enumerated()), id: \.element.cardId) { position, _ in
                 card(at: position)
             }

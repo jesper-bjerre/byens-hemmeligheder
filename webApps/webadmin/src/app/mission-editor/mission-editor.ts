@@ -52,6 +52,9 @@ export class MissionEditor implements OnInit {
   readonly uploadAltText = signal('');
   readonly uploading = signal(false);
   readonly uploadError = signal<string | null>(null);
+  readonly narrationFile = signal<File | null>(null);
+  readonly narrationUploading = signal(false);
+  readonly narrationError = signal<string | null>(null);
   region = '';
 
   readonly mission = computed(() => this.store.pack()?.missions[this.missionIndex] ?? null);
@@ -65,6 +68,10 @@ export class MissionEditor implements OnInit {
   readonly assessedStep = computed(() => {
     const steps = this.mission()?.steps ?? [];
     return steps.find((step) => step.kind !== 'narrative') ?? steps[0] ?? null;
+  });
+  readonly narrationMedia = computed(() => {
+    const mediaId = this.mission()?.narrationMediaId;
+    return this.store.pack()?.media.find((media) => media.id === mediaId) ?? null;
   });
 
   ngOnInit(): void {
@@ -226,6 +233,60 @@ export class MissionEditor implements OnInit {
     } finally {
       this.uploading.set(false);
     }
+  }
+
+  chooseNarration(event: Event): void {
+    this.narrationFile.set((event.target as HTMLInputElement).files?.[0] ?? null);
+    this.narrationError.set(null);
+  }
+
+  async uploadNarration(): Promise<void> {
+    const pack = this.store.pack();
+    const mission = this.mission();
+    const source = this.narrationFile();
+    if (!pack || !mission || !source) return;
+
+    this.narrationUploading.set(true);
+    this.narrationError.set(null);
+    try {
+      const stem = `narration-${mission.slug || 'opgave'}`;
+      const number = this.nextMediaNumber(stem);
+      const suffix = String(number).padStart(3, '0');
+      const filename = `${stem}-${suffix}.mp3`;
+      const mediaId = `media.${stem}.${suffix}`;
+
+      await this.api.uploadNarration(filename, source);
+      pack.media.push({
+        id: mediaId,
+        filename,
+        altText: `Fortælling til ${mission.title}`,
+        owner: this.store.quizmaster(),
+        licence: 'Eget materiale — Byens Gåder ejer rettighederne',
+        credit: 'Byens Gåder',
+        creditLine: null,
+        kind: 'contemporary',
+        mediaType: 'audio',
+        manipulation: 'Konverteret til MP3, mono, 64 kbit/s',
+        restrictions: null,
+        expiresAt: null,
+      });
+      mission.narrationMediaId = mediaId;
+      this.narrationFile.set(null);
+      this.changed();
+    } catch (error) {
+      this.narrationError.set(this.api.describe(error));
+    } finally {
+      this.narrationUploading.set(false);
+    }
+  }
+
+  removeNarration(): void {
+    const mission = this.mission();
+    if (!mission) return;
+    mission.narrationMediaId = null;
+    this.narrationFile.set(null);
+    this.narrationError.set(null);
+    this.changed();
   }
 
   changeStepKind(kind: string): void {
