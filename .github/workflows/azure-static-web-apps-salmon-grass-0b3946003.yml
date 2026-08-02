@@ -28,17 +28,35 @@ jobs:
     name: Build and Deploy Job
     steps:
       - uses: actions/checkout@v4
-      - name: Byg og udrul
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+          cache: npm
+          cache-dependency-path: webApps/webadmin/package-lock.json
+
+      - name: Installér afhængigheder
+        run: npm ci
+        working-directory: webApps/webadmin
+
+      - name: Test og byg
+        run: npm run check
+        working-directory: webApps/webadmin
+
+      # Angular er allerede bygget og testet ovenfor. Azure-actionen skal kun
+      # uploade artefaktet; dermed afhænger resultatet ikke af Oryx' egen
+      # detektion af monorepo, Angular-version eller Node-version.
+      - name: Udrul
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_GRASS_0B3946003 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "webApps/webadmin"
+          app_location: "webApps/webadmin/dist/webadmin/browser"
           api_location: ""
-          output_location: "dist/webadmin/browser"
-          app_build_command: "npm run build"
+          output_location: ""
+          skip_app_build: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
