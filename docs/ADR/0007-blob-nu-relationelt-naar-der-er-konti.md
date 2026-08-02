@@ -7,6 +7,12 @@
 [ADR 0005](./0005-blob-er-kilden-til-indholdet.md),
 [feature 003](../../specs/003-indholdslager/research.md)
 
+> **Ikke accepteret og under revurdering.** Feature 003's research blev
+> genåbnet 2. august 2026, da partnerretning og flere quizmastere blev en del af
+> forudsætningen. Den nye anbefaling er Azure SQL som redaktionel kilde og blob
+> som læsemodel. Accepteres den, markeres denne ADR som afvist og erstattes af
+> en ny beslutning.
+
 ## Kontekst
 
 Forfatningens tekniske rammer siger:
