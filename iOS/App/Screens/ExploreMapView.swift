@@ -190,7 +190,7 @@ struct ExploreMapView: View {
 
                 ForEach(mappableMissions) { mission in
                     if let point = displayPoint(for: mission) {
-                        Annotation(mission.shortTitle, coordinate: point.coordinate) {
+                        Annotation(mission.title, coordinate: point.coordinate) {
                             missionPin(mission)
                         }
                         // MapKit tegner titlen selv.

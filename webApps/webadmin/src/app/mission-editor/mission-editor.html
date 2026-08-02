@@ -63,6 +63,19 @@
               />
             </div>
             <div class="field">
+              <label for="mission-short-title">Kort titel</label>
+              <input
+                id="mission-short-title"
+                [(ngModel)]="mission.shortTitle"
+                (ngModelChange)="changed()"
+                placeholder="Kort titel til navigation og pointoversigt"
+              />
+              <p class="help">
+                Den fulde titel vises på kortet. Den korte titel bruges under spillet og på
+                pointoversigten.
+              </p>
+            </div>
+            <div class="field">
               <label for="mission-description">Beskrivelse</label>
               <textarea
                 id="mission-description"

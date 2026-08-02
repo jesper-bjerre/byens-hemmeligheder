@@ -59,8 +59,16 @@ struct MissionTab: View {
 
     var body: some View {
         Form {
-            Section("Titel") {
+            Section {
                 TextField("Titel", text: title)
+                TextField(
+                    "Kort titel",
+                    text: document.text(.mission(index, .key("shortTitle"))))
+            } header: {
+                Text("Titel")
+            } footer: {
+                Text("Den fulde titel vises på kortet. Den korte titel bruges i "
+                     + "navigation og pointoversigten.")
             }
 
             Section("Beskrivelse") {
@@ -122,11 +130,8 @@ struct MissionTab: View {
 
     // MARK: - Titlen
 
-    /// Der er ét titelfelt i standardvisningen, men kontrakten har to.
-    ///
-    /// `shortTitle` følger titlen. Der er ikke længere et felt til den, så
-    /// den holder aldrig op med at følge med — men feltet står stadig i
-    /// pakken, fordi kontrakten kræver det.
+    /// `shortTitle` følger den fulde titel, indtil quizmasteren selv giver den
+    /// en anden værdi. Derefter kan de to redigeres uafhængigt.
     private var title: Binding<String> {
         Binding(
             get: { document.string(at: .mission(index, .key("title"))) },
