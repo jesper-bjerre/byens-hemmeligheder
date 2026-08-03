@@ -1,6 +1,6 @@
 # Køreplan
 
-**Sidst opdateret:** 2. august 2026
+**Sidst opdateret:** 3. august 2026
 
 ## Beslutning: research før produktionssikring
 
@@ -12,10 +12,10 @@ Begge iOS-apps er i TestFlight. Den næste periode bruges på to parallelle spor
    adgangskontrol og den øvrige produktionssikring
    implementeres.
 
-Det er en bevidst ændring af den tidligere rækkefølge. Begrundelsen er, at
-partner- og quizmastermodellen kan påvirke datagrænser, ejerskab og
-samtidighed. Den beslutning skal ikke træffes efter adgangskontrollen allerede
-har låst API'et til den nuværende samlede JSON-fil.
+Det er en bevidst ændring af den tidligere rækkefølge. Researchen har nu
+afklaret, at partnernes quizmastere arbejder i samme indholdssamling: der skal
+ikke designes multi-tenancy eller adskilte partnerdata. Lageret kan derfor
+ændres uden at foregribe den senere adgangskontrol.
 
 Kun **research og design** er flyttet frem. Det åbne skrive-API og DEV-data er
 fortsat accepteret alene til den interne test; data må smides væk. Det nye
@@ -44,12 +44,13 @@ arkitekturombygning, mens testen kører.
 
 Researchen ligger i
 [`specs/003-indholdslager/research.md`](../../specs/003-indholdslager/research.md).
-Den skal tage højde for, at spillerlæsninger udgør omtrent 99 % af trafikken,
-mens få quizmastere opretter og retter indhold, og at partnerorganisationer kan
-blive en kommende ejerskabsgrænse.
+Den tager højde for, at spillerlæsninger udgør omtrent 99 % af trafikken, mens
+få quizmastere opretter og retter indhold. Partnerorganisationer er ikke en
+datagrænse; deres quizmastere arbejder i samme samling.
 
-Researchen afsluttes med en anbefaling og et reviewpunkt. Først derefter
-fastlægges implementeringsrækkefølgen mellem lagerændringen og mål 3.
+Det reviderede forslag er én privat JSON-blob pr. opgave og en genereret
+offentlig pakke. SQL bruges kun, hvis senere målinger eller nye relationelle
+krav gør det nødvendigt. Forslaget afventer accept, før implementering starter.
 
 ## Mål 3 — Login, adgangskontrol og produktionssikring
 
@@ -75,8 +76,7 @@ Den mindste løsning, der virker for fem personer:
 **Vær ærlig om, hvad det er.** Nøglen ligger i app-binæren og kan hentes ud af
 en IPA. Den spærrer for tilfældige, der finder adressen — ikke for en, der vil
 ind. Den er en spærring, ikke en rettighedsmodel, og forfatningens princip IV
-er derfor stadig fraveget, indtil der er rigtige konti. Se
-[ADR 0007](../ADR/0007-blob-nu-relationelt-naar-der-er-konti.md).
+er derfor stadig fraveget, indtil der er rigtige konti.
 
 `X-Quizmaster` bliver ved med at være et navn, klienten selv skriver. Det er et
 spor, ikke en identitet, og det ændrer sig ikke af, at der kommer en nøgle.
@@ -93,7 +93,8 @@ az webapp update -n byensgaader-api-p -g Gulvet --https-only true
 
 **Blob-versionering er slået fra.** Soft delete er slået til med 7 dage, så en
 overskrevet pakke kan hentes tilbage i en uge. Versionering giver
-punkt-i-tid-gendannelse uden udløb og koster ingenting ved denne datamængde:
+punkt-i-tid-gendannelse; tidligere versioner koster lager, men beløbet er
+ubetydeligt for de små JSON-dokumenter, når en lifecycle-regel rydder op:
 
 ```bash
 az storage account blob-service-properties update \
@@ -139,10 +140,11 @@ Den skal ske, før der er rigtige spillere.
 Analysen er lavet: [`specs/003-indholdslager/research.md`](../../specs/003-indholdslager/research.md).
 Kravene står i [`spec.md`](../../specs/003-indholdslager/spec.md).
 
-**Foreslået efter den nye research:** Azure SQL som lille redaktionel kilde og
-en **genereret** pakke i Blob Storage til spillerne. Databasen ser kun de få
-quizmasterkald; omtrent 99 % spillerlæsninger går fortsat mod den statiske
-læsemodel. Anbefalingen kræver accept og en ny ADR, før implementeringen starter.
+**Revideret forslag:** én privat JSON-blob pr. opgave som redaktionel kilde og
+en **genereret** pakke i Blob Storage til spillerne. Den eksisterende
+Storage-konto genbruges, og der kommer ingen ny fast databasepris. ETag pr.
+opgave løser samtidighed, mens en kort lease og dirty-state gør publicering
+genoptagelig. Anbefalingen kræver accept af den reviderede ADR 0007.
 
 Det løser tre ting, der bliver værre for hver ny opgave:
 
@@ -169,4 +171,4 @@ spærrer for den aktuelle interne test.
 | ⬜ | Admin-appen har ingen UI-tests. En fejlrapport om, at kun to faneblade var synlige, kunne aldrig genskabes | [002/plan.md](../../specs/002-quizmaster-app/plan.md) |
 | ⬜ | Ståvejledningen ("stå på promenaden med fjorden til venstre") forsvandt med `vantagePoint`. Skal den tilbage, hører den til som indhold | [ADR 0006](../ADR/0006-kontrakten-forenklet.md) |
 | ⬜ | `backend-deploy.yml` udløses af `backend/**` — også af en rettet README. Workflowets egen kommentar siger, det ikke må ske | [udrulning.md](../drift/udrulning.md) |
-| ⬜ | Rigtige konti og roller håndhævet server-side (princip IV) | [ADR 0007](../ADR/0007-blob-nu-relationelt-naar-der-er-konti.md) |
+| ⬜ | Rigtige konti og roller håndhævet server-side (princip IV) | [Mål 3](#mål-3--login-adgangskontrol-og-produktionssikring) |

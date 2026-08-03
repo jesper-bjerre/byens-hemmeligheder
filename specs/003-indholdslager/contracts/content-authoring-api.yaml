@@ -8,19 +8,18 @@ info:
   description: |
     Foreslået kontrakt for opgavevis redigering. Authentication og
     authorization fastlægges i en særskilt feature før produktionsaktivering.
-    Kontrakten beskriver metadata. Eksisterende binære uploadruter for billeder
-    og fortællinger bevares og får workspace-kontekst under implementeringen.
+    Kontrakten beskriver metadata i én fælles indholdssamling. Eksisterende
+    binære uploadruter for billeder og fortællinger bevares.
 servers:
   - url: https://byensgaader-api-p.azurewebsites.net
 security:
   - quizmasterSession: []
 paths:
-  /workspaces/{workspace}/content/{locale}/missions:
+  /authoring/content/{locale}/missions:
     get:
       summary: Vis opgaveindekset
       operationId: listMissions
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
       responses:
         '200':
@@ -29,10 +28,8 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [workspace, locale, missions]
+                required: [locale, missions]
                 properties:
-                  workspace:
-                    type: string
                   locale:
                     type: string
                   missions:
@@ -42,12 +39,11 @@ paths:
         '404':
           $ref: '#/components/responses/Problem'
 
-  /workspaces/{workspace}/content/{locale}/missions/{missionId}:
+  /authoring/content/{locale}/missions/{missionId}:
     get:
       summary: Hent ét redaktionelt opgaveaggregate
       operationId: getMission
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/MissionId'
       responses:
@@ -69,7 +65,6 @@ paths:
         der kom med sidste GET, i `If-Match`. Mangler begge, afvises kaldet.
       operationId: putMission
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/MissionId'
         - name: If-Match
@@ -111,25 +106,23 @@ paths:
       summary: Slet én opgave
       operationId: deleteMission
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/MissionId'
         - $ref: '#/components/parameters/RequiredIfMatch'
         - $ref: '#/components/parameters/Quizmaster'
       responses:
         '204':
-          description: Slettet; publicering er registreret i outboxen.
+          description: Slettet; publication-state er markeret til regenerering.
         '404':
           $ref: '#/components/responses/Problem'
         '412':
           $ref: '#/components/responses/Problem'
 
-  /workspaces/{workspace}/content/{locale}/media:
+  /authoring/content/{locale}/media:
     get:
       summary: Vis mediekatalogets metadata
       operationId: listMediaAssets
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
       responses:
         '200':
@@ -143,12 +136,11 @@ paths:
         '404':
           $ref: '#/components/responses/Problem'
 
-  /workspaces/{workspace}/content/{locale}/media/{mediaId}:
+  /authoring/content/{locale}/media/{mediaId}:
     get:
       summary: Hent én mediebeskrivelse
       operationId: getMediaAsset
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/MediaId'
       responses:
@@ -167,7 +159,6 @@ paths:
       summary: Opret eller ret én mediebeskrivelse
       operationId: putMediaAsset
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/MediaId'
         - $ref: '#/components/parameters/IfMatch'
@@ -193,7 +184,6 @@ paths:
       description: Afvises med 409, hvis en mission stadig refererer til id'et.
       operationId: deleteMediaAsset
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/MediaId'
         - $ref: '#/components/parameters/RequiredIfMatch'
@@ -206,12 +196,11 @@ paths:
         '412':
           $ref: '#/components/responses/Problem'
 
-  /workspaces/{workspace}/content/{locale}/sources:
+  /authoring/content/{locale}/sources:
     get:
       summary: Vis kildekataloget
       operationId: listSources
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
       responses:
         '200':
@@ -225,12 +214,11 @@ paths:
         '404':
           $ref: '#/components/responses/Problem'
 
-  /workspaces/{workspace}/content/{locale}/sources/{sourceId}:
+  /authoring/content/{locale}/sources/{sourceId}:
     get:
       summary: Hent én kilde
       operationId: getSource
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/SourceId'
       responses:
@@ -249,7 +237,6 @@ paths:
       summary: Opret eller ret én kilde
       operationId: putSource
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/SourceId'
         - $ref: '#/components/parameters/IfMatch'
@@ -275,7 +262,6 @@ paths:
       description: Afvises med 409, hvis en mission stadig refererer til id'et.
       operationId: deleteSource
       parameters:
-        - $ref: '#/components/parameters/Workspace'
         - $ref: '#/components/parameters/Locale'
         - $ref: '#/components/parameters/SourceId'
         - $ref: '#/components/parameters/RequiredIfMatch'
@@ -327,13 +313,6 @@ components:
         ikke tokenudsteder eller loginmetode.
 
   parameters:
-    Workspace:
-      name: workspace
-      in: path
-      required: true
-      schema:
-        type: string
-        pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
     Locale:
       name: locale
       in: path
@@ -392,7 +371,7 @@ components:
 
   headers:
     ETag:
-      description: Stærk ETag af SQL-rowversion for det redaktionelle dokument.
+      description: Stærk ETag af den redaktionelle blob.
       schema:
         type: string
 

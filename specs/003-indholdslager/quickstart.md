@@ -1,18 +1,17 @@
-# Quickstart: validering af det nye indholdslager
+# Quickstart: validering af det blobbaserede indholdslager
 
-Denne guide beskriver de scenarier, implementationen skal kunne bevise. Den er
-ikke en udrulningsvej og indeholder ingen credentials.
+Guiden beskriver de scenarier, implementeringen skal bevise. Den er ikke en
+udrulningsvej og indeholder ingen credentials.
 
 ## Forudsætninger
 
 - .NET 10 fra repoets normale opsætning
-- Docker til den SQL Server-container, integrationstestene starter
+- Azurite til isolerede storage-integrationstests
 - Xcode valgt gennem `DEVELOPER_DIR`
 - Node-versionen fra `webApps/webadmin/package.json`
 
-Testcontainers opretter en isoleret SQL-database med tilfældige lokale
-credentials. Der skal ikke oprettes en `.env`-fil eller skrives en adgangskode
-i repoet.
+Azurite-data ligger i testens midlertidige mappe og må ikke pege på den
+eksisterende Azure-konto.
 
 ## 1. Datalag og HTTP-kontrakter
 
@@ -23,46 +22,60 @@ dotnet test --configuration Release
 
 Forventet:
 
-- migrationer kan anvendes på en tom SQL Server;
-- opret og ret kræver henholdsvis `If-None-Match` og `If-Match`;
+- oprettelse kræver `If-None-Match: *`;
+- rettelse og sletning kræver den aktuelle blob-ETag i `If-Match`;
 - to rettelser til forskellige opgaver lykkes uafhængigt;
 - anden rettelse til samme revision får `412`;
-- listekaldet læser oversigtsfelter uden at hente alle JSON-dokumenter;
-- delte medie- og kildemetadata har selvstændige ETags og kan ikke slettes,
-  mens en mission refererer til dem;
-- ingen spillerendpoint åbner en SQL-forbindelse.
+- kladder findes i authoring, men aldrig i publiceret pakke;
+- medie og kilde kan ikke slettes, mens en mission refererer til dem;
+- admin-listen bruger det private indeks, men GET returnerer blobens aktuelle
+  ETag.
 
-## 2. Publicering og fejlgenoptagelse
+## 2. Lease, publicering og genoptagelse
 
-Integrationstesten gemmer en opgave i SQL og bruger en midlertidig blob-fixture.
-Den skal bevise:
+Testene skal bevise:
 
-1. Kun publicerbare statusser ender i pakken.
-2. Et skift til pause fjerner opgaven ved næste publicering.
-3. Samme snapshot giver byte-identisk JSON, hash og `contentVersion`.
-4. En simuleret blobfejl efter SQL-commit efterlader et pending job.
-5. Et nyt forsøg publicerer ændringen præcis én gang.
-6. To samtidige jobs kan ikke lade en ældre pakke vinde.
+1. Alle authoring-skrivninger respekterer locale-leasen.
+2. Samme kildesnapshot giver byte-identisk JSON, hash og `contentVersion`.
+3. Versionspakken skrives før den stabile pakke.
+4. En simuleret fejl efter opgaveskrivning efterlader dirty state og den gamle
+   offentlige pakke intakt.
+5. Reconciler publicerer dirty state ved næste forsøg og gør det idempotent.
+6. To næsten samtidige gemninger kan ikke lade en ældre pakke vinde.
+7. Pause af en opgave bliver synlig i den offentlige pakke inden for ét minut,
+   også efter én simuleret transient fejl.
 
 ## 3. Migrationsprøve
-
-Kør migrationsværktøjet mod en tom testdatabase med fixturen:
 
 ```bash
 cd backend
 dotnet run --project tools/ByensGaader.ContentMigration -- \
-  import ../contracts/content/da-DK/content-pack.json --workspace byens-gaader --dry-run
+  split ../contracts/content/da-DK/content-pack.json \
+  --locale da-DK --dry-run
 ```
 
 Forventet rapport:
 
 - 11 missioner og 11 lokationer;
 - 31 mediebeskrivelser og 6 kilder;
-- ingen uafklarede referencer;
+- ingen manglende eller modstridende referencer;
 - genereret pakke er semantisk identisk med fixturen;
-- `--dry-run` skriver hverken SQL eller blob.
+- `--dry-run` skriver ingen blobs.
 
-## 4. Admin-klienter
+## 4. Belastningsmåling
+
+Kør generatoren med 11, 100 og 500 syntetiske opgaver. Rapportér mindst P50,
+P95, læste/skrevne blobs, genereret størrelse og peak memory. Ved repræsentativ
+intern test skal telemetrien desuden vise:
+
+- P95 gem-og-publicér under 2 sekunder;
+- leasekonflikter under 1 % af gemningerne;
+- ingen dirty state ældre end ét minut, mens API'et er sundt.
+
+Overskrides en tærskel stabilt, genåbnes lagerbeslutningen; det betyder ikke
+automatisk, at SQL er løsningen.
+
+## 5. Admin-klienter
 
 ```bash
 cd webApps/webadmin
@@ -77,21 +90,16 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
   -only-testing:ByensGaaderAdminTests
 ```
 
-Begge klienter skal kunne liste opgaver, hente én editor, gemme med ETag og
-forklare forskellen mellem “gemt” og “publicering afventer”.
+Begge klienter skal liste opgaver, hente én editor, gemme med ETag og forklare
+forskellen mellem “gemt” og “publicering afventer”.
 
-## 5. Kompatibilitet med spillerne
+## 6. Azure-spike før migration
 
-Kør BHKit-kontrakttestene og webspillerens test mod den genererede pakke. Ingen
-spillerkode må kræve et nyt felt eller en ny URL for at bestå.
+Før de nye stier oprettes i den eksisterende konto, skal et isoleret spike
+bekræfte:
 
-## 6. Azure-spike før ressourceoprettelse
-
-Før den rigtige database oprettes, skal et kort spike bekræfte:
-
-- Azure SQL Basic findes i West Europe med 2 GB og den forventede pris;
-- App Servicens managed identity kan forbinde uden password;
-- firewall tillader kun de nødvendige udvikler- og App Service-veje;
-- EF-migration kører som deployment-step;
-- budgetalarm er oprettet;
-- en testdatabase kan slettes uden at røre den nuværende DEV-storage.
+- privat authoring-container og eksisterende offentlig læsevej;
+- ETag-betingelser og leases gennem App Servicens managed identity;
+- versioning, blob/container soft delete og lifecycle-indstillinger;
+- resource lock og alarm for gentagne publiceringsfejl;
+- at en testcontainer kan slettes uden at røre nuværende DEV-indhold.

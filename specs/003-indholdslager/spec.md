@@ -1,96 +1,80 @@
 # Feature 003 — Indholdslageret
 
-**Status:** Research opdateret — afventer accept af [research.md](./research.md)
-**Aftalt:** 2. august 2026
-**Kode:** `backend/`, `iOS-admin/`
+**Status:** Revideret forslag — afventer accept af [research.md](./research.md)
+**Aftalt:** 3. august 2026
+**Kode:** `backend/`, `iOS-admin/`, `webApps/webadmin/`
 
-Opgavedata ligger i dag som **én** JSON-fil i blob. Den læses ved hver
-appstart og skrives, hver gang en quizmaster gemmer — og en gemning sender hele
-samlingen, uanset hvor lille rettelsen er.
+Opgavedata ligger i dag som én JSON-fil i Blob Storage. Featuren opdeler den
+redaktionelle kilde i én privat JSON-blob pr. opgave og lader serveren generere
+den samlede offentlige pakke, spillerne allerede henter.
 
-Featuren flytter den redaktionelle kilde til små opgaveaggregater i Azure SQL
-og lader serveren **generere** den blobpakke, spillerne henter. Begrundelsen og
-de fravalgte muligheder står i [research.md](./research.md).
+Azure SQL indføres ikke. Partneres data skal ikke adskilles, og der er ikke
+aktuelt relationelle forespørgsler eller transaktioner, som retfærdiggør en ny
+fast driftsomkostning.
 
 ## Hvorfor nu
 
-Tre ting, der alle bliver værre med hver ny opgave:
-
-1. En rettelse koster hele samlingen at lægge op — fra en telefon i felten.
-2. `If-Match` sidder på pakken, så to quizmastere kolliderer, selv når de
-   retter hver sin opgave.
-3. Kladder udleveres til alle, der kender adressen — **inklusive svarene på
-   gåder, der ikke er udgivet.**
-
-Det tredje er det, der ikke kan vente, hvis quizmasterne begynder at lave rigtigt
-indhold.
+1. En lille rettelse uploader i dag hele samlingen fra quizmasterens enhed.
+2. Alle quizmastere deler pakkens ETag og konflikter derfor på tværs af opgaver.
+3. Kladder og deres facit kan udleveres sammen med den offentlige pakke.
 
 ## Krav
 
-- **FR-201**: Hver opgave MUST ligge som et selvstændigt aggregate i Azure SQL
-  med mission og sted som kontraktnært JSON samt udtrukne kolonner til
-  workspace, locale, id, slug, titel, status og postnummer.
-- **FR-202**: `PUT` og `GET` på en enkelt opgave MUST findes, og `If-Match`
-  MUST gælde **den opgave** og ikke samlingen.
+- **FR-201**: Hver opgave MUST ligge som et selvstændigt JSON-aggregate i en
+  privat authoring-container med mission og lokation.
+- **FR-202**: `GET`, `PUT` og `DELETE` MUST arbejde på én opgave, og `If-Match`
+  MUST bruge den opgaveblobs ETag. Oprettelse MUST bruge `If-None-Match: *`.
 - **FR-203**: Serveren MUST generere `{locale}/content-pack.json` af de opgaver,
   der er spilbare (`fieldTestReady`, `publishReady`).
 - **FR-204**: Den genererede pakke MUST NOT indeholde kladder eller deres svar.
-- **FR-205**: `GET /content/{locale}/pack` MUST svare uændret — samme adresse,
-  samme form, samme `ETag`-opførsel. Spillerappen ændres ikke.
-- **FR-206**: Genereringen MUST være serialiseret, så to gemninger tæt på
-  hinanden ikke kan efterlade en halv pakke.
-- **FR-207**: `contentVersion` MUST afledes og ændre sig, når og kun når pakkens
-  indhold ændrer sig.
-- **FR-208**: Admin-appene MUST kunne vise hierarkiet uden at hente hvert
-  JSON-dokument enkeltvis; listekaldet læser kun de udtrukne oversigtskolonner.
-- **FR-209**: Admin-appen MUST hente og gemme én opgave ad gangen.
-- **FR-210**: En engangsmigrering MUST importere den nuværende pakke til ét
-  standard-workspace og generere en semantisk identisk spillerpakke.
-- **FR-211**: `pull-content.sh` MUST eksportere **kilden** som gennemgåelige
-  opgavefiler, så fixturen i repoet dækker det, der faktisk redigeres.
-- **FR-212**: Den accepterede lagerbeslutning MUST skrives i en ADR. Accepteres
-  SQL-anbefalingen, MUST ADR 0007 markeres som afvist eller erstattet.
-- **FR-213**: Alle redaktionelle data MUST have `WorkspaceId`; migrationen
-  opretter ét standard-workspace uden at implementere brugere eller roller.
-- **FR-214**: Gemning og oprettelse af et publiceringsjob MUST ske i samme
-  SQL-transaktion. Et fejlet job MUST kunne genoptages idempotent.
-- **FR-215**: Mediefiler MUST fortsat ligge i Blob Storage. Kun metadata og
-  referencer må ligge i den relationelle kilde.
-- **FR-216**: Medie- og kildemetadata MUST have egne opgaveuafhængige
-  endpoints og ETags, så delte rettigheds- og kildeoplysninger ikke duplikeres
-  i missionernes JSON.
-- **FR-217**: Den nuværende `/content/{locale}/pack` MUST være alias for
-  standard-workspacets pakke. Nye workspaces MUST have hver sin entydige
-  publiceringssti.
+- **FR-205**: `GET /content/{locale}/pack` MUST bevare adresse, form og
+  ETag-adfærd, så spillerapps ikke skal ændres.
+- **FR-206**: Gemning og publicering MUST serialiseres med en kort blob-lease,
+  så en ældre generering ikke kan overskrive en nyere.
+- **FR-207**: `contentVersion` MUST være SHA-256 af den deterministisk
+  serialiserede pakke og kun ændre sig, når pakkeindholdet ændrer sig.
+- **FR-208**: En privat, regenererbar `index.json` MUST give admin-appene
+  hierarkiet uden at hente alle opgavedokumenter.
+- **FR-209**: Admin-appene MUST hente og gemme én opgave ad gangen.
+- **FR-210**: En engangsmigrering MUST splitte den nuværende pakke og generere
+  en semantisk identisk spillerpakke uden at ændre kilden under dry-run.
+- **FR-211**: `pull-content.sh` MUST eksportere authoring-kilden som
+  gennemgåelige opgavefiler til repoets fixture.
+- **FR-212**: Lagerafvigelsen fra forfatningens relationelle mål MUST beskrives
+  og accepteres i ADR 0007 før implementering.
+- **FR-213**: Alle quizmastere MUST arbejde i samme indholdssamling. Featuren
+  MUST NOT indføre workspace, tenant eller partneropdeling.
+- **FR-214**: `publication-state.json` MUST markeres dirty før opgaveskrivning.
+  En background reconciler MUST genoptage publicering idempotent ved opstart og
+  mindst én gang i minuttet.
+- **FR-215**: Billeder og fortællinger MUST forblive uforanderlige blobs. Deres
+  eksisterende konvertering og komprimering ændres ikke.
+- **FR-216**: Medie- og kildemetadata MUST have egne blobs, endpoints og ETags,
+  så delte oplysninger ikke duplikeres i opgaverne.
+- **FR-217**: Den eksisterende offentlige pakke MUST opdateres sidst. En
+  versionsbestemt pakke MUST skrives først med `If-None-Match: *`.
+- **FR-218**: Blob versioning, blob/container soft delete og lifecycle MUST
+  være dokumenterede produktionskrav, men behøver ikke aktiveres, mens
+  testdata bevidst må smides væk.
+- **FR-219**: Implementeringen MUST måle gem-og-publicér-tid samt leasekonflikt,
+  så SQL kun genovervejes ud fra de accepterede tærskler i researchen.
 
 ## Uden for denne feature
 
-- **Login og adgangskontrol (authentication/authorization).** Datamodellen
-  forbereder workspace som grænse, men opretter ikke brugere, medlemskaber
-  eller roller.
-- **Medier.** De ligger allerede som enkeltfiler og røres ikke.
-- **Flere sprog.** Der findes én pakke.
+- Login, authentication og authorization.
+- Multi-tenancy, workspaces og særskilte partnerdatasæt.
+- Database til opgaveindhold.
+- Ændring af billed- eller lydformater.
+- Flere sprog; strukturen beholder locale i stien, men kun `da-DK` findes nu.
 
-## Rækkefølge
+## Rækkefølge efter accept
 
-**Research og design gennemføres før adgangskontrollen**, fordi partner- og
-workspacegrænsen skal være kendt, før API'ets fremtidige rettigheder designes.
-Det er en planbeslutning, ikke tilladelse til at sætte et nyt anonymt
-skrivelager i produktion.
+1. Accepter den reviderede ADR 0007.
+2. Implementér privat authoring-container, opgaveblobs og ETag-endpoints.
+3. Implementér indeks, lease, dirty-state og deterministisk publicering.
+4. Migrér den nuværende pakke gennem et verificeret dry-run.
+5. Skift iOS-admin og webadmin til opgavevise kald.
+6. Mål publiceringstid og leasekonflikter under intern test.
 
-Efter accept af researchen:
-
-1. ADR og database-spike: Azure SQL Basic, JSON-mapping og managed identity
-2. Datalag: opgaveaggregate, oversigtskolonner, ETag og migrationsværktøj
-3. Publicering: transaktionel outbox, deterministisk pakke og blob-lease
-4. Endepunkter: liste samt `GET`/`PUT`/`DELETE` pr. opgave
-5. Engangsmigrering og eksport af kildefixturer
-6. Admin-appene henter og gemmer pr. opgave
-7. `PackMerge` skrumper til én opgave — eller udgår efter afprøvning
-
-## Hvad der bliver lettere bagefter
-
-`PackMerge` findes, fordi to quizmastere kunne kollidere på pakken. Retter de
-hver sin opgave, kolliderer de ikke længere, og fletningen bliver kun nødvendig,
-når to retter **den samme** opgave. Den skal ikke fjernes uden at nogen har
-prøvet det af — men den holder op med at være hovedvejen.
+Authentication og produktionssikring forbliver bevidst efter denne research.
+Det er ikke tilladelse til at give eksterne quizmastere adgang til det åbne API.

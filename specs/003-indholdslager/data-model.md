@@ -1,159 +1,148 @@
-# Datamodel: redaktionelt indhold
+# Datamodel: blobbaseret redaktionelt indhold
 
 ## Overblik
 
 ```text
-Workspace 1 ── * MissionDocument 1 ── * MissionMedia * ── 1 MediaAsset
-    │                    │
-    │                    └── * MissionSource * ── 1 Source
-    ├── * AuditEntry
-    ├── * PublicationJob
-    └── * PublishedPackState
+MissionDocument ──refererer──> MediaAsset
+       │               └──────> Source
+       │
+       ├──genererer──> AuthoringIndex
+       └──genererer──> PublishedPack + PublishedPackVersion
+
+PublicationState beskriver, om de genererede modeller er ajour.
+PublicationLock serialiserer ændringer og publicering.
 ```
 
-`WorkspaceId` og `Locale` indgår i alle forretningsnøgler. Databasen starter
-med ét workspace, men ingen række er global ved et uheld.
-
-## Workspace
-
-En redaktionel ejergrænse. Den er klar til senere partnere, men er ikke en
-bruger eller en rettighed.
-
-| Felt | Type | Regler |
-|---|---|---|
-| Id | uniqueidentifier | Primærnøgle, servergenereret |
-| Slug | nvarchar(100) | Unik, lowercase ASCII, uforanderlig efter publicering |
-| Name | nvarchar(200) | Påkrævet |
-| Status | varchar(20) | `active` eller `paused` |
-| CreatedAt | datetimeoffset | UTC, servergenereret |
-| UpdatedAt | datetimeoffset | UTC |
-
-Et pauset workspace genererer ingen offentlig pakke, men data slettes ikke.
+Der findes én fælles indholdssamling. `Locale` indgår i blobstien, men der
+findes ingen workspace-, tenant- eller partnermodel.
 
 ## MissionDocument
 
-Et aggregate, der kan hentes og gemmes atomisk af én quizmaster.
+Blobsti: `authoring/{locale}/missions/{missionId}.json`
 
-| Felt | Type | Regler |
-|---|---|---|
-| WorkspaceId | uniqueidentifier | FK til Workspace, del af forretningsnøglen |
-| Locale | varchar(10) | BCP-47, først `da-DK` |
-| MissionId | nvarchar(160) | Kontraktens engelske `id`, uforanderligt |
-| Slug | nvarchar(140) | Unik pr. workspace/locale |
-| Title | nvarchar(240) | Kopi af dokumentfeltet, valideres ved gemning |
-| Status | varchar(32) | Kopi af dokumentfeltet, database-check |
-| PostalCode | varchar(16) | Kopi af lokationen til hierarki/filter |
-| SchemaVersion | varchar(20) | Kontraktversion for dette aggregate |
-| Document | nvarchar(max) | Gyldigt JSON med `{ mission, location }` |
-| Revision | rowversion | Eksponeres som stærk HTTP-ETag |
-| CreatedAt | datetimeoffset | UTC |
-| UpdatedAt | datetimeoffset | UTC |
-| UpdatedByDisplayName | nvarchar(200) | Eksisterende auditnavn; ingen påstået identitet |
+Et kontraktnært aggregate med:
 
-Primærnøgle: `(WorkspaceId, Locale, MissionId)`.
+| Felt | Regler |
+|---|---|
+| `schemaVersion` | Påkrævet kontraktversion |
+| `mission` | Én fuld mission fra wire-kontrakten |
+| `location` | Missionens eneste sted/startkoordinat |
 
-Indekser:
+Blobnavnets `missionId` skal svare til `mission.id`. Missionens reference til
+lokation skal svare til `location.id`. API'et validerer hele dokumentet mod
+JSON Schema før skrivning.
 
-- unik `(WorkspaceId, Locale, Slug)`;
-- listeindeks `(WorkspaceId, Locale, Status, PostalCode, Title)`;
-- ingen indeks på hele JSON-dokumentet.
-
-`Document` har `CHECK (ISJSON(Document)=1)`. API'et validerer desuden, at de
-udtrukne kolonner svarer til JSON-felterne; databasen må aldrig have to titler
-for samme revision.
-
-Tilladte statusværdier følger kontrakten. Kun `fieldTestReady` og
-`publishReady` indgår foreløbigt i spillerpakken. En pause gemmes som status og
-skal udløse publicering på samme måde som øvrige ændringer.
+Blob-ETag er dokumentets revision. Oprettelse bruger `If-None-Match: *`;
+rettelse og sletning bruger senest læste `If-Match`.
 
 ## MediaAsset
 
-Metadata om en uforanderlig fil i Blob Storage.
+Metadatasti: `authoring/{locale}/media/{mediaId}.json`
 
-| Felt | Type | Regler |
-|---|---|---|
-| WorkspaceId, Locale, MediaId | sammensat nøgle | Media-id er uforanderligt |
-| Filename | nvarchar(260) | Unik pr. workspace/locale; filen overskrives aldrig |
-| MediaType | varchar(20) | `image` eller `audio` |
-| Metadata | nvarchar(max) | Hele MediaAsset-kontrakten, gyldigt JSON |
-| Revision | rowversion | Samtidighed på metadata |
-| CreatedAt, UpdatedAt | datetimeoffset | UTC |
+Metadata følger kontraktens `mediaAsset`. Selve billedet eller den konverterede
+fortælling forbliver en uforanderlig filblob. En ny fil får nyt filnavn/media-id
+frem for at overskrive bytes, mens metadata kan rettes med sin egen ETag.
 
-Selve billedet eller lyden ligger fortsat i Blob Storage. `MissionMedia`
-materialiserer referencerne fra missionens kort, thumbnail og fortælling, så en
-mediebeskrivelse ikke kan slettes, mens en opgave bruger den.
+Før sletning scanner API'et missionreferencerne og afviser med `409`, hvis
+mediet stadig bruges. Det er applikationsvalidering, ikke en databaseconstraint.
 
 ## Source
 
-Kildemetadata med sammensat nøgle `(WorkspaceId, Locale, SourceId)`, titel,
-publisher og JSON-payload. `MissionSource` materialiserer missionens
-`sourceIds`. En kilde kan deles af flere opgaver uden duplikering.
+Blobsti: `authoring/{locale}/sources/{sourceId}.json`
 
-## AuditEntry
+Kilden følger kontraktens `source` og har sin egen ETag. Før sletning scanner
+API'et missionernes `sourceIds` og afviser refererede kilder med `409`.
 
-| Felt | Type | Regler |
-|---|---|---|
-| Id | bigint identity | Primærnøgle |
-| WorkspaceId | uniqueidentifier | Ejerskabsgrænse |
-| Locale, MissionId | tekst | MissionId kan være null ved workspaceændringer |
-| At | datetimeoffset | UTC, servergenereret |
-| ActorDisplayName | nvarchar(200) | Fra nuværende `X-Quizmaster`; ikke identitet |
-| ChangeKind | varchar(40) | oprettet, rettet, status, slettet, publiceret |
-| FromStatus, ToStatus | varchar(32) | Kun ved statusskift |
-| MissionRevision | binary(8) | Revisionen hændelsen vedrører |
-| Details | nvarchar(max) | Minimal JSON uden hele facit eller persondata |
+## AuthoringIndex
 
-Audit slettes ikke sammen med missionen. Når authentication kommer, kan et
-nullable `ActorUserId` tilføjes uden at ændre historiske rækker.
+Blobsti: `authoring/{locale}/index.json`
 
-## PublicationJob
+En regenererbar privat læsemodel:
 
-Transaktionel outboxrække.
+```json
+{
+  "schemaVersion": "1",
+  "generatedAt": "2026-08-03T10:00:00Z",
+  "sourceRequestId": "uuid",
+  "missions": [
+    {
+      "id": "mission.fjordenhus",
+      "slug": "fjordenhus",
+      "title": "Fjordenhus",
+      "status": "fieldTestReady",
+      "postalCode": "7100",
+      "etag": "opaque-api-etag"
+    }
+  ]
+}
+```
 
-| Felt | Type | Regler |
-|---|---|---|
-| Id | bigint identity | Bevarer rækkefølge |
-| WorkspaceId, Locale | nøgle | Hvilken pakke skal gendannes |
-| CauseRevision | binary(8) | Revisionen, der udløste jobbet |
-| State | varchar(20) | `pending`, `processing`, `completed`, `failed` |
-| Attempts | int | Starter 0, begrænset retry/backoff |
-| AvailableAt | datetimeoffset | Næste tilladte forsøg |
-| LastErrorCode | varchar(80) | Klassifikation, ingen stacktrace eller hemmelighed |
-| CreatedAt, CompletedAt | datetimeoffset | UTC |
+Indekset er ikke kilde. En ETag i indekset er kun et hint til klientens cache;
+API'et genlæser den rigtige blob og returnerer dens aktuelle ETag før redigering.
 
-Flere ventende jobs for samme workspace/locale må samles, fordi generatoren
-altid læser den aktuelle databasesnapshot. Jobbet er et signal, ikke en kopi af
-indholdet.
+## PublicationState
 
-## PublishedPackState
+Blobsti: `authoring/{locale}/publication-state.json`
 
-Én række pr. workspace/locale med senest publicerede databasevandmærke,
-SHA-256/contentVersion, blobsti, publiceringstidspunkt og fejlstatus. Den gør
-det muligt for admin at vise “gemt, publicering afventer” uden at gætte.
+| Felt | Betydning |
+|---|---|
+| `requestedId` | Seneste ændring, der kræver regenerering |
+| `requestedAt` | UTC-tid for ændringen |
+| `publishedId` | Seneste request, der er sikkert publiceret |
+| `contentVersion` | SHA-256 for den seneste offentlige pakke |
+| `publishedAt` | UTC-tid for publiceringen |
+| `lastErrorCode` | Stabil fejlkategori, aldrig stacktrace eller hemmelighed |
+| `attempts` | Antal mislykkede forsøg for det aktuelle request |
+
+State er dirty, når `requestedId != publishedId`. En ny ændring opdaterer
+`requestedId` betinget under publication-leasen, før kilden skrives.
+
+## PublicationLock
+
+Blobsti: `authoring/locks/{locale}`
+
+En eksisterende nul-byte block blob med en 15–60 sekunders lease. Alle
+authoring-skrivninger og publiceringsforsøg respekterer leasen. Leasen er
+infrastrukturtilstand og må ikke indeholde indhold eller identiteter.
+
+## PublishedPack og versioner
+
+Stabil sti: `content/{locale}/content-pack.json`
+Versionssti: `content/{locale}/versions/{contentVersion}.json`
+
+Generatoren medtager kun spilbare statusser, sorterer alle samlinger
+deterministisk og beregner SHA-256 over de færdige bytes. Versionsblobben
+oprettes idempotent, hvorefter den stabile pakke opdateres. En igangværende
+spilsession kan fastholde versionsstien.
+
+## Audit
+
+Det eksisterende `audit.jsonl` fortsætter som append blob. Hændelsen bærer
+objekttype, id, tidspunkt, ændringsart, før/efter-ETag og det oplyste
+quizmasternavn. Den indeholder ikke hele opgaven, facit eller credentials.
 
 ## Tilstande
 
 ```text
-Quizmaster gemmer
-  → MissionDocument + AuditEntry + PublicationJob committes atomisk
-  → publisher tager blob-lease
-  → læser aktuel publicerbar snapshot
-  → skriver ny pakke med indholdshash
-  → markerer job og PublishedPackState
+API tager lease
+  → publication-state markeres dirty
+  → objektblob skrives med If-Match/If-None-Match
+  → indeks og pakke genereres fra aktuel kilde
+  → versionspakke skrives idempotent
+  → stable pakke opdateres
+  → publication-state markeres publiceret
+  → lease frigives
 ```
 
-Ved fejl efter SQL-commit er opgaven stadig gemt. Jobbet bliver pending/failed
-og kan genoptages. Ved konflikt på `Revision` svarer API'et `412`; klienten
-henter kun den berørte opgave og fletter den.
+Ved fejl efter kildeskrivning består den tidligere offentlige pakke uændret.
+Reconciler genoptager hele genereringen. Ved fejl før kildeskrivning kan dirty
+state stadig regenereres sikkert fra den uændrede kilde.
 
 ## Migration
 
-1. Opret standard-workspace.
-2. Split den aktuelle pakke i mission/location-aggregater og globale media- og
-   source-rækker i én SQL-transaktion.
-3. Materialisér reference-tabeller og afvis manglende eller modstridende id'er.
-4. Generér en pakke fra SQL og sammenlign kanonisk JSON med inputpakken.
-5. Skift først skrivevejen, når sammenligningen og rollback er godkendt.
-
-Migrationen kan gentages mod en tom database og må ikke ændre blobkilden, før
-cutover besluttes.
+1. Opret tomme private authoring-præfikser i en testcontainer.
+2. Split den aktuelle pakke i mission-, media- og source-blobs.
+3. Validér alle referencer og afvis modstridende id'er.
+4. Generér admin-indeks og spillerpakke.
+5. Sammenlign den genererede pakke kanonisk med input.
+6. Gentag i den rigtige container først efter godkendt dry-run og rollback.

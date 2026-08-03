@@ -1,241 +1,240 @@
 # Research: næste lager til opgavedata
 
 **Feature**: 003 — Indholdslageret
-
-**Opdateret**: 2026-08-02
-
+**Opdateret**: 2026-08-03
 **Input**: [spec.md](./spec.md)
 
 ## Konklusion
 
-**Anbefalingen er Azure SQL Database som redaktionel kilde og Azure Blob
-Storage som offentlig læsemodel.**
+**Anbefalingen er fortsat Azure Blob Storage, men med én privat JSON-blob pr.
+opgave og en genereret offentlig spillerpakke. Azure SQL skal ikke indføres
+nu.**
 
-Opgaver gemmes som selvstændige JSON-dokumenter i SQL med få udtrukne kolonner
-til listevisning, ejerskab og status. Når en quizmaster gemmer, genererer
-backenden en uforanderlig `content-pack.json` med kun publicerbart indhold og
-lægger den i Blob Storage. Spillerne læser fortsat pakken og medierne; de rammer
-aldrig databasen.
+Den tidligere SQL-anbefaling byggede især på en antagelse om, at partnere
+skulle have adskilte dataområder. Den antagelse gælder ikke: alle quizmastere
+arbejder i samme indholdssamling. Dermed er der hverken et aktuelt
+multi-tenancy-behov, relationelle ejergrænser eller forespørgsler, der kræver en
+database.
 
-Det er ikke en anbefaling om en stor database. Startniveauet er **Azure SQL
-Basic, 5 DTU og 2 GB**, som i West Europe aktuelt koster 0,161 USD pr. dag —
-omtrent 4,90 USD pr. måned. Niveauet kan skaleres uden at ændre datamodellen.
+Blob Storage løser de konkrete problemer direkte:
 
-Anbefalingen erstatter den tidligere konklusion om én blob pr. opgave. Den
-tidligere analyse antog fem quizmastere og ingen partnerstruktur. Den nye
-forudsætning er, at løsningen skal kunne præsenteres for partnere og få flere
-quizmastere, mens omtrent 99 % af alle kald fortsat er spillerlæsninger.
+- én opgave kan hentes og gemmes uden resten af samlingen;
+- hver opgave har sin egen ETag, så forskellige opgaver ikke konflikter;
+- kladder ligger i en privat container og kommer ikke i spillerpakken;
+- en blob-lease kan serialisere den korte publicering;
+- versioning og soft delete kan gøre fejlagtige overskrivninger og sletninger
+  gendannelige;
+- spillerne henter fortsat én statisk, cachebar pakke.
+
+Løsningen bruger den eksisterende Storage-konto. Den har derfor ingen ny fast
+månedspris. Ved prisopslaget 3. august 2026 kostede Hot LRS i West Europe
+omtrent 0,0043 USD pr. 10.000 læsninger, 0,054 USD pr. 10.000 skrivninger og
+0,018–0,020 USD pr. GB/måned. For den nuværende indholdsmængde er den ekstra
+omkostning praktisk talt nul; medier og netværkstrafik er ikke medregnet.
 
 ## Arbejdsprofilen
 
 Den aktuelle fixtur er 63.462 bytes og indeholder 11 opgaver, 11 steder, 31
-mediebeskrivelser og 6 kilder. Det er cirka 5,8 KB pr. opgave inklusive dens
-andel af fælles data.
+mediebeskrivelser og 6 kilder. Cirka 99 % af trafikken er spillerlæsninger, mens
+få quizmastere skriver sjældent.
 
-Selv ved 10.000 opgaver er selve opgaveindholdet sandsynligvis under 100 MB.
-Medierne bliver i Blob Storage og tæller ikke med i databasen. Kapacitet er
-derfor ikke beslutningens svære del; de vigtige egenskaber er:
+De aktuelle behov er:
 
-- 99 % læsninger skal være statiske, cachebare og billige.
-- En quizmaster skal gemme én opgave uden at sende eller låse alle andre.
-- To quizmastere skal kun kollidere, når de retter samme opgave.
-- Kladder og deres facit må ikke indgå i den offentlige læsemodel.
-- En kommende partnergrænse må ikke kræve, at alle id'er og tabeller bygges om.
-- Indholdskontrakten ændres ofte og skal kunne udvides uden en tabelmigration
-  for hvert nyt tekstfelt.
+1. Gem én opgave uden at uploade hele pakken.
+2. Lad to quizmastere rette hver sin opgave uden brugeroplevet konflikt.
+3. Hold kladder og facit ude af den offentlige pakke.
+4. Publicér eller pausér en opgave inden for minutter.
+5. Bevar den eksisterende spillerkontrakt og billige læsevej.
+6. Kunne gendanne en fejl eller en afbrudt publicering.
 
-## Beslutning 1 — adskil skrivekilde og læsemodel
+Der er ikke aktuelt behov for joins, vilkårlige serverforespørgsler,
+transaktioner over mange domæneobjekter, rapportering eller adskilte
+partnerdata. Det er netop de egenskaber, der ellers kunne retfærdiggøre SQL.
+
+## Beslutning 1 — adskil privat skrivekilde og offentlig læsemodel
 
 ### Beslutning
-
-Den redaktionelle kilde og spillerens læsemodel er to forskellige ting:
 
 ```text
-Quizmaster-apps → API → Azure SQL → publiceringsjob → Blob-pakke → spillerapps
-                            ↘ audit/outbox       ↘ billeder og lyd
+Quizmaster-apps
+      │
+      ▼
+API → privat authoring-container → publiceringsjob → offentlig content-pack
+              │                         │                    │
+              ├─ én JSON pr. opgave     ├─ blob-lease        └─ spillerapps
+              ├─ media/kilder           └─ retry/reconcile
+              └─ audit
 ```
 
-SQL tager kun quizmastertrafik. Blobben tager spillertrafikken. Den nuværende
-`GET /content/{locale}/pack` bevares som kompatibilitetsvej, mens en direkte
-offentlig blobadresse kan tilføjes til nye klientversioner senere.
+Den private container er den redaktionelle kilde. Den offentlige pakke er en
+afledt læsemodel. Spillerne må aldrig læse authoring-containeren.
+
+Foreslåede stier:
+
+```text
+authoring/da-DK/missions/{missionId}.json
+authoring/da-DK/media/{mediaId}.json
+authoring/da-DK/sources/{sourceId}.json
+authoring/da-DK/index.json
+authoring/da-DK/publication-state.json
+authoring/locks/da-DK
+
+content/da-DK/content-pack.json
+content/da-DK/versions/{contentVersion}.json
+```
+
+`index.json` er en regenererbar admin-læsemodel med titel, status og postnummer.
+Den er ikke kilde. Mediefiler og konverterede fortællinger bliver liggende som
+uforanderlige blobs på deres nuværende stier.
 
 ### Begrundelse
 
-En database på læsevejen ville være den dyreste og mindst cachebare løsning på
-et problem, som en statisk fil allerede løser. En blob som eneste skrivekilde
-ville omvendt mangle relationer til partner/ejerskab og gøre fremtidige roller
-til metadata, som applikationen selv skulle håndhæve.
-
-CQRS her betyder ikke microservices. API, publicering og baggrundsjob bliver i
-den samme modulære monolit og deler én database.
+Adskillelsen løser kladdeproblemet uden database. Det offentlige endpoint
+bevarer samme URL, JSON-form og ETag-adfærd. De 99 % læsninger påvirkes derfor
+ikke af antallet af redaktionelle filer.
 
 ### Alternativer
 
-- **SQL ved hvert spillerkald**: fravalgt; databasen ville blive dimensioneret
-  efter den trafik, som en statisk pakke allerede håndterer bedre.
-- **Kun blob**: teknisk tilstrækkeligt til opgaver, men en ny afvigelse fra
-  forfatningens relationelle ramme netop før partner-/ejerskabsbehovet opstår.
+- **Nuværende ene blob**: fravalgt, fordi alle opgaver deler ETag og upload.
+- **SQL på læsevejen**: fravalgt; statisk JSON er billigere og mere cachebar.
+- **Table Storage**: giver også ETag pr. entitet, men dokumentet ender stadig
+  som JSON i et felt og køber ingen nødvendig forespørgselsfunktion.
 
-## Beslutning 2 — Azure SQL Basic som første størrelse
+## Beslutning 2 — én blob og én ETag pr. redaktionelt objekt
 
 ### Beslutning
 
-Start med én Azure SQL Database i DTU-niveauet Basic. App Service forbinder med
-sin managed identity; der indføres ingen databaseadgangskode eller connection
-string med en hemmelighed.
+Mission og lokation gemmes samlet som ét JSON-aggregate. Medie- og
+kildemetadata gemmes hver for sig, fordi de kan deles mellem opgaver.
+
+Et `GET` returnerer blobbens ETag. `PUT` af en eksisterende opgave kræver
+`If-Match`; oprettelse kræver `If-None-Match: *`. Azure afviser skrivningen,
+hvis blobben er ændret siden læsningen. To forskellige opgaveblobs har
+uafhængige ETags.
 
 ### Begrundelse
 
-Basic giver 5 DTU og 2 GB på et fast, lavt prisniveau. Databasen er altid klar,
-hvilket er mere værd i felten end automatisk pause. Azure SQL har automatisk
-backup og point-in-time restore på alle niveauer, og den eksisterende App
-Service-identitet kan få mindst mulige SQL-rettigheder.
+Kontrakten er naturligt dokumentformet med indlejrede kort, hints og svar.
+Blobben bevarer wire-formatet direkte og kræver ingen skemamigration ved et nyt
+valgfrit kontraktfelt.
 
-Prisopslaget er foretaget 2026-08-02 i Microsofts Azure Retail Prices API for
-`SQL Database Single Basic`, West Europe: 0,161 USD/dag. Pris er et øjebliksbillede
-og skal kontrolleres i Azure-portalen før oprettelse.
+Admin-indekset gør listevisning billig uden at downloade alle dokumenter til
+klienten. Serveren kan altid regenerere indekset fra blobberne, hvis det er
+mistet eller gammelt.
 
-### Alternativer
-
-| Mulighed | Vurdering |
-|---|---|
-| Azure SQL General Purpose Serverless | Compute betales pr. sekund og kan pause, men auto-resume er typisk omkring ét minut. Det er en dårlig første gemmeoplevelse for en quizmaster og er ikke billigere end Basic ved jævnlig redigering. |
-| Cosmos DB Serverless | Meget billig ved få operationer og passer naturligt til dokumenter. Den køber global dokumentdistribution, som spillerne ikke bruger, og gør partner-, rolle- og revisionsrelationer til applikationslogik. |
-| Azure Database for PostgreSQL B1ms | Fagligt fint, men dyrere og en ny databasefamilie i en stak, der allerede har valgt Azure SQL. Retail-prisen for compute alene er aktuelt ca. 14,50 USD/måned før storage. |
-| Table Storage | Billigt og har ETag, men en opgave ender som JSON i en streng. Det giver færre relationer og dårligere transaktioner end SQL uden at forbedre læsevejen. |
-| Én blob pr. opgave | Billigst og enklest. Beholdes som migrations-/eksportformat, men ikke som langsigtet primær domænedatabase. |
-
-## Beslutning 3 — hybrid relationel/JSON-model
+## Beslutning 3 — publicering med lease og genopretning
 
 ### Beslutning
 
-Stabile felter bliver relationelle kolonner; den skiftende kontrakt bliver et
-JSON-dokument:
+Alle gemninger for `da-DK` bruger den samme korte lease på
+`authoring/locks/da-DK`. Leasen serialiserer kun serverens skrive- og
+publiceringssekvens; quizmasteren låser ikke dokumentet, mens det redigeres.
 
-- Relationelt: workspace, locale, id, slug, titel, status, postnummer,
-  revisionsnummer og ændringstidspunkt.
-- JSON: selve missionen og dens lokation i kontraktens engelske wire-format.
-- Egne tabeller: mediebeskrivelser, kilder, revisionsspor og publiceringsjob.
-- Blob: de tunge mediefiler og genererede spillerpakker.
+Under leasen gør API'et følgende:
 
-De eksisterende binære uploadruter for billeder og fortællinger er fortsat
-selvstændige ruter. Ved implementering skal de få workspace-kontekst og
-kontrollere ejerskab på samme måde som metadata-API'et; denne research ændrer
-ikke deres konvertering eller filformater.
+1. Genkontrollerer opgavens ETag.
+2. Markerer `publication-state.json` som dirty med et nyt request-id.
+3. Skriver den ene opgave betinget med dens ETag.
+4. Regenererer admin-indeks og offentlig pakke deterministisk.
+5. Skriver først den versionsbestemte pakke og derefter den stabile latest-pakke.
+6. Markerer request-id'et som publiceret og frigiver leasen.
 
-JSON gemmes først som `nvarchar(max)` med `CHECK (ISJSON(...)=1)`. Azure SQL har
-nu en native `json`-type, men teksttypen giver enklere EF Core-mapping og kan
-migreres senere uden at gøre den første leverance afhængig af serverens update
-policy. Felter, der bruges i filtre og sortering, duplikeres bevidst som
-validerede kolonner og indekseres.
+Fejler trin 4–6, er den gamle offentlige pakke stadig hel og gyldig. API'et
+viser “gemt — publicering afventer”. En `BackgroundService` ved opstart og
+mindst én gang i minuttet sammenligner dirty-state med senest publicerede
+request-id og forsøger igen under samme lease. Der kræves derfor ikke SQL,
+Service Bus eller endnu en Azure-ressource.
 
-### Begrundelse
+`contentVersion` er SHA-256 af den kanonisk serialiserede pakke. Den
+versionsbestemte blob skrives med `If-None-Match: *`, så samme version er
+idempotent. Den stabile `content-pack.json` opdateres først, når hele pakken er
+klar.
 
-En fuldt normaliseret model ville gøre hvert nyt hint- eller tekstfelt til en
-databasemigration. Ét stort JSON-dokument pr. opgave ville omvendt skjule
-status, ejerskab og listefelter. Hybridmodellen bevarer kontraktens
-dokumentform, men lader databasen håndhæve de grænser, der skal være stabile.
+### Pris og begrænsning
 
-### Alternativer
+Gemninger bliver kortvarigt serialiseret. Det er acceptabelt ved få
+quizmastere, men mindre velegnet ved høj samtidig skrivetrafik. Det er en
+bevidst lavpris-byttehandel, som skal måles i stedet for at blive løst på
+forhånd med en database.
 
-- **Normalisér hvert kort, hint og svar**: fravalgt; høj migrationspris uden
-  forespørgselsbehov.
-- **Kun én JSON-kolonne**: fravalgt; partnergrænse, status og samtidighed skal
-  kunne håndhæves og indekseres uden at parse alle dokumenter.
-- **Native `json` fra dag ét**: genovervejes efter et spike med EF Core 10 og
-  Azure SQL Basic. Det ændrer ikke API'et eller den logiske model.
-
-## Beslutning 4 — workspace er datagrænsen, ikke loginløsningen
+## Beslutning 4 — versionshistorik og gendannelse
 
 ### Beslutning
 
-Alle redaktionelle rækker får `WorkspaceId`. Der oprettes ét standard-workspace
-ved migrationen. Et workspace kan senere repræsentere Byens Gåder eller en
-partnerorganisation.
+Aktivér blob versioning samt blob- og container-soft-delete, før indholdet ikke
+længere må smides væk. En lifecycle-regel sletter gamle versioner efter den
+aftalte periode, så historikken ikke vokser uden grænse.
 
-Der oprettes **ikke** brugere, roller eller login som del af lagerfeaturen.
-Auditsporet beholder quizmasterens viste navn, indtil authentication kommer.
-Når identitet implementeres, kan medlemskab og roller referere til det allerede
-eksisterende workspace.
-
-### Begrundelse
-
-At undlade workspace nu vil gøre partneradskillelse til en migration af alle
-primærnøgler og unikke constraints. At designe hele identitetsmodellen nu ville
-omvendt foregribe den særskilte authentication-/authorizationbeslutning.
-
-### Alternativer
-
-- **Globalt indhold uden ejergrænse**: fravalgt på grund af partnerretningen.
-- **Fuld multitenancy og roller nu**: fravalgt; brugeren har udtrykkeligt
-  placeret authorization efter denne research.
-
-## Beslutning 5 — publicering er transaktion + outbox
-
-### Beslutning
-
-En opgavegemning og et publiceringsjob skrives i samme SQL-transaktion. Efter
-commit forsøger API'et straks at generere pakken. Fejler blobskrivningen, ligger
-jobbet i outbox-tabellen og prøves igen af en `BackgroundService`.
-
-En kort blob-lease pr. workspace/locale serialiserer genereringen på tværs af
-eventuelle API-instanser. Efter leasen er taget, læses alle publicerbare opgaver
-fra en konsistent databasesnapshot, sorteres deterministisk og serialiseres.
-`contentVersion` og HTTP-ETag afledes af SHA-256 over den færdige pakke.
+Auditsporet fortsætter som append blob. Blobversioner er teknisk gendannelse;
+auditsporet forklarer, hvem der forsøgte at ændre hvad. Det viste
+quizmasternavn er fortsat ikke en identitet, før authentication implementeres.
 
 ### Begrundelse
 
-SQL og Blob Storage kan ikke deltage i samme atomiske transaktion. Outboxen gør
-en fejlet publicering synlig og genoptagelig uden at rulle quizmasterens gemte
-arbejde tilbage. Blob-leasen forhindrer, at en ældre generering skriver over en
-nyere.
+Azure anbefaler versioning og soft delete som lagdelt beskyttelse mod
+overskrivning og sletning. Hver blobversion faktureres som lager, men
+JSON-dokumenterne er små, og lifecycle begrænser væksten.
 
-### Alternativer
+## Hvorfor SQL ikke er nødvendigt nu
 
-- **Skriv SQL og blob uden outbox**: fravalgt; et netværksudfald kan efterlade
-  den offentlige pakke permanent gammel.
-- **Service Bus/Azure Functions**: robust, men endnu en tjeneste for få
-  daglige skrivninger. Outboxen kan senere sende til en kø uden API-ændring.
-- **Generér kun periodisk**: fravalgt; en pauset usikker opgave skal forsvinde
-  fra læsemodellen med det samme.
+SQL Basic ville koste omtrent 4,90 USD pr. måned og kræve databaseserver,
+firewall, managed identity-bruger, migrationer, backup-/restore-procedure og
+overvågning. Det er ikke voldsomt i absolutte tal, men det er en fast pris og
+en ny driftsflade for funktioner, Blob Storage allerede leverer til denne
+arbejdsprofil.
 
-## Kontrakt og kompatibilitet
+SQL ville konkret give:
 
-- `GET /content/{locale}/pack` og den eksisterende spillerkontrakt ændres ikke.
-- Ruten er et bagudkompatibelt alias for standard-workspacets pakke. Hvert nyt
-  workspace får en entydig publiceringssti og blobsti.
-- Admin får liste-, hent-, gem- og slet-endpoints pr. opgave.
-- Delte medie- og kildemetadata får egne endpoints og ETags. De må ikke
-  duplikeres i opgaveaggregaterne, fordi en rettighedsrettelse skal have ét
-  autoritativt sted.
-- SQL `rowversion` eksponeres som HTTP-ETag. `If-Match` gælder én opgave.
-- Oprettelse bruger `If-None-Match: *`; filnavne og id'er genbruges ikke.
-- En response fortæller, om læsemodellen er publiceret eller stadig afventer
-  retry. Gemte redaktionelle ændringer må ikke fremstilles som tabt.
-- Den nuværende pakke kan migreres deterministisk til ét standard-workspace og
-  eksporteres tilbage byte-semantisk identisk efter kanonisk sortering.
+- transaktioner på tværs af opgaver, media, kilder og outbox;
+- constraints og relationel referentiel integritet;
+- effektive filtre, sorteringer og rapporter på tværs af store datasæt;
+- mindre arbejde pr. publicering, hvis pakken senere kan bygges inkrementelt.
+
+Ingen af disse er et aktuelt krav. Authentication og authorization kræver
+heller ikke SQL; API'et kan beskytte de samme blob-endpoints og føre audit uden
+at flytte indholdet. Partnernes quizmastere arbejder i samme datasæt, så der er
+ingen tenantgrænse at modellere.
+
+## Målbare kriterier for at genoverveje SQL
+
+SQL undersøges igen, hvis mindst ét konkret behov indtræffer:
+
+1. En redaktionel handling skal være atomisk på tværs af flere opgaver eller
+   katalogobjekter, og kompensation ikke er forsvarlig.
+2. Admin kræver vilkårlige, kombinerede serverforespørgsler eller rapportering,
+   som et genereret indeks ikke kan betjene.
+3. P95 for gem-og-publicér overstiger 2 sekunder eller lease-konflikter rammer
+   mere end 1 % af gemningerne over en repræsentativ måned.
+4. Den fulde regenerering overskrider App Servicens sikre tids- eller
+   hukommelsesbudget ved den faktiske opgavemængde.
+5. Data udvides med serverbåret progression, point eller andre stærkt
+   relationelle domæner. De data kan få SQL uden automatisk at flytte
+   opgaveindholdet med.
+
+Konti og roller alene er **ikke** længere et migrationskriterium. Flere byer er
+heller ikke i sig selv et kriterium; de kan organiseres med blobpræfikser og
+genererede indeksfiler, så længe målingerne ovenfor holder.
 
 ## Drift og sikkerhed
 
-Denne research implementerer ikke authentication eller authorization. Den
-ændrer heller ikke den aktuelle risiko ved det anonyme skrive-API.
+Denne research implementerer ikke authentication eller authorization og ændrer
+ikke risikoen ved det nuværende anonyme skrive-API.
 
-Produktionsaktivering af SQL-skrivevejen kræver senere:
+Før data ikke længere må smides væk, kræves stadig:
 
-- managed identity fra App Service til Azure SQL med mindst mulige rettigheder;
-- firewall eller netværksgrænse for databaseserveren;
-- automatiske EF-migrationer som et særskilt deployment-step, ikke ved hvert
-  app-start;
-- budgetalarm og månedlig kontrol;
-- authentication/authorization før partnerdata behandles som beskyttede data;
-- en dokumenteret rollback, hvor den gamle blobpakke kan genaktiveres.
+- privat authoring-container og mindst mulige Blob Data Contributor-rettighed
+  til App Servicens managed identity;
+- versioning, blob/container soft delete, lifecycle og resource lock;
+- overvågning af dirty publiceringsstate og gentagne lease-/publiceringsfejl;
+- authentication/authorization før eksterne quizmastere får skriveadgang;
+- migrationsprøve og dokumenteret rollback til den nuværende samlede blob.
 
 ## Kilder
 
-- [Azure SQL: Basic og øvrige DTU-niveauer](https://learn.microsoft.com/en-us/azure/azure-sql/database/service-tiers-dtu)
-- [Azure SQL serverless: pause, prisprincip og resume-latens](https://learn.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview)
-- [JSON-dokumenter i Azure SQL](https://learn.microsoft.com/en-us/sql/relational-databases/json/store-json-documents-in-sql-tables)
-- [Managed identity fra App Service til Azure SQL](https://learn.microsoft.com/en-us/azure/app-service/tutorial-connect-msi-sql-database)
-- [Automatiske backups og point-in-time restore](https://learn.microsoft.com/en-us/azure/azure-sql/database/recovery-using-backups)
-- [Cosmos DB serverless](https://learn.microsoft.com/en-us/azure/cosmos-db/serverless)
+- [Optimistisk samtidighed og ETags i Blob Storage](https://learn.microsoft.com/en-us/azure/storage/blobs/concurrency-manage)
+- [Betingede Blob-operationer](https://learn.microsoft.com/en-us/rest/api/storageservices/specifying-conditional-headers-for-blob-service-operations)
+- [Blob leases](https://learn.microsoft.com/en-us/rest/api/storageservices/lease-blob)
+- [List Blobs, præfikser og paginering](https://learn.microsoft.com/en-us/rest/api/storageservices/list-blobs)
+- [Versioning og soft delete](https://learn.microsoft.com/en-us/azure/storage/blobs/soft-delete-vs-versioning-options)
+- [Lifecycle management](https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-overview)
 - [Azure Retail Prices API](https://prices.azure.com/api/retail/prices)
