@@ -1,0 +1,484 @@
+openapi: 3.1.0
+info:
+  title: Byens Gåder — redaktionelt indhold
+  version: 0.1.0-proposed
+  license:
+    name: Ingen åben licens angivet
+    identifier: LicenseRef-All-Rights-Reserved
+  description: |
+    Foreslået kontrakt for opgavevis redigering. Authentication og
+    authorization fastlægges i en særskilt feature før produktionsaktivering.
+    Kontrakten beskriver metadata i én fælles indholdssamling. Eksisterende
+    binære uploadruter for billeder og fortællinger bevares.
+servers:
+  - url: https://byensgaader-api-p.azurewebsites.net
+security:
+  - quizmasterSession: []
+paths:
+  /authoring/content/{locale}/missions:
+    get:
+      summary: Vis opgaveindekset
+      operationId: listMissions
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: Oversigtsfelter; de fulde dokumenter hentes ikke.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [locale, missions]
+                properties:
+                  locale:
+                    type: string
+                  missions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MissionSummary'
+        '404':
+          $ref: '#/components/responses/Problem'
+
+  /authoring/content/{locale}/missions/{missionId}:
+    get:
+      summary: Hent ét redaktionelt opgaveaggregate
+      operationId: getMission
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/MissionId'
+      responses:
+        '200':
+          description: Opgaven og dens sted.
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissionAggregate'
+        '404':
+          $ref: '#/components/responses/Problem'
+    put:
+      summary: Opret eller ret én opgave
+      description: |
+        Ved oprettelse sendes `If-None-Match: *`. Ved rettelse sendes den ETag,
+        der kom med sidste GET, i `If-Match`. Mangler begge, afvises kaldet.
+      operationId: putMission
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/MissionId'
+        - name: If-Match
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: If-None-Match
+          in: header
+          required: false
+          schema:
+            type: string
+            const: '*'
+        - name: X-Quizmaster
+          in: header
+          required: true
+          description: Midlertidigt auditnavn; er ikke en identitet.
+          schema:
+            type: string
+            maxLength: 200
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MissionAggregate'
+      responses:
+        '200':
+          $ref: '#/components/responses/Saved'
+        '201':
+          $ref: '#/components/responses/Saved'
+        '400':
+          $ref: '#/components/responses/Problem'
+        '412':
+          $ref: '#/components/responses/Problem'
+        '428':
+          $ref: '#/components/responses/Problem'
+    delete:
+      summary: Slet én opgave
+      operationId: deleteMission
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/MissionId'
+        - $ref: '#/components/parameters/RequiredIfMatch'
+        - $ref: '#/components/parameters/Quizmaster'
+      responses:
+        '204':
+          description: Slettet; publication-state er markeret til regenerering.
+        '404':
+          $ref: '#/components/responses/Problem'
+        '412':
+          $ref: '#/components/responses/Problem'
+
+  /authoring/content/{locale}/media:
+    get:
+      summary: Vis mediekatalogets metadata
+      operationId: listMediaAssets
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: Mediebeskrivelser; selve filerne ligger fortsat i blob.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionedMediaAsset'
+        '404':
+          $ref: '#/components/responses/Problem'
+
+  /authoring/content/{locale}/media/{mediaId}:
+    get:
+      summary: Hent én mediebeskrivelse
+      operationId: getMediaAsset
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/MediaId'
+      responses:
+        '200':
+          description: Mediets metadata.
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/mediaAsset'
+        '404':
+          $ref: '#/components/responses/Problem'
+    put:
+      summary: Opret eller ret én mediebeskrivelse
+      operationId: putMediaAsset
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/MediaId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - $ref: '#/components/parameters/Quizmaster'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/mediaAsset'
+      responses:
+        '200':
+          $ref: '#/components/responses/MetadataSaved'
+        '201':
+          $ref: '#/components/responses/MetadataSaved'
+        '412':
+          $ref: '#/components/responses/Problem'
+        '428':
+          $ref: '#/components/responses/Problem'
+    delete:
+      summary: Slet metadata til et ubrugt medie
+      description: Afvises med 409, hvis en mission stadig refererer til id'et.
+      operationId: deleteMediaAsset
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/MediaId'
+        - $ref: '#/components/parameters/RequiredIfMatch'
+        - $ref: '#/components/parameters/Quizmaster'
+      responses:
+        '204':
+          description: Metadata er slettet. Den uforanderlige blob håndteres særskilt.
+        '409':
+          $ref: '#/components/responses/Problem'
+        '412':
+          $ref: '#/components/responses/Problem'
+
+  /authoring/content/{locale}/sources:
+    get:
+      summary: Vis kildekataloget
+      operationId: listSources
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: Kilder med hver sin ETag.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionedSource'
+        '404':
+          $ref: '#/components/responses/Problem'
+
+  /authoring/content/{locale}/sources/{sourceId}:
+    get:
+      summary: Hent én kilde
+      operationId: getSource
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/SourceId'
+      responses:
+        '200':
+          description: Kilden og dens revision.
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/source'
+        '404':
+          $ref: '#/components/responses/Problem'
+    put:
+      summary: Opret eller ret én kilde
+      operationId: putSource
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/SourceId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/IfNoneMatch'
+        - $ref: '#/components/parameters/Quizmaster'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/source'
+      responses:
+        '200':
+          $ref: '#/components/responses/MetadataSaved'
+        '201':
+          $ref: '#/components/responses/MetadataSaved'
+        '412':
+          $ref: '#/components/responses/Problem'
+        '428':
+          $ref: '#/components/responses/Problem'
+    delete:
+      summary: Slet en ubrugt kilde
+      description: Afvises med 409, hvis en mission stadig refererer til id'et.
+      operationId: deleteSource
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/SourceId'
+        - $ref: '#/components/parameters/RequiredIfMatch'
+        - $ref: '#/components/parameters/Quizmaster'
+      responses:
+        '204':
+          description: Kilden er slettet.
+        '409':
+          $ref: '#/components/responses/Problem'
+        '412':
+          $ref: '#/components/responses/Problem'
+
+  /content/{locale}/pack:
+    get:
+      summary: Hent den offentlige spillerpakke
+      description: Eksisterende kompatibilitetsrute; form og ETag ændres ikke.
+      operationId: getPublishedPack
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - name: If-None-Match
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Den genererede indholdspakke.
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '../../../contracts/bh-content-v1.schema.json'
+        '304':
+          description: Klienten har allerede denne indholdsversion.
+        '404':
+          $ref: '#/components/responses/Problem'
+
+components:
+  securitySchemes:
+    quizmasterSession:
+      type: http
+      scheme: bearer
+      description: |
+        Pladsholder for den senere authentication-feature. Lagerdesignet
+        forudsætter kun en servervalideret quizmasteridentitet og fastlægger
+        ikke tokenudsteder eller loginmetode.
+
+  parameters:
+    Locale:
+      name: locale
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^[a-z]{2}-[A-Z]{2}$'
+    MissionId:
+      name: missionId
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 160
+    MediaId:
+      name: mediaId
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 160
+    SourceId:
+      name: sourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 160
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      schema:
+        type: string
+    RequiredIfMatch:
+      name: If-Match
+      in: header
+      required: true
+      schema:
+        type: string
+    IfNoneMatch:
+      name: If-None-Match
+      in: header
+      required: false
+      schema:
+        type: string
+        const: '*'
+    Quizmaster:
+      name: X-Quizmaster
+      in: header
+      required: true
+      description: Midlertidigt auditnavn; er ikke en identitet.
+      schema:
+        type: string
+        maxLength: 200
+
+  headers:
+    ETag:
+      description: Stærk ETag af den redaktionelle blob.
+      schema:
+        type: string
+
+  responses:
+    Saved:
+      description: Opgaven er gemt; læsemodellen kan være publiceret eller afvente retry.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-Content-Publication:
+          schema:
+            type: string
+            enum: [published, pending, unchanged]
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SaveResult'
+    Problem:
+      description: Kaldet kunne ikke udføres.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    MetadataSaved:
+      description: Metadata er gemt og har fået en ny revision.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+
+  schemas:
+    MissionSummary:
+      type: object
+      additionalProperties: false
+      required: [id, slug, title, status, postalCode, updatedAt, etag]
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        title:
+          type: string
+        status:
+          type: string
+        postalCode:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: [string, 'null']
+        etag:
+          type: string
+
+    MissionAggregate:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, mission, location]
+      properties:
+        schemaVersion:
+          type: string
+        mission:
+          $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/mission'
+        location:
+          $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/location'
+
+    SaveResult:
+      type: object
+      additionalProperties: false
+      required: [id, publication]
+      properties:
+        id:
+          type: string
+        publication:
+          type: string
+          enum: [published, pending, unchanged]
+        publishedContentVersion:
+          type: [string, 'null']
+
+    VersionedMediaAsset:
+      type: object
+      additionalProperties: false
+      required: [asset, etag]
+      properties:
+        asset:
+          $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/mediaAsset'
+        etag:
+          type: string
+
+    VersionedSource:
+      type: object
+      additionalProperties: false
+      required: [source, etag]
+      properties:
+        source:
+          $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/source'
+        etag:
+          type: string
+
+    ProblemDetails:
+      type: object
+      additionalProperties: true
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string

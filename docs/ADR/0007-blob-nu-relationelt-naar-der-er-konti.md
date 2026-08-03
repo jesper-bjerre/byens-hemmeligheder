@@ -1,7 +1,7 @@
-# ADR 0007 — Blob nu, relationelt når der er konti
+# ADR 0007 — Blob som redaktionel kilde, SQL kun ved dokumenteret behov
 
 **Status**: Foreslået
-**Dato**: 2026-08-02
+**Dato**: 2026-08-03
 **Ændrer**: Forfatningens afsnit **Tekniske rammer** (afsnittet om data)
 **Berører**: [ADR 0004](./0004-serverbaaret-indhold.md),
 [ADR 0005](./0005-blob-er-kilden-til-indholdet.md),
@@ -9,96 +9,106 @@
 
 ## Kontekst
 
-Forfatningens tekniske rammer siger:
+Forfatningens tekniske rammer siger, at en relationel database er den primære
+domænedatabase, og at JSON kun bruges til prototyper eller seed-data. Projektet
+bruger allerede Blob Storage som kilde til indhold efter ADR 0005, men den
+afvigelse blev oprindeligt ikke skrevet eksplicit.
 
-> Relationel database er den primære domænedatabase for indhold, versioner,
-> progression og point. Table Storage anvendes kun til simple sidebehov.
-> JSON-filer anvendes kun til engangsprototyper eller seed-data.
+Den første genåbning af feature 003 anbefalede Azure SQL ud fra en antagelse om
+separate partnerdata og workspaces. Den forudsætning gælder ikke. Partneres
+quizmastere skal arbejde i den samme indholdssamling, og cirka 99 % af trafikken
+er statiske spillerlæsninger.
 
-Stakken nævner **Azure SQL Database**, og Blob Storage kun til medier.
-
-Indholdet ligger i dag som JSON i blob, og [ADR 0005](./0005-blob-er-kilden-til-indholdet.md)
-gjorde blobben til kilden. **Ingen af de to ADR'er nævnte, at det var en
-afvigelse.** Rammerne må kun ændres gennem en forfatningsændring eller en ADR,
-der eksplicit henviser til afsnittet. Det er ikke sket. Denne ADR lukker den
-mangel og tager stilling frem for at lade tilstanden fortsætte i tavshed.
+De aktuelle problemer er dokumentproblemer: en samlet fil giver unødigt store
+uploads, fælles ETag-konflikter og risiko for at udlevere kladder. Der findes
+ikke aktuelle behov for joins, rapportering, tværgående transaktioner eller
+tenantgrænser.
 
 ## Beslutning
 
-**Indholdet ligger i blob, indtil der findes konti, roller eller
-serverbåret progression. Så flytter sandheden til en relationel database, og
-blobben bliver læsemodellen.**
+**Blob Storage forbliver den redaktionelle kilde til opgaveindhold. Kilden
+opdeles til én privat JSON-blob pr. opgave; den offentlige spillerpakke
+genereres. Azure SQL indføres kun, hvis et målt eller nyt relationelt behov
+udløser et nedenstående kriterium.**
 
-Konkret nu (feature 003):
+Konkret:
 
-- Én blob pr. opgave er kilden.
-- `content-pack.json` genereres af de spilbare opgaver og er det, spillerne
-  henter.
-- Table Storage bruges ikke til indhold. Forfatningens "kun til simple
-  sidebehov" står ved magt.
+- én privat blob pr. mission/location-aggregate;
+- én privat blob pr. medie- og kildemetadataobjekt;
+- ETag og betingede writes pr. objekt;
+- et privat, regenererbart admin-indeks;
+- en kort locale-lease, dirty publication-state og automatisk reconciliation;
+- deterministiske, versionsbestemte offentlige pakker samt en stabil latest;
+- blob versioning og soft delete, før data ikke længere må smides væk;
+- ingen workspace-, tenant- eller partneropdeling.
 
-Betingelsen for at flytte er skrevet ned med vilje. Den udløses af **det
-første** af:
+SQL skal genovervejes, hvis mindst ét af følgende opstår:
 
-1. Brugerkonti for quizmastere med roller håndhævet server-side (princip IV).
-2. Progression eller point, der skal overleve en telefon (i dag lokalt, ADR 0002).
-3. Indhold, der skal kunne forespørges på tværs — flere sprog, flere byer.
+1. En handling skal være atomisk på tværs af flere domæneobjekter.
+2. Admin kræver vilkårlige tværgående queries eller rapportering, som et
+   genereret indeks ikke kan betjene.
+3. P95 gem-og-publicér overstiger 2 sekunder eller leasekonflikter overstiger
+   1 % over en repræsentativ måned.
+4. Fuld regenerering overskrider App Servicens sikre ressourcebudget.
+5. Et nyt domæne som serverbåret progression/point kræver stærke relationer.
+
+Konti, roller, flere quizmastere eller flere byer er ikke i sig selv
+migrationskriterier. Authentication kan beskytte blobbaserede endpoints.
 
 ## Begrundelse
 
-**Læsevejen og skrivevejen vil ikke det samme.** Læsningen er mange, anonyme og
-hyppige og vil have noget statisk med `ETag` og `304`. Skrivningen er få,
-sjældne og fra en telefon i felten og vil have små enheder med samtidighed pr.
-opgave. En database løser den anden, ikke den første — man ville alligevel
-generere en pakke og lægge den i blob.
+**Lageret matcher dataformen.** Opgaven er et lille JSON-dokument med
+indlejrede kort, hints og svar. Én blob pr. aggregate giver præcis den
+samtidighedsgrænse, editoren har brug for.
 
-**Rammernes begrundelse er endnu ikke indtruffet.** Sætningen taler om
-"indhold, versioner, progression og point". Der er ingen konti (princip VI),
-progression skrives lokalt (ADR 0002), og det eneste serverdata er ét dokument.
-En database ville i dag holde nul relationer.
+**SQL løser ikke spillerlæsningen.** Selv med SQL skulle der genereres en
+statisk pakke til de mange reads. SQL ville kun betjene de få redaktionelle
+writes.
 
-**Kontrakten er dokumentformet.** Kort, hints og accepterede svar er indlejrede
-lister. At mappe dem til tabeller trækker mod ADR 0001, hvor kontrakttyperne
-*er* API'ets DTO'er, og gør hver ny felttilføjelse til en migrering, hvor den i
-dag koster ingenting.
+**SQL's stærkeste begrundelse bortfalder.** Der skal ikke være adskilte
+partnerdata. Der er derfor ingen tenantnøgler, ejerskabsrelationer eller
+tenantfiltre at håndhæve relationelt.
 
-**"Engangsprototype" er ikke længere en dækkende beskrivelse**, og det er netop
-derfor, dette skal skrives ned frem for at blive læst som en midlertidighed, der
-bare varede ved.
+**Omkostningen er mere end licensprisen.** Azure SQL Basic er relativt billig,
+men tilføjer fast månedspris, server/firewall, databaseidentitet, migrationer,
+backup-/restore-procedure og overvågning. Den eksisterende Storage-konto har
+ingen ny fast pris og leverer allerede ETags, leases, versioning og soft delete.
+
+**Beslutningen er reversibel.** Spillerapps kender kun den genererede pakke.
+Authoring-repository og pakkegenerator holdes adskilt, så en senere relationel
+kilde kan erstatte Blob uden at ændre spillerkontrakten.
 
 ## Konsekvenser
 
-**Grænsen skal trækkes nu, ikke ved flytningen.** Genereringen af pakken skal
-fra dag ét være et selvstændigt skridt med en egen indgang, så kilden kan skiftes
-ud under den. Bliver genereringen flettet ind i gemningen, bliver flytningen til
-SQL en omskrivning frem for en udskiftning.
+**Gevinst:** Ingen ny Azure-ressource eller fast databasepris. Små opgavevise
+writes, uafhængige ETags og privat kladdelager kan implementeres i den
+eksisterende stak.
 
-**Spillerappen må ikke kende kilden.** Den henter `GET /content/{locale}/pack`
-og skal blive ved med det. Den er allerede sådan i dag, og den egenskab er
-grunden til, at beslutningen kan udskydes uden at det koster.
+**Pris:** Gemninger serialiseres kort under publicering, referentiel integritet
+håndhæves af applikationen, og hele pakken regenereres. Driftstelemetri skal
+vise, om denne pris forbliver acceptabel.
 
-**Der findes ikke serverside-rettigheder, før databasen kommer.** Princip IV
-kræver, at rolle- og rettighedsmodellen håndhæves server-side. Indtil da er
-adgangskontrollen en delt nøgle — en spærring mod tilfældige, ikke en
-rettighedsmodel. Det er registreret som en afvigelse i
-[feature 002's plan](../../specs/002-quizmaster-app/plan.md) og i
-[udrulning.md](../drift/udrulning.md).
+**Fejl mellem blobs er ikke transaktionelle.** Dirty-state og reconciliation
+giver eventual consistency. Ved fejl forbliver den tidligere offentlige pakke
+hel, mens admin viser, at publicering afventer.
 
-**Forfatningen rettes ikke.** Rammerne beskriver, hvor produktet skal hen, og de
-er stadig rigtige. Denne ADR er den registrerede afvigelse, rammerne selv
-foreskriver — ikke en ændring af målet.
+**Forfatningen fraviges bevidst.** Opgaveindhold bruger fortsat JSON som
+primær domænekilde. Denne ADR er den eksplicitte, begrundede afvigelse, som de
+tekniske rammer kræver. Det relationelle mål gælder fortsat for domæner, der
+faktisk har relationelle behov.
 
 ## Alternativer
 
-**Azure SQL nu.** Ville følge rammerne uden at skulle begrundes. Men den løser
-ikke læsevejen, koster en skema-migrering ved hver kontraktændring, og ville i
-dag holde ét dokument uden relationer. Arbejdet ville skulle gøres om, når
-kontrakten alligevel ændrer sig, mens quizmasterne finder ud af, hvad de har
-brug for.
+**Azure SQL Basic nu.** Giver transaktionel outbox, constraints og queries, men
+ingen af dem er aktuelle krav. Det tilføjer en fast pris og ny driftsoverflade.
 
-**Table Storage.** Køber ETag pr. entitet, som en blob pr. opgave også giver, og
-punktopslag, ingen har brug for. Betaler med læsevejens cacheegenskab. Se
-[research.md](../../specs/003-indholdslager/research.md) afsnit C.
+**Table Storage.** Har ETag pr. entitet, men opgaven ville stadig være JSON i
+en property. Det giver ingen fordel over én blob pr. opgave til denne
+arbejdsprofil.
 
-**Lade være med at skrive noget ned.** Tilstanden ville fortsætte, og den næste,
-der læser forfatningen, ville tro, at indholdet lå i Azure SQL.
+**Cosmos DB Serverless.** Dokumentformen passer, men tjenesten køber query- og
+distributionsfunktioner, som spillerne ikke bruger. Blob er enklere og allerede
+driftet.
+
+**Behold én samlet blob.** Billigst i kode nu, men løser ikke opgavevise
+uploads, uafhængig samtidighed eller sikker adskillelse af kladder.
