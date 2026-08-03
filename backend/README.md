@@ -61,6 +61,11 @@ forespørgselslogning til — så det kan **ses**, at appen faktisk ringer. Uden
 ligner en tavs server en app, der ikke prøver, og det kostede flere runder at
 opdage.
 
+Ved første start kopieres `contracts/content` til den gitignorerede
+`src/ByensGaader.Api/.local/public`. Admin-kald skriver kun i arbejdskopien.
+Kontrakt-fixturen er testinput og må ikke ændre sig, bare fordi webadminen åbnes
+under lokal debugging.
+
 Det advarer også, hvis porten ikke stemmer med `BH_CONTENT_BASE_URL` i
 `iOS/Config/Local.xcconfig`. Gør den ikke det, henter appen ingenting, og fejlen
 ser ud som manglende indhold frem for en forkert port.

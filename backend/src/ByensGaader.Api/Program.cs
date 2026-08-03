@@ -65,6 +65,10 @@ if (storage.Provider is ContentStoreProvider.Blob)
 }
 else
 {
+    if (builder.Environment.IsDevelopment())
+    {
+        SeedLocalPublicStore(storage);
+    }
     var publicStore = new FileSystemContentStore(
         Microsoft.Extensions.Options.Options.Create(storage));
     var authoringStore = new FileSystemContentStore(
@@ -121,6 +125,34 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
+
+static void SeedLocalPublicStore(ContentStoreOptions storage)
+{
+    var target = Path.GetFullPath(storage.RootPath);
+    var pack = Path.Combine(target, "da-DK", "content-pack.json");
+    if (File.Exists(pack)) return;
+
+    var fixture = Path.GetFullPath(storage.FixtureRootPath);
+    var fixturePack = Path.Combine(fixture, "da-DK", "content-pack.json");
+    if (!File.Exists(fixturePack))
+    {
+        throw new InvalidOperationException(
+            $"Den lokale indholdsfixture findes ikke: {fixturePack}");
+    }
+
+    // Public-lageret er skrivbart gennem admin-API'et. Det må derfor være en
+    // ignoreret arbejdskopi og aldrig contracts-fixturen, som testene læser.
+    foreach (var directory in Directory.EnumerateDirectories(fixture, "*", SearchOption.AllDirectories))
+    {
+        Directory.CreateDirectory(Path.Combine(target, Path.GetRelativePath(fixture, directory)));
+    }
+    foreach (var source in Directory.EnumerateFiles(fixture, "*", SearchOption.AllDirectories))
+    {
+        var destination = Path.Combine(target, Path.GetRelativePath(fixture, source));
+        Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+        File.Copy(source, destination, overwrite: true);
+    }
+}
 
 /// <summary>
 /// Gør værtsklassen synlig for <c>WebApplicationFactory</c> i testprojektet.

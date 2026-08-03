@@ -242,6 +242,12 @@ internal sealed class ContentStoreOptions
     public string AuthoringRootPath { get; set; } = ".local/authoring";
 
     /// <summary>
+    /// Read-only fixture, der kopieres til <see cref="RootPath"/> første gang
+    /// udviklingsserveren starter. Der skrives aldrig tilbage hertil.
+    /// </summary>
+    public string FixtureRootPath { get; set; } = "../../../contracts/content";
+
+    /// <summary>
     /// Fx <c>https://byensgaaderdev.blob.core.windows.net</c>. Aldrig en
     /// connection string — der er ingen nøgle at lække med managed identity.
     /// </summary>
