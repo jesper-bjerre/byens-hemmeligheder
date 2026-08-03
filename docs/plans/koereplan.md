@@ -40,6 +40,11 @@ kan forklares og sælges til partnere, der kan bidrage med flere quizmastere.
 Fejl og observationer fra testen noteres, men udløser ikke automatisk en større
 arkitekturombygning, mens testen kører.
 
+DEV har samme typer kørende ressourcer som PROD: API, adminweb og spillerweb.
+Relevante ændringer på `main` udrulles foreløbig til begge miljøer. Næste trin i
+release-flowet er API-tests mod DEV, som skal være grønne, før samme commit må
+udrulles til PROD.
+
 ## Mål 2 — Research af et bedre lager til opgavedata
 
 Researchen ligger i

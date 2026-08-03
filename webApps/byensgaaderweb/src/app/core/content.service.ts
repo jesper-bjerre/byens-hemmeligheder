@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { ContentPack, MediaAsset, Mission } from './models';
 
 @Injectable({ providedIn: 'root' })
@@ -9,7 +10,7 @@ export class ContentService {
   readonly isLocal = ['localhost', '127.0.0.1'].includes(globalThis.location?.hostname ?? '');
   readonly baseUrl = this.isLocal
     ? 'http://localhost:5199'
-    : 'https://byensgaader-api-p.azurewebsites.net';
+    : environment.apiBaseUrl;
   readonly playableMissions = computed(() =>
     (this.pack()?.missions ?? []).filter(
       (mission) => mission.status === 'fieldTestReady' || mission.status === 'publishReady',

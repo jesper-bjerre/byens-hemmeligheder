@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "check": "ng test --watch=false && ng build"
+    "check": "ng test --watch=false && ng build",
+    "check:dev": "ng test --watch=false && ng build --configuration production,dev-cloud"
   },
   "private": true,
   "engines": {

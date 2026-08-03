@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 import {
   AuditEntry,
   AuthoringSnapshot,
@@ -31,7 +32,7 @@ export class ContentApiService {
   readonly baseUrl = computed(() =>
     this.backend() === 'lokal'
       ? 'http://localhost:5199'
-      : 'https://byensgaader-api-p.azurewebsites.net',
+      : environment.apiBaseUrl,
   );
   readonly host = computed(() => new URL(this.baseUrl()).host);
   private readonly locale = 'da-DK';

@@ -10,20 +10,23 @@ tenant-id står i GitHub-secrets og ikke her — repoet er public.
 | | Navn | Bemærkning |
 |---|---|---|
 | App Service Plan | `ASP-Gulvet-8d7b` | B1, Linux, West Europe, ressourcegruppe `Gulvet` |
-| Web app | `byensgaader-api-p` | `DOTNETCORE:10.0`, samme plan som fire andre apps |
+| API (PROD) | `byensgaader-api-p` | `DOTNETCORE:10.0` |
+| API (DEV) | `byensgaader-api-d` | `DOTNETCORE:10.0`, samme App Service Plan som PROD |
 | Storage (PROD) | `byensgaaderp` | ressourcegruppe `byensgaader-p_rg`, containere `content` og `authoring` |
-| Storage (DEV/lokal) | `byensgaaderd` | ressourcegruppe `byensgaader-d_rg`; lokal bruger `content-local` og `authoring-local` |
-| App'ens identitet | system-assigned på `byensgaader-api-p` | *Storage Blob Data Contributor* på `byensgaaderp` |
-| Udrulningens identitet | `oidc-msi-8800` | user-assigned, *Website Contributor* på app'en alene |
+| Storage (DEV/lokal) | `byensgaaderd` | DEV bruger `content`/`authoring`; lokal bruger `content-local`/`authoring-local` |
+| API-identiteter | system-assigned pr. API | hver har kun *Storage Blob Data Contributor* på sit eget miljø |
+| Udrulningens identitet | `oidc-msi-8800` | user-assigned, *Website Contributor* på de to API'er alene |
 
-**Planen deles med fire andre apps.** B1 er én kerne og 1,75 GB til dem alle.
+**Planen deles af seks apps.** B1 er én kerne og 1,75 GB til dem alle.
 Bliver API'et langsomt, er det dér, der skal kigges — ikke i koden.
 
-**B1 har ingen deployment slots.** En udrulning går direkte i luften. Derfor kan
-workflowet også køres manuelt: det skal være en beslutning og ikke en bivirkning
-af en rettet stavefejl.
+**B1 har ingen deployment slots.** En udrulning går direkte i luften. Relevante
+ændringer på `main` udrulles i den aktuelle testfase automatisk til både DEV og
+PROD; begge API-workflows kan også genkøres manuelt.
 
 ## App-indstillinger
+
+PROD:
 
 ```
 ContentStore__Provider          = Blob
@@ -34,17 +37,22 @@ Authoring__ReconciliationEnabled = false
 ASPNETCORE_ENVIRONMENT          = Production
 ```
 
+DEV bruger samme indstillinger med disse miljøværdier:
+
+```text
+ContentStore__StorageAccountUri = https://byensgaaderd.blob.core.windows.net
+ContentStore__Container         = content
+ContentStore__AuthoringContainer = authoring
+ASPNETCORE_ENVIRONMENT          = Development
+```
+
 `Authoring__ReconciliationEnabled` står på `false`, fordi migrationen til
 opgavevise blobs er afsluttet. En almindelig kodeudrulning må ikke forsøge at
 genskabe eller migrere PROD-indhold ved opstart.
 
-Rollback af storage-cutoveren er:
-
-1. stop quizmaster-redigering, så nye writes ikke splittes mellem konti;
-2. sæt `ContentStore__StorageAccountUri` tilbage til
-   `https://byensgaaderd.blob.core.windows.net`;
-3. genstart og smoke-test API'et;
-4. afstem eventuelle writes fra `byensgaaderp`, før D igen bruges til test.
+Den tidligere mulighed for at pege PROD tilbage på D-kontoen er lukket, fordi D
+nu er et aktivt testmiljø. PROD må ikke peges på `byensgaaderd`, medmindre DEV
+først fryses, begge datasæt afstemmes, og adgangsrollen gives eksplicit igen.
 
 Den gamle admin-builds hel-pakke-PUT afvises efter authoring er aktiveret. Det
 er bevidst: at lade to samtidige kilder acceptere writes ville kunne tabe
@@ -65,9 +73,12 @@ managed identity i Azure.
 
 ## Sådan udrulles der
 
-Et push til `main`, der rører `backend/`, kører
-[`backend-deploy.yml`](../../.github/workflows/backend-deploy.yml): tests,
-publicering, udrulning, og derefter **en kontrol af at `/health` svarer 200**.
+Et push til `main`, der rører `backend/`, kører både
+[`backend-deploy-dev.yml`](../../.github/workflows/backend-deploy-dev.yml) og
+[`backend-deploy.yml`](../../.github/workflows/backend-deploy.yml). De tester,
+publicerer og udruller til henholdsvis DEV og PROD og kontrollerer derefter, at
+miljøets `/health` svarer 200. De to workflows kører indtil videre parallelt.
+Planen er senere at indsætte API-tests mod DEV som gate før PROD-udrulningen.
 
 Uden det sidste trin kan en udrulning melde grønt, mens app'en svarer 503. Det
 er ikke hypotetisk — nabo-app'en `quizmaster-api-p` stod sådan i ugevis, uden at
@@ -99,6 +110,11 @@ Quizmasterens Angular-app er udrullet som en separat Static Web App:
 | Kilde | `webApps/webadmin/` på `main` |
 | Workflow | `azure-static-web-apps-salmon-grass-0b3946003.yml` |
 
+DEV-udgaven er `byensgaader-admin-d` på
+`https://ambitious-forest-0a05d7d03.7.azurestaticapps.net` og udrulles af
+`azure-static-web-apps-admin-dev.yml`. Dens Angular-build bruger
+`byensgaader-api-d`; PROD-buildet bruger fortsat `byensgaader-api-p`.
+
 Workflowet installerer med Node 22, kører enhedstest og produktionsbuild og
 uploader derefter det færdige `dist/webadmin/browser`-artefakt. Azure må ikke
 forsøge at detektere og bygge monorepoet med Oryx; portalens første automatisk
@@ -127,6 +143,11 @@ Spillerens Angular-app er udrullet som sin egen Static Web App:
 | Adresse | `https://agreeable-island-016468f03.7.azurestaticapps.net` |
 | Kilde | `webApps/byensgaaderweb/` på `main` |
 | Workflow | `azure-static-web-apps-agreeable-island-016468f03.yml` |
+
+DEV-udgaven er `byensgaader-web-d` på
+`https://delightful-coast-08c419b03.7.azurestaticapps.net` og udrulles af
+`azure-static-web-apps-player-dev.yml`. Også her vælges API-adressen ved build,
+så et DEV-build ikke kan læse eller skrive PROD-data.
 
 Workflowet følger samme model som webadminen: Node 22, test og produktionsbuild
 før upload af `dist/byensgaaderweb/browser`. API'ets App Service tillader
@@ -180,17 +201,15 @@ Workflowet bruger derfor `az webapp deploy`, som bruger den bearer-token,
 | Fase | Hvad | Status |
 |---|---|---|
 | 1 | DEV-storage + `BlobContentStore`, kørt lokalt | ✅ |
-| 2 | API'et på App Service mod DEV-storage | ✅ |
+| 2 | API'et på App Service mod DEV-storage | ✅ — `byensgaader-api-d` |
 | 3 | Indholdet flytter fra repo til blob | ✅ — se [ADR 0005](../ADR/0005-blob-er-kilden-til-indholdet.md) |
 | 4 | Spillerappen henter fra tjenesten | ✅ — var allerede gjort i ADR 0004 |
 | 5a | PROD-storage | ✅ — `byensgaaderp`, cutover 3. august 2026 |
 | 5b | Adgangskontrol | ⬜ — bevidst udskudt under intern test |
 
-Appen peger på PROD-storage. `byensgaaderd` står urørt med snapshot fra
-cutoveren som kortvarig rollback og bruges derudover kun gennem de isolerede
-lokalcontainere. Når rollback-perioden afsluttes, skal PROD-appens rolle på
-`byensgaaderd` fjernes, før D-kontoens `content` og `authoring` tages i brug af
-et DEV-miljø.
+PROD peger kun på `byensgaaderp`; DEV peger kun på `byensgaaderd`. PROD-appens
+rolle på D-kontoen er fjernet. Lokal backend deler D-kontoen, men bruger de
+isolerede lokalcontainere.
 
 ### Fase 5b — planlagt, ikke lavet
 
@@ -199,7 +218,7 @@ også `PUT` og `DELETE`. Enhver, der finder adressen, kan omskrive
 indholdspakken eller slette billederne. `X-Quizmaster` er et navn, klienten selv
 skriver; det er et spor, ikke en spærring.
 
-**`httpsOnly` står på `false`.** En forespørgsel over almindelig HTTP bliver
+**PRODs `httpsOnly` står på `false`.** En forespørgsel over almindelig HTTP bliver
 besvaret. Det skal rettes, *før* der indføres en nøgle — ellers kan nøglen
 sendes i klartekst.
 

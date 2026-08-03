@@ -23,7 +23,7 @@ Miljøerne adskilles sådan:
 | Miljø | Storage Account | Containere |
 |---|---|---|
 | PROD | `byensgaaderp` | `content`, `authoring` |
-| Kommende DEV App Service | `byensgaaderd` | `content`, `authoring` |
+| DEV App Service | `byensgaaderd` | `content`, `authoring` |
 | Lokal backend | `byensgaaderd` | `content-local`, `authoring-local` |
 
 PROD App Services managed identity har kun den nødvendige Blob Contributor-rolle
@@ -32,10 +32,9 @@ på `byensgaaderp`. Lokal udvikling bruger `DefaultAzureCredential` og udviklere
 og eksplicit offline-fejlsøgning, men er ikke længere lokal standard.
 
 Den eksisterende D-konto slettes eller nulstilles ikke ved cutover. Dens
-oprindelige `content` og `authoring` beholdes først som rollback-snapshot. Den må
-først blive aktiv DEV-kilde, når rollback-perioden er afsluttet, og eventuelle
-senere PROD-writes er afstemt. Derefter fjernes PROD App Services rolle på
-D-kontoen, så miljøgrænsen også håndhæves af RBAC.
+oprindelige `content` og `authoring` blev beholdt som rollback-snapshot, indtil
+`byensgaader-api-d` blev oprettet. Ved aktiveringen blev PROD App Services rolle
+på D-kontoen fjernet, så miljøgrænsen også håndhæves af RBAC.
 
 ## Begrundelse
 
@@ -82,6 +81,11 @@ metadata blev sammenlignet objekt for objekt:
 En lokalt startet backend mod den nye konto og den genstartede PROD App Service
 returnerede samme content-version og samme antal publicerede og redaktionelle
 objekter før og efter cutover.
+
+Senere samme dag blev `byensgaader-api-d` oprettet på den delte App Service-plan
+og koblet til `byensgaaderd/content` og `authoring`. PROD-API'ets adgang til
+`byensgaaderd` blev samtidig fjernet. Lokal backend bruger fortsat de særskilte
+`content-local` og `authoring-local`.
 
 ## Alternativer
 

@@ -1,0 +1,47 @@
+name: Byens Gåder web — udrul DEV
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "webApps/byensgaaderweb/**"
+      - ".github/workflows/azure-static-web-apps-player-dev.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: byensgaaderweb-dev
+  cancel-in-progress: true
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    name: Byg og udrul DEV
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+          cache: npm
+          cache-dependency-path: webApps/byensgaaderweb/package-lock.json
+
+      - name: Installér afhængigheder
+        run: npm ci
+        working-directory: webApps/byensgaaderweb
+
+      - name: Test og byg til DEV
+        run: npm run check:dev
+        working-directory: webApps/byensgaaderweb
+
+      - name: Udrul til DEV
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BYENSGAADER_WEB_D }}
+          action: "upload"
+          app_location: "webApps/byensgaaderweb/dist/byensgaaderweb/browser"
+          api_location: ""
+          output_location: ""
+          skip_app_build: true

@@ -1,0 +1,126 @@
+name: Backend — udrul DEV
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["backend/**", ".github/workflows/backend-deploy-dev.yml"]
+
+concurrency:
+  group: backend-deploy-dev
+  cancel-in-progress: false
+
+permissions:
+  # Samme OIDC-identitet som PROD, men med Website Contributor begrænset til
+  # DEV-app'en. Der ligger derfor ingen publish profile i GitHub.
+  id-token: write
+  contents: read
+
+env:
+  APP_NAME: byensgaader-api-d
+  RESOURCE_GROUP: Gulvet
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Hent FFmpeg
+        run: |
+          archive="${{ runner.temp }}/ffmpeg.tar.xz"
+          extracted="${{ runner.temp }}/ffmpeg-extracted"
+          url="https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-08-02-13-17/ffmpeg-N-125907-ga7e72069f1-linux64-gpl.tar.xz"
+          checksum="6beedc9411cc6522e22e1117485497e5ea1372551064ad1e247b5b4ca957d597"
+
+          curl --fail --location --retry 3 --output "$archive" "$url"
+          echo "$checksum  $archive" | sha256sum --check
+          mkdir -p "$extracted" "${{ runner.temp }}/ffmpeg-tools"
+          tar -xJf "$archive" --directory "$extracted"
+          cp "$extracted"/*/bin/ffmpeg "${{ runner.temp }}/ffmpeg-tools/ffmpeg"
+          cp "$extracted"/*/LICENSE.txt "${{ runner.temp }}/ffmpeg-tools/FFMPEG-LICENSE.txt"
+          chmod 755 "${{ runner.temp }}/ffmpeg-tools/ffmpeg"
+
+      - name: Test
+        run: dotnet test --configuration Release
+        working-directory: backend
+
+      - name: Publicér
+        run: >
+          dotnet publish src/ByensGaader.Api
+          --configuration Release
+          --output ${{ runner.temp }}/publish
+        working-directory: backend
+
+      - name: Pak FFmpeg med API'et
+        run: |
+          mkdir -p "${{ runner.temp }}/publish/tools"
+          cp "${{ runner.temp }}/ffmpeg-tools/"* "${{ runner.temp }}/publish/tools/"
+
+      - name: Pak
+        run: zip -r "${{ runner.temp }}/app.zip" .
+        working-directory: ${{ runner.temp }}/publish
+
+      - name: Kontrollér at de tre secrets findes
+        env:
+          CLIENT_ID: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B9D566BBDA294AA2938B7D6C22202713 }}
+          TENANT_ID: ${{ secrets.AZUREAPPSERVICE_TENANTID_8C3788C75A2141DC8F151FE1367B6BF0 }}
+          SUBSCRIPTION_ID: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E99D9924A1B746E89A161398EDAB5234 }}
+        run: |
+          mangler=0
+          for navn in CLIENT_ID TENANT_ID SUBSCRIPTION_ID; do
+            vaerdi="${!navn}"
+            if [ -z "$vaerdi" ]; then
+              echo "::error::AZURE_$navn er tom eller findes ikke."
+              mangler=1
+            elif ! printf '%s' "$vaerdi" | grep -qE '^[0-9a-fA-F-]{36}$'; then
+              echo "::error::AZURE_$navn ligner ikke et GUID (${#vaerdi} tegn)."
+              mangler=1
+            else
+              echo "AZURE_$navn: ✓ 36 tegn"
+            fi
+          done
+
+          if [ "$mangler" = "1" ]; then
+            exit 1
+          fi
+
+      - name: Log ind i Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B9D566BBDA294AA2938B7D6C22202713 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8C3788C75A2141DC8F151FE1367B6BF0 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E99D9924A1B746E89A161398EDAB5234 }}
+
+      - name: Udrul til DEV
+        run: >
+          az webapp deploy
+          --name "$APP_NAME"
+          --resource-group "$RESOURCE_GROUP"
+          --src-path "${{ runner.temp }}/app.zip"
+          --type zip
+          --async false
+
+      - name: Kontrollér at DEV svarer
+        run: |
+          host=$(az webapp show -n "$APP_NAME" -g "$RESOURCE_GROUP" \
+            --query defaultHostName -o tsv)
+          echo "Prøver https://$host/health"
+
+          for attempt in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "https://$host/health" || true)
+            if [ "$code" = "200" ]; then
+              echo "DEV er sund efter $attempt forsøg."
+              curl -s "https://$host/health"
+              exit 0
+            fi
+            echo "  forsøg $attempt: $code"
+            sleep 15
+          done
+
+          echo "::error::DEV /health svarede aldrig 200."
+          exit 1
