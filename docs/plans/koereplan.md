@@ -25,9 +25,9 @@ for migration og adgangskontrol.
 | | Mål | Status |
 |---|---|---|
 | 1 | Intern test, partnerdialog og flere quizmastere | 🟡 I gang |
-| 2 | Research og design af et bedre lager til opgavedata | 🟡 I gang |
+| 2 | Research og design af et bedre lager til opgavedata | ✅ Afsluttet |
 | 3 | Login, adgangskontrol og produktionssikring | ⏸ Bevidst udskudt |
-| 4 | Implementering af nyt lager og den øvrige plan | ⬜ Afventer beslutning |
+| 4 | Implementering af opgavevist Blob-lager | ✅ Afsluttet |
 
 ---
 
@@ -48,9 +48,9 @@ Den tager højde for, at spillerlæsninger udgør omtrent 99 % af trafikken, men
 få quizmastere opretter og retter indhold. Partnerorganisationer er ikke en
 datagrænse; deres quizmastere arbejder i samme samling.
 
-Det reviderede forslag er én privat JSON-blob pr. opgave og en genereret
-offentlig pakke. SQL bruges kun, hvis senere målinger eller nye relationelle
-krav gør det nødvendigt. Forslaget afventer accept, før implementering starter.
+Det accepterede og implementerede design er én privat JSON-blob pr. opgave og
+en genereret offentlig pakke. SQL bruges kun, hvis senere målinger eller nye
+relationelle krav gør det nødvendigt. Se [ADR 0007](../ADR/0007-blob-nu-relationelt-naar-der-er-konti.md).
 
 ## Mål 3 — Login, adgangskontrol og produktionssikring
 
@@ -91,27 +91,27 @@ sendes i klartekst. Skal rettes **før** nøglen tages i brug:
 az webapp update -n byensgaader-api-p -g Gulvet --https-only true
 ```
 
-**Blob-versionering er slået fra.** Soft delete er slået til med 7 dage, så en
-overskrevet pakke kan hentes tilbage i en uge. Versionering giver
-punkt-i-tid-gendannelse; tidligere versioner koster lager, men beløbet er
-ubetydeligt for de små JSON-dokumenter, når en lifecycle-regel rydder op:
+**Blob-versionering er slået til på `byensgaaderp`.** Blob- og
+container-soft-delete er slået til med 7 dage. En lifecycle-regel for gamle
+versioner mangler fortsat:
 
 ```bash
-az storage account blob-service-properties update \
-  --account-name byensgaaderd -g byensgaader-d_rg --enable-versioning true
+# Tilføj en godkendt lifecycle-regel på byensgaaderp.
 ```
 
-> Begge kommandoer blev forsøgt kørt herfra 2. august og blev afvist af
-> værktøjsspærringen. De er ikke udført.
+> HTTPS-kravet på App Service er ikke udført. Storage-versionering og soft
+> delete er udført 3. august 2026.
 
-### 3.3 Lagerkontoen hedder stadig noget med DEV
+### 3.3 PROD- og D-lager er adskilt
 
-`byensgaaderd` holder det indhold, quizmasterne laver. Det er bevidst — hele
-kæden kunne køres igennem uden noget at ødelægge — men navnet lyver nu.
+PROD bruger `byensgaaderp` i `byensgaader-p_rg`. Den tidligere konto
+`byensgaaderd` blev kopieret objekt for objekt og beholdt urørt som kortvarig
+rollback. Lokal backend bruger D-kontoens separate `content-local` og
+`authoring-local`, så debugging ikke skriver i PROD eller i en kommende D App
+Services containere.
 
-**Beslutning: kontoen skiftes ikke før TestFlight.** Det er én app-indstilling
-at flytte, og en flytning midt i en felttest koster mere, end navnet forvirrer.
-Den skal ske, før der er rigtige spillere.
+Beslutningen og migrationsprisen står i
+[ADR 0009](../ADR/0009-prod-og-dev-har-hver-sin-storage-account.md).
 
 ### 3.4 Apperne
 

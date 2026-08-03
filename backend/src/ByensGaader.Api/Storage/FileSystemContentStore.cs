@@ -4,12 +4,12 @@ using Microsoft.Extensions.Options;
 namespace ByensGaader.Api.Storage;
 
 /// <summary>
-/// Læser indhold fra en mappe på disk — i udvikling repoets egen
-/// <c>contracts/content</c>.
+/// Læser indhold fra en mappe på disk — i tests repoets egen
+/// <c>contracts/content</c> eller en midlertidig kopi.
 /// </summary>
 /// <remarks>
-/// Findes, så hele læsevejen kan bevises uden en Azure-konto. Afløses af en
-/// blob-baseret variant, når hostingen er på plads.
+/// Findes, så hele læsevejen kan bevises isoleret og uden en Azure-konto.
+/// Almindelig lokal kørsel bruger Blob for at have samme lagertype som drift.
 /// </remarks>
 internal sealed class FileSystemContentStore(IOptions<ContentStoreOptions> options)
     : IContentStore
@@ -248,7 +248,7 @@ internal sealed class ContentStoreOptions
     public string FixtureRootPath { get; set; } = "../../../contracts/content";
 
     /// <summary>
-    /// Fx <c>https://byensgaaderdev.blob.core.windows.net</c>. Aldrig en
+    /// Fx <c>https://byensgaaderd.blob.core.windows.net</c>. Aldrig en
     /// connection string — der er ingen nøgle at lække med managed identity.
     /// </summary>
     public string StorageAccountUri { get; set; } = string.Empty;

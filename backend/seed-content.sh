@@ -3,8 +3,7 @@
 # Lægger repoets indhold op i en blob-container.
 #
 #   ./backend/seed-content.sh --dry-run
-#   ./backend/seed-content.sh byensgaaderd
-#   ./backend/seed-content.sh byensgaaderp content
+#   ./backend/seed-content.sh byensgaaderd content-local authoring-local
 #
 # Bruges til at fylde en tom container første gang, og til at sætte en
 # DEV-container tilbage til det, der står i repoet.

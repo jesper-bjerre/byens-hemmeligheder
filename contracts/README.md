@@ -28,7 +28,7 @@ inden for en uge. Derfor en kopi på disken.
 ### Hold fixturen i takt med kilden
 
 ```bash
-./backend/pull-content.sh byensgaaderd     # kilden → repoet
+./backend/pull-content.sh byensgaaderp content authoring  # PROD-kilden → repoet
 python3 contracts/arkiver-indhold.py       # opdatér det læsbare arkiv
 ```
 
@@ -38,10 +38,11 @@ overholder kontrakten — og det er den eneste publiceringsport, der findes.
 Den modsatte vej findes også, men bruges sjældent:
 
 ```bash
-./backend/seed-content.sh byensgaaderd     # repoet → kilden
+./backend/seed-content.sh byensgaaderd content-local authoring-local
 ```
 
-Den overskriver. Kør den aldrig mod en container, quizmasterne arbejder i.
+Den overskriver. Kør den aldrig mod PROD eller en container, quizmasterne
+arbejder i.
 
 ## Arkivet
 

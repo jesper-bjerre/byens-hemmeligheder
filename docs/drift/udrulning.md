@@ -11,8 +11,9 @@ tenant-id står i GitHub-secrets og ikke her — repoet er public.
 |---|---|---|
 | App Service Plan | `ASP-Gulvet-8d7b` | B1, Linux, West Europe, ressourcegruppe `Gulvet` |
 | Web app | `byensgaader-api-p` | `DOTNETCORE:10.0`, samme plan som fire andre apps |
-| Storage (DEV) | `byensgaaderd` | ressourcegruppe `byensgaader-d_rg`, container `content` |
-| App'ens identitet | system-assigned på `byensgaader-api-p` | *Storage Blob Data Contributor* på `byensgaaderd` |
+| Storage (PROD) | `byensgaaderp` | ressourcegruppe `byensgaader-p_rg`, containere `content` og `authoring` |
+| Storage (DEV/lokal) | `byensgaaderd` | ressourcegruppe `byensgaader-d_rg`; lokal bruger `content-local` og `authoring-local` |
+| App'ens identitet | system-assigned på `byensgaader-api-p` | *Storage Blob Data Contributor* på `byensgaaderp` |
 | Udrulningens identitet | `oidc-msi-8800` | user-assigned, *Website Contributor* på app'en alene |
 
 **Planen deles med fire andre apps.** B1 er én kerne og 1,75 GB til dem alle.
@@ -26,26 +27,24 @@ af en rettet stavefejl.
 
 ```
 ContentStore__Provider          = Blob
-ContentStore__StorageAccountUri = https://byensgaaderd.blob.core.windows.net
+ContentStore__StorageAccountUri = https://byensgaaderp.blob.core.windows.net
 ContentStore__Container         = content
 ContentStore__AuthoringContainer = authoring
 Authoring__ReconciliationEnabled = false
 ASPNETCORE_ENVIRONMENT          = Production
 ```
 
-`Authoring__ReconciliationEnabled` står bevidst på `false` under kodeudrulning.
-Det forhindrer, at en backenddeploy i sig selv starter migrationen. Når
-`./backend/seed-content.sh --dry-run` er godkendt, authoring-containeren er
-privat, og begge nye admin-apps er klar, aktiveres migrationen ved at sætte
-værdien til `true` og genstarte API'et. Første kørsel splitter den eksisterende
-offentlige pakke idempotent og publicerer derefter kun spilbare opgaver.
+`Authoring__ReconciliationEnabled` står på `false`, fordi migrationen til
+opgavevise blobs er afsluttet. En almindelig kodeudrulning må ikke forsøge at
+genskabe eller migrere PROD-indhold ved opstart.
 
-Rollback før afsluttet intern test er:
+Rollback af storage-cutoveren er:
 
-1. sæt reconciliation til `false`;
-2. genudrul den tidligere backendbuild;
-3. gendan den tidligere stabile `content-pack.json` fra blobversion/backup;
-4. behold authoring-containeren urørt til fejlen er forstået.
+1. stop quizmaster-redigering, så nye writes ikke splittes mellem konti;
+2. sæt `ContentStore__StorageAccountUri` tilbage til
+   `https://byensgaaderd.blob.core.windows.net`;
+3. genstart og smoke-test API'et;
+4. afstem eventuelle writes fra `byensgaaderp`, før D igen bruges til test.
 
 Den gamle admin-builds hel-pakke-PUT afvises efter authoring er aktiveret. Det
 er bevidst: at lade to samtidige kilder acceptere writes ville kunne tabe
@@ -184,13 +183,16 @@ Workflowet bruger derfor `az webapp deploy`, som bruger den bearer-token,
 | 2 | API'et på App Service mod DEV-storage | ✅ |
 | 3 | Indholdet flytter fra repo til blob | ✅ — se [ADR 0005](../ADR/0005-blob-er-kilden-til-indholdet.md) |
 | 4 | Spillerappen henter fra tjenesten | ✅ — var allerede gjort i ADR 0004 |
-| 5 | PROD-storage og adgangskontrol | ⬜ |
+| 5a | PROD-storage | ✅ — `byensgaaderp`, cutover 3. august 2026 |
+| 5b | Adgangskontrol | ⬜ — bevidst udskudt under intern test |
 
-**App'en peger stadig på DEV-storage.** Det var med vilje: hele kæden kunne
-køres igennem mod en rigtig server uden noget at ødelægge. Skiftet til en
-PROD-konto er én app-indstilling.
+Appen peger på PROD-storage. `byensgaaderd` står urørt med snapshot fra
+cutoveren som kortvarig rollback og bruges derudover kun gennem de isolerede
+lokalcontainere. Når rollback-perioden afsluttes, skal PROD-appens rolle på
+`byensgaaderd` fjernes, før D-kontoens `content` og `authoring` tages i brug af
+et DEV-miljø.
 
-### Fase 5 — planlagt, ikke lavet
+### Fase 5b — planlagt, ikke lavet
 
 **Der er ingen adgangskontrol.** Hvert endepunkt står med `AllowAnonymous()` —
 også `PUT` og `DELETE`. Enhver, der finder adressen, kan omskrive
@@ -201,12 +203,13 @@ skriver; det er et spor, ikke en spærring.
 besvaret. Det skal rettes, *før* der indføres en nøgle — ellers kan nøglen
 sendes i klartekst.
 
-**Blob-versionering er slået fra.** Soft delete dækker 7 dage.
+**Blob-versionering er slået til på `byensgaaderp`.** Blob- og
+container-soft-delete dækker 7 dage. En lifecycle-regel for gamle versioner
+mangler fortsat, før data ikke længere må smides væk.
 
-Før indholdet ikke længere må smides væk, skal versioning samt blob- og
-container-soft-delete aktiveres på både public og authoring, en lifecycle-regel
-skal begrænse gamle versioner, og gentagne dirty publication-states skal give
-alarm. Det er fortsat bevidst udskudt under den interne test.
+Før indholdet ikke længere må smides væk, skal en lifecycle-regel begrænse gamle
+versioner, og gentagne dirty publication-states skal give alarm. Det er fortsat
+bevidst udskudt under den interne test.
 
 Løsningen er skrevet ud i [køreplanens mål 1](../plans/koereplan.md) med de
 kommandoer, der mangler at blive kørt. Kort: en delt nøgle som header på alt
@@ -220,7 +223,9 @@ venter på [ADR 0007](../ADR/0007-blob-nu-relationelt-naar-der-er-konti.md).
 blob. Blob springes over, når der ikke er en konto:
 
 ```bash
-BH_TEST_BLOB_URI="https://byensgaaderd.blob.core.windows.net" dotnet test
+BH_TEST_BLOB_URI="https://byensgaaderd.blob.core.windows.net" \
+BH_TEST_BLOB_CONTAINER="content-local" \
+dotnet test
 ```
 
 De skriver og sletter. **Kør dem aldrig mod produktion.**

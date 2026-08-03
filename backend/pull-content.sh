@@ -2,7 +2,7 @@
 #
 # Henter indholdet fra kilden ned i repoet.
 #
-#   ./backend/pull-content.sh byensgaaderd
+#   ./backend/pull-content.sh byensgaaderp content authoring
 #
 # Den modsatte vej af `seed-content.sh`.
 #

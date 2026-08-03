@@ -125,22 +125,23 @@ sig ens.
 
 | | `FileSystem` | `Blob` |
 |---|---|---|
-| Bruges | lokalt | i Azure |
+| Bruges | isolerede tests og offline-fejlsøgning | lokal standard samt Azure |
 | Samtidighed | læs, sammenlign, skriv — ikke atomisk | `If-Match` på blobbens ETag |
 | Sporet | `FileMode.Append` | append blob |
-| Adgang | mappen | managed identity |
+| Adgang | mappen | `az login` lokalt, managed identity i Azure |
 
-Blob-konfigurationen bruger to containere:
+Blob-konfigurationen bruger to containere pr. miljø:
 
 ```text
-ContentStore__Container          = content
-ContentStore__AuthoringContainer = authoring
-Authoring__ReconciliationEnabled = true
+                                         PROD          lokal
+ContentStore__Container                 content       content-local
+ContentStore__AuthoringContainer        authoring     authoring-local
 ```
 
-`authoring` skal være privat. Reconciliation slås først til, når dry-run og den
-tomme authoring-container er godkendt; ellers ville en almindelig backenddeploy
-også blive en indholdsmigration.
+Authoring-containerne skal være private.
+`Authoring__ReconciliationEnabled` er normalt `false`; den må kun slås til som
+en eksplicit, overvåget migration. En almindelig backenddeploy må ikke migrere
+indhold som bivirkning.
 
 Skiftes med `ContentStore:Provider`.
 
@@ -155,29 +156,34 @@ Til gengæld er blobbens ETag det eneste, der gør en skrivning atomisk. Derfor
 bæres begge: hashen ligger som metadata på blobben, så en skrivning kun behøver
 at hente egenskaberne for at se, om klienten skrev oven på den udgave, hen troede.
 
-### Kør mod en DEV-konto
+### Lokal kørsel mod D-kontoen
 
-Opret i portalen eller med `az`:
+Lokal kørsel bruger som standard:
 
-- en storage-konto, fx `byensgaaderd`
-- en container ved navn `content`
-- rollen **Storage Blob Data Contributor** til dig selv på kontoen
+```text
+https://byensgaaderd.blob.core.windows.net
+content-local
+authoring-local
+```
 
-Derefter:
+Containerne er adskilt fra en kommende D App Service, så lokal debugging ikke
+ændrer det indhold, DEV-testere ser. Log ind før `./backend/run.sh`:
 
 ```bash
 az login
-dotnet user-secrets set "ContentStore:Provider" "Blob"
-dotnet user-secrets set "ContentStore:StorageAccountUri" "https://byensgaaderd.blob.core.windows.net"
 ```
 
-`DefaultAzureCredential` bruger dit `az login` lokalt og managed identity i
-Azure. Der er ingen nøgle at lække og intet at rotere, hvis repoet er public.
+Din bruger skal have **Storage Blob Data Contributor** på D-kontoen.
+`DefaultAzureCredential` bruger dit `az login`; der er ingen nøgle at lække
+eller rotere. En anden konto eller andre containere kan stadig vælges gennem
+miljøvariabler eller .NET user-secrets.
 
 Kontrakttestene mod Azure køres sådan — de er ellers markeret som oversprunget:
 
 ```bash
-BH_TEST_BLOB_URI="https://byensgaaderd.blob.core.windows.net" dotnet test
+BH_TEST_BLOB_URI="https://byensgaaderd.blob.core.windows.net" \
+BH_TEST_BLOB_CONTAINER="content-local" \
+dotnet test
 ```
 
 > De skriver og sletter. Kør dem aldrig mod produktion.
@@ -192,11 +198,12 @@ Indholdet i blob ejes ikke af dette repo — se
 
 ## Hemmeligheder
 
-Ingen nøgler i `appsettings.json`. Den fil er sporet og ligger i et **public**
-repo.
+Ingen nøgler eller connection strings i `appsettings.json`. Den fil er sporet
+og ligger i et **public** repo. Et Blob-endpoint og containernavne er ikke
+adgangsoplysninger og må gerne stå der.
 
-- **Lokalt:** `dotnet user-secrets set "ContentStore:StorageAccountUri" "..."` —
-  gemmer uden for repoet.
+- **Lokalt:** `DefaultAzureCredential` bruger `az login`. Eventuelle rigtige
+  hemmeligheder skal stadig ligge i user-secrets og aldrig i repoet.
 - **I Azure:** managed identity. Ingen nøgle at lække.
 
 `appsettings.Development.json`, `appsettings.local.json` og

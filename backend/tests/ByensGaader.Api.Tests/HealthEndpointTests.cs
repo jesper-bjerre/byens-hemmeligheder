@@ -53,6 +53,9 @@ public sealed class App : AppFixture<Program>
 {
     protected override void ConfigureApp(IWebHostBuilder builder)
     {
+        // Lokal kørsel bruger rigtig D-Blob som standard. Testene vælger
+        // filsystemet eksplicit, så de forbliver isolerede og kan køre offline.
+        builder.UseSetting("ContentStore:Provider", "FileSystem");
         builder.UseSetting("ContentStore:RootPath", FindContentRoot());
     }
 
@@ -115,6 +118,7 @@ public class WritableApp : AppFixture<Program>
 
     protected override void ConfigureApp(IWebHostBuilder builder)
     {
+        builder.UseSetting("ContentStore:Provider", "FileSystem");
         builder.UseSetting("ContentStore:RootPath", _root);
         builder.UseSetting("ContentStore:AuthoringRootPath", _authoringRoot);
     }

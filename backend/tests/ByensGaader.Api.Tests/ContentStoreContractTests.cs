@@ -21,7 +21,8 @@ namespace ByensGaader.Api.Tests;
 /// ## Blobtestene springes over, når der ikke er en konto
 ///
 /// Sæt <c>BH_TEST_BLOB_URI</c> til DEV-kontoens adresse — fx
-/// <c>https://byensgaaderd.blob.core.windows.net</c> — og log ind med
+/// <c>https://byensgaaderd.blob.core.windows.net</c> samt
+/// <c>BH_TEST_BLOB_CONTAINER=content-local</c> — og log ind med
 /// <c>az login</c>. Så kører de samme tests mod Azure.
 ///
 /// De springes over frem for at fejle, fordi en test, der kræver en

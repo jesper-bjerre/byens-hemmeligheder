@@ -217,7 +217,12 @@ internal static class CatalogEndpoints
             var document = await read(locale, id, ct);
             if (document is null)
             {
-                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                // En response uden body bliver overskrevet til 204, når det
+                // ydre FastEndpoints-endpoint returnerer. Problem-svaret
+                // starter responsen og bevarer derfor den tilsigtede 404.
+                await Results.Problem(
+                    title: "Katalogobjektet findes ikke",
+                    statusCode: StatusCodes.Status404NotFound).ExecuteAsync(context);
                 return;
             }
             context.Response.Headers.ETag = document.ETag;

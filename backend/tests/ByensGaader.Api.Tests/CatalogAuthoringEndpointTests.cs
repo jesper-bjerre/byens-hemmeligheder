@@ -11,6 +11,20 @@ public sealed class CatalogAuthoringApp : WritableApp;
 public sealed class CatalogAuthoringEndpointTests(CatalogAuthoringApp app)
     : FastEndpoints.Testing.TestBase<CatalogAuthoringApp>
 {
+    [Theory]
+    [InlineData("media", "media.findes-ikke")]
+    [InlineData("sources", "source.findes-ikke")]
+    public async Task Et_katalogobjekt_der_ikke_findes_svarer_404(
+        string catalog,
+        string id)
+    {
+        var response = await app.Client.GetAsync(
+            $"/authoring/content/da-DK/{catalog}/{id}",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
     [Fact]
     public async Task Et_medies_metadata_har_egen_etag()
     {
