@@ -29,7 +29,10 @@ public sealed class CorsTests(App app) : FastEndpoints.Testing.TestBase<App>
         get.Headers.Add("Origin", "http://localhost:4200");
         var pack = await app.Client.SendAsync(get, TestContext.Current.CancellationToken);
 
-        Assert.Contains("ETag", pack.Headers.GetValues("Access-Control-Expose-Headers"));
+        var exposed = pack.Headers.GetValues("Access-Control-Expose-Headers")
+            .SelectMany(value => value.Split(',', StringSplitOptions.TrimEntries));
+        Assert.Contains("ETag", exposed);
+        Assert.Contains("X-Content-Publication", exposed);
     }
 
     [Fact]

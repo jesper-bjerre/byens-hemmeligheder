@@ -111,15 +111,18 @@ Stabil sti: `content/{locale}/content-pack.json`
 Versionssti: `content/{locale}/versions/{contentVersion}.json`
 
 Generatoren medtager kun spilbare statusser, sorterer alle samlinger
-deterministisk og beregner SHA-256 over de færdige bytes. Versionsblobben
+deterministisk og beregner SHA-256 med `contentVersion` tømt i hash-inputtet.
+Den færdige pakke bærer derefter denne hash. Versionsblobben
 oprettes idempotent, hvorefter den stabile pakke opdateres. En igangværende
 spilsession kan fastholde versionsstien.
 
 ## Audit
 
-Det eksisterende `audit.jsonl` fortsætter som append blob. Hændelsen bærer
-objekttype, id, tidspunkt, ændringsart, før/efter-ETag og det oplyste
-quizmasternavn. Den indeholder ikke hele opgaven, facit eller credentials.
+Det eksisterende `audit.jsonl` fortsætter som append blob. Hændelsen bærer id,
+tidspunkt, ændringsart, eventuel før/efter-status, publiceret contentVersion og
+det oplyste quizmasternavn. Den indeholder ikke hele opgaven, facit eller
+credentials. Under overgangen samler læseendpointet det gamle public-spor og
+det nye private authoring-spor; nye objektgemninger skriver kun privat.
 
 ## Tilstande
 
@@ -144,5 +147,6 @@ state stadig regenereres sikkert fra den uændrede kilde.
 2. Split den aktuelle pakke i mission-, media- og source-blobs.
 3. Validér alle referencer og afvis modstridende id'er.
 4. Generér admin-indeks og spillerpakke.
-5. Sammenlign den genererede pakke kanonisk med input.
+5. Kontrollér, at den genererede offentlige projektion kun indeholder spilbare
+   opgaver; kladder skal ikke være semantisk identiske med det gamle input.
 6. Gentag i den rigtige container først efter godkendt dry-run og rollback.

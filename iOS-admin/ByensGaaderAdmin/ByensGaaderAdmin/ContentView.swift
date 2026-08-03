@@ -293,10 +293,7 @@ struct ContentView: View {
         status = "Dine rettelser er genoprettet. De er ikke gemt endnu."
     }
 
-    /// Gemmer og henter straks igen.
-    ///
-    /// Genhentningen er ikke pynt: serveren beregner ETag'en af indholdet, og
-    /// uden den nye ville næste gemning blive afvist som en konflikt med sig selv.
+    /// Gemmer de objekter, der er ændret, med hvert sit revisionsnummer.
     private func save() {
         guard let document else { return }
         isBusy = true
@@ -307,10 +304,14 @@ struct ContentView: View {
                 document.finaliseNewMissionIds()
                 document.fillRequiredLabels()
                 document.fillEmptyMediaDescriptions()
-                let etag = try await client.save(document)
-                document.adopt(etag: etag)
+                let result = try await client.save(document)
+                document.adopt(
+                    revisions: result.revisions,
+                    contentVersion: result.contentVersion)
                 DraftStore.clear()
-                status = "Gemt."
+                status = result.publicationPending
+                    ? "Rettelserne er gemt. Publiceringen afventer automatisk genforsøg."
+                    : result.didPublish ? "Gemt og publiceret." : "Gemt."
             } catch AdminError.conflict {
                 await mergeAndRetry(document)
             } catch {
@@ -331,12 +332,16 @@ struct ContentView: View {
             let server = try await client.load()
             let clashes = document.rebase(onto: server)
 
-            let etag = try await client.save(document)
-            document.adopt(etag: etag)
+            let result = try await client.save(document)
+            document.adopt(
+                revisions: result.revisions,
+                contentVersion: result.contentVersion)
             DraftStore.clear()
 
             conflicts = clashes
-            status = clashes.isEmpty
+            status = result.publicationPending
+                ? "Rettelserne er gemt. Publiceringen afventer automatisk genforsøg."
+                : clashes.isEmpty
                 ? "Gemt. En andens rettelser blev flettet ind."
                 : "Gemt, men \(clashes.count) felter var rettet af begge."
         } catch {

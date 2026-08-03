@@ -1,13 +1,26 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AuditEntry, BackendKind, ContentPack } from './models';
+import {
+  AuditEntry,
+  AuthoringSnapshot,
+  BackendKind,
+  ContentPack,
+  MediaAsset,
+  MissionAggregate,
+  MissionIndex,
+  ObjectRevisions,
+  SaveResult,
+  Source,
+  VersionedMediaAsset,
+  VersionedSource,
+} from './models';
 
 const backendKey = 'bh.webadmin.backend';
 
-export class PackConflictError extends Error {
-  constructor() {
-    super('Pakken er ændret af en anden quizmaster.');
+export class ObjectConflictError extends Error {
+  constructor(readonly id: string) {
+    super(`${id} er ændret af en anden quizmaster.`);
   }
 }
 
@@ -39,30 +52,77 @@ export class ContentApiService {
     return { pack: response.body, etag: response.headers.get('ETag') };
   }
 
-  async savePack(
-    pack: ContentPack,
+  async loadAuthoring(): Promise<AuthoringSnapshot> {
+    const [published, index, media, sources] = await Promise.all([
+      this.loadPack(),
+      firstValueFrom(this.http.get<MissionIndex>(`${this.authoringUrl()}/missions`)),
+      firstValueFrom(this.http.get<VersionedMediaAsset[]>(`${this.authoringUrl()}/media`)),
+      firstValueFrom(this.http.get<VersionedSource[]>(`${this.authoringUrl()}/sources`)),
+    ]);
+    const missionResponses = await Promise.all(
+      index.missions.map((summary) =>
+        firstValueFrom(
+          this.http.get<MissionAggregate>(
+            `${this.authoringUrl()}/missions/${encodeURIComponent(summary.id)}`,
+            { observe: 'response' },
+          ),
+        ),
+      ),
+    );
+    const aggregates = missionResponses.map((response) => {
+      if (!response.body) throw new Error('Serveren sendte en tom opgave.');
+      return response.body;
+    });
+    const revisions: ObjectRevisions = {
+      missions: Object.fromEntries(
+        missionResponses.map((response, index) => [
+          aggregates[index].mission.id,
+          response.headers.get('ETag') ?? '',
+        ]),
+      ),
+      media: Object.fromEntries(media.map((item) => [item.asset.id, item.etag])),
+      sources: Object.fromEntries(sources.map((item) => [item.source.id, item.etag])),
+    };
+    return {
+      pack: {
+        ...published.pack,
+        schemaVersion: aggregates[0]?.schemaVersion ?? published.pack.schemaVersion,
+        locale: index.locale,
+        missions: aggregates.map((aggregate) => aggregate.mission),
+        locations: aggregates.map((aggregate) => aggregate.location),
+        media: media.map((item) => item.asset),
+        sources: sources.map((item) => item.source),
+      },
+      revisions,
+    };
+  }
+
+  saveMission(
+    aggregate: MissionAggregate,
     etag: string | null,
     quizmaster: string,
-  ): Promise<string | null> {
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'X-Quizmaster': encodeURIComponent(quizmaster.trim()),
-    });
-    if (etag) headers = headers.set('If-Match', etag);
+  ): Promise<SaveResult> {
+    return this.putObject('missions', aggregate.mission.id, aggregate, etag, quizmaster);
+  }
 
-    try {
-      const response = await firstValueFrom(
-        this.http.put(this.packUrl(), JSON.stringify(pack, null, 2), {
-          headers,
-          observe: 'response',
-          responseType: 'text',
-        }),
-      );
-      return response.headers.get('ETag');
-    } catch (error) {
-      if (error instanceof HttpErrorResponse && error.status === 412) throw new PackConflictError();
-      throw error;
-    }
+  saveMedia(asset: MediaAsset, etag: string | null, quizmaster: string): Promise<SaveResult> {
+    return this.putObject('media', asset.id, asset, etag, quizmaster);
+  }
+
+  saveSource(source: Source, etag: string | null, quizmaster: string): Promise<SaveResult> {
+    return this.putObject('sources', source.id, source, etag, quizmaster);
+  }
+
+  deleteMission(id: string, etag: string, quizmaster: string): Promise<SaveResult> {
+    return this.deleteObject('missions', id, etag, quizmaster);
+  }
+
+  deleteMedia(id: string, etag: string, quizmaster: string): Promise<SaveResult> {
+    return this.deleteObject('media', id, etag, quizmaster);
+  }
+
+  deleteSource(id: string, etag: string, quizmaster: string): Promise<SaveResult> {
+    return this.deleteObject('sources', id, etag, quizmaster);
   }
 
   async audit(limit = 100): Promise<AuditEntry[]> {
@@ -102,11 +162,89 @@ export class ContentApiService {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 0)
         return 'Kunne ikke få forbindelse til serveren. Er backenden startet?';
-      if (error.status === 409) return 'Filnavnet er allerede brugt. Prøv at lægge mediet op igen.';
       const detail = error.error?.detail ?? error.error?.title;
       return detail || `Serveren svarede ${error.status}.`;
     }
     return error instanceof Error ? error.message : 'Der skete en ukendt fejl.';
+  }
+
+  private async putObject<T>(
+    collection: 'missions' | 'media' | 'sources',
+    id: string,
+    body: T,
+    etag: string | null,
+    quizmaster: string,
+  ): Promise<SaveResult> {
+    const headers = this.writeHeaders(etag, quizmaster);
+    try {
+      const response = await firstValueFrom(
+        this.http.put<Omit<SaveResult, 'etag'>>(
+          `${this.authoringUrl()}/${collection}/${encodeURIComponent(id)}`,
+          body,
+          { headers, observe: 'response' },
+        ),
+      );
+      return this.saveResult(response, id);
+    } catch (error) {
+      this.rethrowConflict(error, id);
+    }
+  }
+
+  private async deleteObject(
+    collection: 'missions' | 'media' | 'sources',
+    id: string,
+    etag: string,
+    quizmaster: string,
+  ): Promise<SaveResult> {
+    try {
+      const response = await firstValueFrom(
+        this.http.delete(`${this.authoringUrl()}/${collection}/${encodeURIComponent(id)}`, {
+          headers: new HttpHeaders({
+            'If-Match': etag,
+            'X-Quizmaster': encodeURIComponent(quizmaster.trim()),
+          }),
+          observe: 'response',
+          responseType: 'text',
+        }),
+      );
+      return {
+        id,
+        publication: this.publication(response),
+        publishedContentVersion: null,
+        etag: null,
+      };
+    } catch (error) {
+      this.rethrowConflict(error, id);
+    }
+  }
+
+  private writeHeaders(etag: string | null, quizmaster: string): HttpHeaders {
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Quizmaster': encodeURIComponent(quizmaster.trim()),
+    });
+    return etag ? headers.set('If-Match', etag) : headers.set('If-None-Match', '*');
+  }
+
+  private saveResult(response: HttpResponse<Omit<SaveResult, 'etag'>>, id: string): SaveResult {
+    if (!response.body) throw new Error(`Serveren sendte intet gemmeresultat for ${id}.`);
+    return { ...response.body, etag: response.headers.get('ETag') };
+  }
+
+  private publication(response: HttpResponse<unknown>): SaveResult['publication'] {
+    const value = response.headers.get('X-Content-Publication');
+    return value === 'published' || value === 'pending' ? value : 'unchanged';
+  }
+
+  private rethrowConflict(error: unknown, id: string): never {
+    if (error instanceof HttpErrorResponse && error.status === 412) {
+      throw new ObjectConflictError(id);
+    }
+    throw error;
+  }
+
+  private authoringUrl(): string {
+    return `${this.baseUrl()}/authoring/content/${this.locale}`;
   }
 
   private contentUrl(): string {

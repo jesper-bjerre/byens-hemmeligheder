@@ -28,8 +28,28 @@ af en rettet stavefejl.
 ContentStore__Provider          = Blob
 ContentStore__StorageAccountUri = https://byensgaaderd.blob.core.windows.net
 ContentStore__Container         = content
+ContentStore__AuthoringContainer = authoring
+Authoring__ReconciliationEnabled = false
 ASPNETCORE_ENVIRONMENT          = Production
 ```
+
+`Authoring__ReconciliationEnabled` står bevidst på `false` under kodeudrulning.
+Det forhindrer, at en backenddeploy i sig selv starter migrationen. Når
+`./backend/seed-content.sh --dry-run` er godkendt, authoring-containeren er
+privat, og begge nye admin-apps er klar, aktiveres migrationen ved at sætte
+værdien til `true` og genstarte API'et. Første kørsel splitter den eksisterende
+offentlige pakke idempotent og publicerer derefter kun spilbare opgaver.
+
+Rollback før afsluttet intern test er:
+
+1. sæt reconciliation til `false`;
+2. genudrul den tidligere backendbuild;
+3. gendan den tidligere stabile `content-pack.json` fra blobversion/backup;
+4. behold authoring-containeren urørt til fejlen er forstået.
+
+Den gamle admin-builds hel-pakke-PUT afvises efter authoring er aktiveret. Det
+er bevidst: at lade to samtidige kilder acceptere writes ville kunne tabe
+opgaver. Udrul derfor de nye admin-klienter før aktiveringen.
 
 `Provider` er eksplicit og udledes **ikke** af, om der står en adresse. En
 tastefejl ville ellers falde tilbage til containerens lokale disk, og API'et
@@ -182,6 +202,11 @@ besvaret. Det skal rettes, *før* der indføres en nøgle — ellers kan nøglen
 sendes i klartekst.
 
 **Blob-versionering er slået fra.** Soft delete dækker 7 dage.
+
+Før indholdet ikke længere må smides væk, skal versioning samt blob- og
+container-soft-delete aktiveres på både public og authoring, en lifecycle-regel
+skal begrænse gamle versioner, og gentagne dirty publication-states skal give
+alarm. Det er fortsat bevidst udskudt under den interne test.
 
 Løsningen er skrevet ud i [køreplanens mål 1](../plans/koereplan.md) med de
 kommandoer, der mangler at blive kørt. Kort: en delt nøgle som header på alt

@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod()
                 // Browserklienten skal læse ETag for at undgå, at to
                 // quizmastere overskriver hinanden.
-                .WithExposedHeaders("ETag");
+                .WithExposedHeaders("ETag", "X-Content-Publication");
         }
     });
 });
@@ -54,16 +54,35 @@ if (storage.Provider is ContentStoreProvider.Blob)
 
     // `DefaultAzureCredential` er `az login` lokalt og managed identity i
     // Azure. Ingen nøgle at lække — og intet at rotere, hvis repoet er public.
-    builder.Services.AddSingleton(
-        new BlobServiceClient(account, new Azure.Identity.DefaultAzureCredential()));
-    builder.Services.AddSingleton<IContentStore, BlobContentStore>();
+    var service = new BlobServiceClient(account, new Azure.Identity.DefaultAzureCredential());
+    var publicStore = new BlobContentStore(
+        service.GetBlobContainerClient(storage.Container));
+    var authoringStore = new BlobContentStore(
+        service.GetBlobContainerClient(storage.AuthoringContainer));
+    builder.Services.AddSingleton(service);
+    builder.Services.AddSingleton<IContentStore>(publicStore);
+    builder.Services.AddSingleton(new ContentStores(publicStore, authoringStore));
 }
 else
 {
-    builder.Services.AddSingleton<IContentStore, FileSystemContentStore>();
+    var publicStore = new FileSystemContentStore(
+        Microsoft.Extensions.Options.Options.Create(storage));
+    var authoringStore = new FileSystemContentStore(
+        Microsoft.Extensions.Options.Options.Create(new ContentStoreOptions
+        {
+            RootPath = storage.AuthoringRootPath,
+        }));
+    builder.Services.AddSingleton<IContentStore>(publicStore);
+    builder.Services.AddSingleton(new ContentStores(publicStore, authoringStore));
 }
 
 builder.Services.AddSingleton<ByensGaader.Api.Features.Content.AuditTrail>();
+builder.Services.Configure<ByensGaader.Api.Features.Content.AuthoringOptions>(
+    builder.Configuration.GetSection(ByensGaader.Api.Features.Content.AuthoringOptions.Section));
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<ByensGaader.Api.Features.Content.AuthoringRepository>();
+builder.Services.AddSingleton<ByensGaader.Api.Features.Content.ContentPublisher>();
+builder.Services.AddHostedService<ByensGaader.Api.Features.Content.PublicationReconciler>();
 builder.Services.AddSingleton<
     ByensGaader.Api.Features.Content.IAudioTranscoder,
     ByensGaader.Api.Features.Content.FfmpegAudioTranscoder>();

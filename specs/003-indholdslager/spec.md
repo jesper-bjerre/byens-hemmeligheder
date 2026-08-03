@@ -1,6 +1,6 @@
 # Feature 003 — Indholdslageret
 
-**Status:** Revideret forslag — afventer accept af [research.md](./research.md)
+**Status:** Accepteret og implementeret
 **Aftalt:** 3. august 2026
 **Kode:** `backend/`, `iOS-admin/`, `webApps/webadmin/`
 
@@ -36,8 +36,9 @@ fast driftsomkostning.
 - **FR-208**: En privat, regenererbar `index.json` MUST give admin-appene
   hierarkiet uden at hente alle opgavedokumenter.
 - **FR-209**: Admin-appene MUST hente og gemme én opgave ad gangen.
-- **FR-210**: En engangsmigrering MUST splitte den nuværende pakke og generere
-  en semantisk identisk spillerpakke uden at ændre kilden under dry-run.
+- **FR-210**: En engangsmigrering MUST splitte den nuværende pakke uden at
+  ændre kilden under dry-run. Den offentlige pakke er den forventede projektion
+  af spilbare opgaver; kladder må bevidst ikke længere kopieres til den.
 - **FR-211**: `pull-content.sh` MUST eksportere authoring-kilden som
   gennemgåelige opgavefiler til repoets fixture.
 - **FR-212**: Lagerafvigelsen fra forfatningens relationelle mål MUST beskrives

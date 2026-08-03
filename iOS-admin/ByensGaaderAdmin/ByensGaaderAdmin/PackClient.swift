@@ -1,6 +1,6 @@
 import Foundation
 
-/// Taler med backenden om indholdspakken og dens medier.
+/// Taler med backenden om redaktionelle objekter og deres medier.
 ///
 /// ## Pakken behandles som JSON, ikke som modeller
 ///
@@ -39,6 +39,10 @@ struct PackClient {
         base.appending(path: "content").appending(path: locale).appending(path: "pack")
     }
 
+    private var authoringURL: URL {
+        base.appending(path: "authoring").appending(path: "content").appending(path: locale)
+    }
+
     private var mediaURL: URL {
         base.appending(path: "content").appending(path: locale).appending(path: "media")
     }
@@ -52,52 +56,187 @@ struct PackClient {
         mediaURL.appending(path: filename)
     }
 
-    // MARK: - Pakken
+    // MARK: - Redaktionelt indhold
 
     func load() async throws -> PackDocument {
-        var request = URLRequest(url: packURL)
-        request.cachePolicy = .reloadIgnoringLocalCacheData
+        let (packData, _) = try await get(packURL)
+        guard var root = try JSONSerialization.jsonObject(with: packData) as? [String: Any]
+        else { throw AdminError.message("Pakken er ikke et JSON-objekt.") }
 
+        let (indexData, _) = try await get(authoringURL.appending(path: "missions"))
+        guard let index = try JSONSerialization.jsonObject(with: indexData) as? [String: Any],
+              let summaries = index["missions"] as? [[String: Any]]
+        else { throw AdminError.message("Opgaveindekset kunne ikke læses.") }
+
+        var missions: [[String: Any]] = []
+        var locations: [[String: Any]] = []
+        var revisions = ObjectRevisions.empty
+        for summary in summaries {
+            guard let id = summary["id"] as? String else { continue }
+            let (data, http) = try await get(
+                authoringURL.appending(path: "missions").appending(path: id))
+            guard let aggregate = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let mission = aggregate["mission"] as? [String: Any],
+                  let location = aggregate["location"] as? [String: Any]
+            else { throw AdminError.message("Opgaven \(id) kunne ikke læses.") }
+            missions.append(mission)
+            locations.append(location)
+            if let etag = http.value(forHTTPHeaderField: "ETag") {
+                revisions.missions[id] = etag
+            }
+            if let schemaVersion = aggregate["schemaVersion"] {
+                root["schemaVersion"] = schemaVersion
+            }
+        }
+
+        let media = try await loadCatalog(collection: "media", objectKey: "asset")
+        let sources = try await loadCatalog(collection: "sources", objectKey: "source")
+        revisions.media = media.revisions
+        revisions.sources = sources.revisions
+        root["locale"] = index["locale"] ?? locale
+        root["missions"] = missions
+        root["locations"] = locations
+        root["media"] = media.objects
+        root["sources"] = sources.objects
+        return PackDocument(root: root, base: root, revisions: revisions)
+    }
+
+    /// Gemmer kun de objekter, der er ændret siden indlæsningen.
+    func save(_ document: PackDocument) async throws -> AuthoringSaveSummary {
+        guard AdminConfiguration.isReady else { throw AdminError.noQuizmaster }
+        let changes = try document.authoringChanges()
+        var revisions = document.revisions
+        var summary = AuthoringSaveSummary(revisions: revisions)
+
+        // Metadata oprettes før opgaverne, så nye referencer altid peger på
+        // noget, der allerede findes. Sletninger kommer omvendt til sidst.
+        for object in changes.media.updates {
+            let result = try await put(
+                object, collection: "media", etag: revisions.media[object.id])
+            revisions.media[object.id] = result.etag
+            summary.record(result)
+        }
+        for object in changes.sources.updates {
+            let result = try await put(
+                object, collection: "sources", etag: revisions.sources[object.id])
+            revisions.sources[object.id] = result.etag
+            summary.record(result)
+        }
+        for object in changes.missions.updates {
+            let result = try await put(
+                object, collection: "missions", etag: revisions.missions[object.id])
+            revisions.missions[object.id] = result.etag
+            summary.record(result)
+        }
+        for id in changes.missions.deletions {
+            let etag = try requiredRevision(revisions.missions[id], id: id)
+            summary.record(try await deleteObject(collection: "missions", id: id, etag: etag))
+            revisions.missions.removeValue(forKey: id)
+        }
+        for id in changes.media.deletions {
+            let etag = try requiredRevision(revisions.media[id], id: id)
+            summary.record(try await deleteObject(collection: "media", id: id, etag: etag))
+            revisions.media.removeValue(forKey: id)
+        }
+        for id in changes.sources.deletions {
+            let etag = try requiredRevision(revisions.sources[id], id: id)
+            summary.record(try await deleteObject(collection: "sources", id: id, etag: etag))
+            revisions.sources.removeValue(forKey: id)
+        }
+        summary.revisions = revisions
+        return summary
+    }
+
+    private func loadCatalog(
+        collection: String, objectKey: String
+    ) async throws -> (objects: [[String: Any]], revisions: [String: String]) {
+        let (data, _) = try await get(authoringURL.appending(path: collection))
+        guard let wrapped = try JSONSerialization.jsonObject(with: data) as? [[String: Any]]
+        else { throw AdminError.message("Listen over \(collection) kunne ikke læses.") }
+        var objects: [[String: Any]] = []
+        var revisions: [String: String] = [:]
+        for item in wrapped {
+            guard let object = item[objectKey] as? [String: Any],
+                  let id = object["id"] as? String,
+                  let etag = item["etag"] as? String
+            else { continue }
+            objects.append(object)
+            revisions[id] = etag
+        }
+        return (objects, revisions)
+    }
+
+    private func put(
+        _ object: AuthoringObject, collection: String, etag: String?
+    ) async throws -> AuthoringWriteResponse {
+        var request = URLRequest(
+            url: authoringURL.appending(path: collection).appending(path: object.id))
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(
+            AdminConfiguration.quizmaster.percentEncodedForHeader,
+            forHTTPHeaderField: "X-Quizmaster")
+        if let etag {
+            request.setValue(etag, forHTTPHeaderField: "If-Match")
+        } else {
+            request.setValue("*", forHTTPHeaderField: "If-None-Match")
+        }
+        request.httpBody = try JSONSerialization.data(
+            withJSONObject: object.json, options: [.sortedKeys, .withoutEscapingSlashes])
+
+        let (data, response) = try await Self.session.data(for: request)
+        let http = try Self.http(response)
+        if http.statusCode == 412 { throw AdminError.conflict }
+        guard http.statusCode == 200 || http.statusCode == 201,
+              let etag = http.value(forHTTPHeaderField: "ETag"),
+              let body = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else { throw AdminError.message("Serveren afviste \(object.id) med \(http.statusCode).") }
+        return AuthoringWriteResponse(
+            id: object.id,
+            etag: etag,
+            publication: body["publication"] as? String ?? "unchanged",
+            contentVersion: body["publishedContentVersion"] as? String)
+    }
+
+    private func deleteObject(
+        collection: String, id: String, etag: String
+    ) async throws -> AuthoringWriteResponse {
+        var request = URLRequest(
+            url: authoringURL.appending(path: collection).appending(path: id))
+        request.httpMethod = "DELETE"
+        request.setValue(etag, forHTTPHeaderField: "If-Match")
+        request.setValue(
+            AdminConfiguration.quizmaster.percentEncodedForHeader,
+            forHTTPHeaderField: "X-Quizmaster")
+        let (_, response) = try await Self.session.data(for: request)
+        let http = try Self.http(response)
+        if http.statusCode == 412 { throw AdminError.conflict }
+        guard http.statusCode == 204 else {
+            throw AdminError.message("Serveren afviste sletning af \(id) med \(http.statusCode).")
+        }
+        return AuthoringWriteResponse(
+            id: id,
+            etag: nil,
+            publication: http.value(forHTTPHeaderField: "X-Content-Publication") ?? "unchanged",
+            contentVersion: nil)
+    }
+
+    private func get(_ url: URL) async throws -> (Data, HTTPURLResponse) {
+        var request = URLRequest(url: url)
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         let (data, response) = try await Self.session.data(for: request)
         let http = try Self.http(response)
         guard http.statusCode == 200 else {
             throw AdminError.message("Serveren svarede \(http.statusCode).")
         }
-        return try PackDocument(data: data, etag: http.value(forHTTPHeaderField: "ETag"))
+        return (data, http)
     }
 
-    /// - Returns: den nye ETag.
-    func save(_ document: PackDocument) async throws -> String? {
-        guard AdminConfiguration.isReady else { throw AdminError.noQuizmaster }
-
-        var request = URLRequest(url: packURL)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        // Uden denne overskriver to quizmastere hinanden i tavshed.
-        if let etag = document.etag {
-            request.setValue(etag, forHTTPHeaderField: "If-Match")
+    private func requiredRevision(_ value: String?, id: String) throws -> String {
+        guard let value, !value.isEmpty else {
+            throw AdminError.message("Mangler revisionsnummer for \(id). Hent opgaverne igen.")
         }
-        // Uden dette kan sporet ikke svare på hvem, og serveren afviser (FR-111).
-        //
-        // Procentkodet, fordi en HTTP-header ikke kan bære andet end ASCII.
-        // "Søren" ville ellers stå som "SÃ¸ren" i sporet — eller blive tabt
-        // undervejs, alt efter hvad de to ender gætter på.
-        request.setValue(
-            AdminConfiguration.quizmaster.percentEncodedForHeader,
-            forHTTPHeaderField: "X-Quizmaster")
-        request.httpBody = try document.serialised()
-
-        let (_, response) = try await Self.session.data(for: request)
-        let http = try Self.http(response)
-
-        switch http.statusCode {
-        case 200, 204:
-            return http.value(forHTTPHeaderField: "ETag")
-        case 412:
-            throw AdminError.conflict
-        default:
-            throw AdminError.message("Serveren afviste med \(http.statusCode).")
-        }
+        return value
     }
 
     // MARK: - Medier
@@ -291,5 +430,29 @@ enum AdminError: LocalizedError {
         case .noQuizmaster:
             "Skriv dit navn under Quizmaster, før du gemmer. Sporet skal kunne svare på hvem."
         }
+    }
+}
+
+private struct AuthoringWriteResponse {
+    let id: String
+    let etag: String?
+    let publication: String
+    let contentVersion: String?
+}
+
+struct AuthoringSaveSummary {
+    var revisions: ObjectRevisions
+    private(set) var publicationPending = false
+    private(set) var didPublish = false
+    private(set) var contentVersion: String?
+
+    init(revisions: ObjectRevisions) {
+        self.revisions = revisions
+    }
+
+    fileprivate mutating func record(_ response: AuthoringWriteResponse) {
+        if response.publication == "pending" { publicationPending = true }
+        if response.publication == "published" { didPublish = true }
+        if let version = response.contentVersion { contentVersion = version }
     }
 }

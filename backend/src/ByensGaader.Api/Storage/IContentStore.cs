@@ -52,9 +52,28 @@ internal interface IContentStore
 
     public Task<bool> DeleteAsync(string relativePath, CancellationToken ct);
 
+    /// <summary>Sletter kun, hvis filen stadig har den forventede ETag.</summary>
+    public Task<WriteOutcome> DeleteIfMatchAsync(
+        string relativePath, string expectedETag, CancellationToken ct);
+
     /// <summary>Filnavne i en mappe, sorteret. Tom hvis mappen ikke findes.</summary>
     public Task<IReadOnlyList<string>> ListAsync(string relativeDirectory, CancellationToken ct);
+
+    /// <summary>
+    /// Tager en advisory lease. Alle authoring-skrivninger respekterer den;
+    /// lageret låser ikke andre filer af sig selv.
+    /// </summary>
+    public Task<IContentLease> AcquireLeaseAsync(string relativePath, CancellationToken ct);
 }
+
+internal interface IContentLease : IAsyncDisposable
+{
+    /// <summary>Om kaldet måtte vente på en anden publicering.</summary>
+    public bool WasContended { get; }
+}
+
+/// <summary>De to dataområder har samme teknik, men aldrig samme rettigheder.</summary>
+internal sealed record ContentStores(IContentStore Public, IContentStore Authoring);
 
 internal enum WriteOutcome
 {

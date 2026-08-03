@@ -96,10 +96,12 @@ public sealed class App : AppFixture<Program>
 public class WritableApp : AppFixture<Program>
 {
     private string _root = string.Empty;
+    private string _authoringRoot = string.Empty;
 
     protected override ValueTask PreSetupAsync()
     {
         _root = Path.Combine(Path.GetTempPath(), "byensgaader-test-" + Guid.NewGuid().ToString("N"));
+        _authoringRoot = Path.Combine(_root, "authoring");
         var locale = Path.Combine(_root, "da-DK");
         Directory.CreateDirectory(locale);
 
@@ -114,6 +116,7 @@ public class WritableApp : AppFixture<Program>
     protected override void ConfigureApp(IWebHostBuilder builder)
     {
         builder.UseSetting("ContentStore:RootPath", _root);
+        builder.UseSetting("ContentStore:AuthoringRootPath", _authoringRoot);
     }
 
     protected override ValueTask TearDownAsync()

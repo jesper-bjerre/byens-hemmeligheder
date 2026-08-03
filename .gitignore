@@ -160,6 +160,7 @@ $RECYCLE.BIN/
 *.tmp
 tmp/
 .tmp/
+.local/
 
 # --- ASP.NET-backend ---------------------------------------------------------
 # Lokale konfigurationer kan indeholde connection strings og nøgler til Azure.

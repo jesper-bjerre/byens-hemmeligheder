@@ -184,6 +184,37 @@ public abstract class ContentStoreContractTests : IAsyncLifetime
         Assert.False(await _store.DeleteAsync(Path("m/slet.jpg"), TestContext.Current.CancellationToken));
     }
 
+    [Fact]
+    public async Task Betinget_sletning_afviser_en_foraeldet_etag()
+    {
+        await _store.WriteAsync(Path("slet.json"), Bytes("før"), null, TestContext.Current.CancellationToken);
+        var stale = await _store.ReadAsync(Path("slet.json"), TestContext.Current.CancellationToken);
+        await _store.WriteAsync(
+            Path("slet.json"), Bytes("efter"), stale!.ETag, TestContext.Current.CancellationToken);
+
+        var outcome = await _store.DeleteIfMatchAsync(
+            Path("slet.json"), stale.ETag, TestContext.Current.CancellationToken);
+
+        Assert.Equal(WriteOutcome.Conflict, outcome);
+        Assert.NotNull(await _store.ReadAsync(Path("slet.json"), TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task En_lease_lader_kun_en_publicering_fortsætte_ad_gangen()
+    {
+        var first = await _store.AcquireLeaseAsync(
+            Path("locks/da-DK"), TestContext.Current.CancellationToken);
+        var waiting = _store.AcquireLeaseAsync(
+            Path("locks/da-DK"), TestContext.Current.CancellationToken);
+
+        await Task.Delay(100, TestContext.Current.CancellationToken);
+        Assert.False(waiting.IsCompleted);
+
+        await first.DisposeAsync();
+        await using var second = await waiting;
+        Assert.True(second.WasContended);
+    }
+
     // MARK: - Sporet
 
     /// <summary>

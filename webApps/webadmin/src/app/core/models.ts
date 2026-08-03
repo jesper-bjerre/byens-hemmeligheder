@@ -156,9 +156,59 @@ export interface AuditEntry {
 export interface Draft {
   root: ContentPack;
   base: ContentPack;
-  etag: string | null;
+  revisions: ObjectRevisions;
   backend: BackendKind;
   savedAt: string;
+}
+
+export interface ObjectRevisions {
+  missions: Record<string, string>;
+  media: Record<string, string>;
+  sources: Record<string, string>;
+}
+
+export interface MissionAggregate {
+  schemaVersion: string;
+  mission: Mission;
+  location: LocationRecord;
+}
+
+export interface MissionSummary {
+  id: string;
+  slug: string;
+  title: string;
+  status: string;
+  postalCode: string;
+  updatedAt: string;
+  updatedBy: string | null;
+  etag: string;
+}
+
+export interface MissionIndex {
+  locale: string;
+  missions: MissionSummary[];
+}
+
+export interface VersionedMediaAsset {
+  asset: MediaAsset;
+  etag: string;
+}
+
+export interface VersionedSource {
+  source: Source;
+  etag: string;
+}
+
+export interface AuthoringSnapshot {
+  pack: ContentPack;
+  revisions: ObjectRevisions;
+}
+
+export interface SaveResult {
+  id: string;
+  publication: 'published' | 'pending' | 'unchanged';
+  publishedContentVersion: string | null;
+  etag: string | null;
 }
 
 export type BackendKind = 'lokal' | 'drift';

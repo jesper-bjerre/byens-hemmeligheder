@@ -1,6 +1,6 @@
 # ADR 0007 — Blob som redaktionel kilde, SQL kun ved dokumenteret behov
 
-**Status**: Foreslået
+**Status**: Accepteret
 **Dato**: 2026-08-03
 **Ændrer**: Forfatningens afsnit **Tekniske rammer** (afsnittet om data)
 **Berører**: [ADR 0004](./0004-serverbaaret-indhold.md),

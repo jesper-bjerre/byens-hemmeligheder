@@ -20,6 +20,9 @@ enum DraftStore {
     private struct Draft: Codable {
         let root: Data
         let base: Data
+        /// Optional, så en kladde fra TestFlight-versionen før objektlageret
+        /// stadig kan åbnes. Den gamle pakke-ETag kan kun bruges til fletning.
+        let revisions: ObjectRevisions?
         let etag: String?
         let savedAt: Date
     }
@@ -41,6 +44,7 @@ enum DraftStore {
             let draft = Draft(
                 root: try JSONSerialization.data(withJSONObject: document.root),
                 base: try JSONSerialization.data(withJSONObject: document.base),
+                revisions: document.revisions,
                 etag: document.etag,
                 savedAt: .now)
             try JSONEncoder().encode(draft).write(to: url, options: [.atomic])
@@ -75,7 +79,11 @@ enum DraftStore {
         }
 
         return Restored(
-            document: PackDocument(root: root, base: base, etag: draft.etag),
+            document: PackDocument(
+                root: root,
+                base: base,
+                etag: draft.etag,
+                revisions: draft.revisions ?? .empty),
             savedAt: draft.savedAt)
     }
 }

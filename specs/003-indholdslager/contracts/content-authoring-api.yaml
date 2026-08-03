@@ -1,19 +1,18 @@
 openapi: 3.1.0
 info:
   title: Byens Gåder — redaktionelt indhold
-  version: 0.1.0-proposed
+  version: 1.0.0
   license:
     name: Ingen åben licens angivet
     identifier: LicenseRef-All-Rights-Reserved
   description: |
-    Foreslået kontrakt for opgavevis redigering. Authentication og
-    authorization fastlægges i en særskilt feature før produktionsaktivering.
+    Implementeret kontrakt for opgavevis redigering. Authentication og
+    authorization er som aftalt udskudt til en særskilt feature.
     Kontrakten beskriver metadata i én fælles indholdssamling. Eksisterende
     binære uploadruter for billeder og fortællinger bevares.
 servers:
   - url: https://byensgaader-api-p.azurewebsites.net
-security:
-  - quizmasterSession: []
+security: []
 paths:
   /authoring/content/{locale}/missions:
     get:
@@ -84,7 +83,7 @@ paths:
           description: Midlertidigt auditnavn; er ikke en identitet.
           schema:
             type: string
-            maxLength: 200
+            maxLength: 60
       requestBody:
         required: true
         content:
@@ -172,9 +171,9 @@ paths:
               $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/mediaAsset'
       responses:
         '200':
-          $ref: '#/components/responses/MetadataSaved'
+          $ref: '#/components/responses/Saved'
         '201':
-          $ref: '#/components/responses/MetadataSaved'
+          $ref: '#/components/responses/Saved'
         '412':
           $ref: '#/components/responses/Problem'
         '428':
@@ -250,9 +249,9 @@ paths:
               $ref: '../../../contracts/bh-content-v1.schema.json#/$defs/source'
       responses:
         '200':
-          $ref: '#/components/responses/MetadataSaved'
+          $ref: '#/components/responses/Saved'
         '201':
-          $ref: '#/components/responses/MetadataSaved'
+          $ref: '#/components/responses/Saved'
         '412':
           $ref: '#/components/responses/Problem'
         '428':
@@ -367,7 +366,7 @@ components:
       description: Midlertidigt auditnavn; er ikke en identitet.
       schema:
         type: string
-        maxLength: 200
+        maxLength: 60
 
   headers:
     ETag:
@@ -395,12 +394,6 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
-    MetadataSaved:
-      description: Metadata er gemt og har fået en ny revision.
-      headers:
-        ETag:
-          $ref: '#/components/headers/ETag'
-
   schemas:
     MissionSummary:
       type: object

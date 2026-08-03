@@ -52,7 +52,7 @@ internal sealed record AuditEntry(
 /// kræve, at hele filen læses og skrives om for hver gemning — og så ville to
 /// samtidige gemninger kunne tabe hinandens linjer.
 /// </remarks>
-internal sealed class AuditTrail(IContentStore store)
+internal sealed class AuditTrail(ContentStores stores)
 {
     private static readonly JsonSerializerOptions Format = new()
     {
@@ -60,7 +60,7 @@ internal sealed class AuditTrail(IContentStore store)
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    internal static string PathFor(string locale) => Path.Combine(locale, "audit.jsonl");
+    internal static string PathFor(string locale) => AuthoringPaths.Audit(locale);
 
     /// <summary>
     /// Sammenholder den gemte pakke med den nye og skriver forskellen.
@@ -107,36 +107,67 @@ internal sealed class AuditTrail(IContentStore store)
             lines.Append(JsonSerializer.Serialize(entry, Format)).Append('\n');
         }
 
-        await store.AppendAsync(PathFor(locale), Encoding.UTF8.GetBytes(lines.ToString()), ct);
+        // Legacy hel-pakke-gemninger fortsætter i det gamle spor, indtil
+        // authoring aktiveres. Så opstår der ikke et migrationsvindue, hvor
+        // en gammel admin-build kan få historikken til at splitte tavst.
+        await stores.Public.AppendAsync(
+            PathFor(locale), Encoding.UTF8.GetBytes(lines.ToString()), ct);
+    }
+
+    public async Task RecordObjectAsync(
+        string locale,
+        string by,
+        string change,
+        string id,
+        string? from,
+        string? to,
+        string? contentVersion,
+        CancellationToken ct)
+    {
+        var entry = new AuditEntry(
+            DateTimeOffset.UtcNow,
+            by,
+            change,
+            id,
+            from,
+            to,
+            contentVersion ?? "afventer");
+        var line = JsonSerializer.Serialize(entry, Format) + "\n";
+        await stores.Authoring.AppendAsync(
+            PathFor(locale), Encoding.UTF8.GetBytes(line), ct);
     }
 
     /// <summary>De seneste linjer, nyeste først.</summary>
     public async Task<IReadOnlyList<JsonElement>> ReadAsync(
         string locale, int limit, CancellationToken ct)
     {
-        var file = await store.ReadAsync(PathFor(locale), ct);
-        if (file is null)
-        {
-            return [];
-        }
-
         var entries = new List<JsonElement>();
-        foreach (var line in Encoding.UTF8.GetString(file.Content)
-                     .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        // Det gamle spor bliver liggende i public under den sikre overgang;
+        // nye objektgemninger skriver kun privat. Endpointet samler begge, så
+        // historikken ikke forsvinder, før den gamle blob er arkiveret.
+        foreach (var store in new[] { stores.Public, stores.Authoring })
         {
-            try
+            var file = await store.ReadAsync(PathFor(locale), ct);
+            if (file is null) continue;
+            foreach (var line in Encoding.UTF8.GetString(file.Content)
+                         .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
-                entries.Add(JsonDocument.Parse(line).RootElement.Clone());
-            }
-            catch (JsonException)
-            {
-                // En ulæselig linje springes over. Et halvskrevet spor er
-                // stadig et spor, og resten af linjerne skal kunne læses.
+                try
+                {
+                    entries.Add(JsonDocument.Parse(line).RootElement.Clone());
+                }
+                catch (JsonException)
+                {
+                    // En ulæselig linje springes over. Et halvskrevet spor er
+                    // stadig et spor, og resten af linjerne skal kunne læses.
+                }
             }
         }
-
-        entries.Reverse();
-        return entries.Take(limit).ToArray();
+        return entries
+            .OrderByDescending(entry => entry.TryGetProperty("at", out var at)
+                && at.TryGetDateTimeOffset(out var parsed) ? parsed : DateTimeOffset.MinValue)
+            .Take(limit)
+            .ToArray();
     }
 
     private static string VersionOf(byte[] pack)

@@ -31,7 +31,10 @@ extension Array where Element == JSONStep {
 final class PackDocument {
 
     private(set) var root: [String: Any]
+    /// Kun bevaret for kladder fra den gamle hel-pakke-klient og dens tests.
+    /// Nye gemninger bruger ét revisionsnummer pr. objekt.
     private(set) var etag: String?
+    private(set) var revisions: ObjectRevisions
 
     /// Pakken, som den så ud, da den blev hentet.
     ///
@@ -53,14 +56,21 @@ final class PackDocument {
         self.root = object
         self.base = object
         self.etag = etag
+        self.revisions = .empty
     }
 
     /// Genskaber en kladde. Basis er den udgave, kladden blev bygget oven på —
     /// ikke kladden selv, ellers ser alt ud som om det aldrig blev rettet.
-    init(root: [String: Any], base: [String: Any], etag: String?) {
+    init(
+        root: [String: Any],
+        base: [String: Any],
+        etag: String? = nil,
+        revisions: ObjectRevisions = .empty
+    ) {
         self.root = root
         self.base = base
         self.etag = etag
+        self.revisions = revisions
     }
 
     // MARK: - Rå adgang
@@ -266,6 +276,54 @@ final class PackDocument {
 
     // MARK: - Gemning
 
+    /// De enkelte objekter, der faktisk er rettet siden indlæsningen.
+    /// Stedet ligger sammen med sin opgave, så en koordinatrettelse udløser
+    /// samme mission-PUT som en titelrettelse.
+    func authoringChanges() throws -> AuthoringChanges {
+        let currentMissions = Self.byID(objects(at: [.key("missions")]))
+        let baseMissions = Self.byID(Self.objects(in: base, key: "missions"))
+        let currentLocations = Self.byID(objects(at: [.key("locations")]))
+        let baseLocations = Self.byID(Self.objects(in: base, key: "locations"))
+        let schemaVersion = root["schemaVersion"] ?? "1.0.0"
+        let baseSchemaVersion = base["schemaVersion"] ?? schemaVersion
+
+        var missionUpdates: [AuthoringObject] = []
+        for mission in objects(at: [.key("missions")]) {
+            let id = try Self.requiredID(mission)
+            let locationID = mission["locationId"] as? String ?? ""
+            guard let location = currentLocations[locationID] else {
+                throw AdminError.message("Opgaven \(id) mangler sit sted.")
+            }
+            let aggregate: [String: Any] = [
+                "schemaVersion": schemaVersion,
+                "mission": mission,
+                "location": location,
+            ]
+            let oldMission = baseMissions[id]
+            let oldLocationID = oldMission?["locationId"] as? String ?? ""
+            let oldAggregate: [String: Any]? = oldMission.flatMap { value in
+                guard let oldLocation = baseLocations[oldLocationID] else { return nil }
+                return [
+                    "schemaVersion": baseSchemaVersion,
+                    "mission": value,
+                    "location": oldLocation,
+                ]
+            }
+            if oldAggregate == nil || !Self.equal(aggregate, oldAggregate!) {
+                missionUpdates.append(AuthoringObject(id: id, json: aggregate))
+            }
+        }
+
+        return AuthoringChanges(
+            missions: .init(
+                updates: missionUpdates,
+                deletions: baseMissions.keys.filter { currentMissions[$0] == nil }.sorted()),
+            media: Self.catalogChanges(current: objects(at: [.key("media")]),
+                                       base: Self.objects(in: base, key: "media")),
+            sources: Self.catalogChanges(current: objects(at: [.key("sources")]),
+                                         base: Self.objects(in: base, key: "sources")))
+    }
+
     func serialised() throws -> Data {
         // Sorterede nøgler, så to gemninger af det samme giver den samme fil —
         // ellers ændrer ETag'en sig, uden at noget er ændret.
@@ -281,6 +339,14 @@ final class PackDocument {
         base = root
     }
 
+    /// Efter objektvise gemninger er både basis og alle revisionsnumre nye.
+    func adopt(revisions: ObjectRevisions, contentVersion: String?) {
+        self.revisions = revisions
+        if let contentVersion { root["contentVersion"] = contentVersion }
+        etag = nil
+        base = root
+    }
+
     /// Lægger vores rettelser oven på serverens udgave efter en `412`.
     ///
     /// - Returns: felterne, hvor begge havde rettet forskelligt. Vores værdi
@@ -291,9 +357,71 @@ final class PackDocument {
         root = result.root
         base = server.root
         etag = server.etag
+        revisions = server.revisions
         onChange?()
         return result.conflicts
     }
+
+    private static func objects(in root: [String: Any], key: String) -> [[String: Any]] {
+        root[key] as? [[String: Any]] ?? []
+    }
+
+    private static func byID(_ objects: [[String: Any]]) -> [String: [String: Any]] {
+        Dictionary(uniqueKeysWithValues: objects.compactMap { object in
+            (object["id"] as? String).map { ($0, object) }
+        })
+    }
+
+    private static func requiredID(_ object: [String: Any]) throws -> String {
+        guard let id = object["id"] as? String, !id.isEmpty else {
+            throw AdminError.message("Et redaktionelt objekt mangler id.")
+        }
+        return id
+    }
+
+    private static func catalogChanges(
+        current: [[String: Any]], base: [[String: Any]]
+    ) -> AuthoringCollectionChanges {
+        let currentByID = byID(current)
+        let baseByID = byID(base)
+        let updates = current.compactMap { object -> AuthoringObject? in
+            guard let id = object["id"] as? String,
+                  baseByID[id] == nil || !equal(object, baseByID[id]!)
+            else { return nil }
+            return AuthoringObject(id: id, json: object)
+        }
+        return .init(
+            updates: updates,
+            deletions: baseByID.keys.filter { currentByID[$0] == nil }.sorted())
+    }
+
+    private static func equal(_ left: [String: Any], _ right: [String: Any]) -> Bool {
+        NSDictionary(dictionary: left).isEqual(to: right)
+    }
+}
+
+struct ObjectRevisions: Codable, Equatable {
+    var missions: [String: String]
+    var media: [String: String]
+    var sources: [String: String]
+
+    static let empty = ObjectRevisions(missions: [:], media: [:], sources: [:])
+}
+
+struct AuthoringObject {
+    let id: String
+    let json: [String: Any]
+}
+
+struct AuthoringCollectionChanges {
+    let updates: [AuthoringObject]
+    let deletions: [String]
+}
+
+struct AuthoringChanges {
+    let missions: AuthoringCollectionChanges
+    let media: AuthoringCollectionChanges
+    let sources: AuthoringCollectionChanges
 }
 
 struct MissionSummary: Identifiable, Hashable {

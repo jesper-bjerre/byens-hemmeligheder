@@ -15,7 +15,13 @@
       </div>
       <div class="save-state" [class.dirty]="store.isDirty()">
         <span class="state-dot"></span>
-        {{ store.saving() ? 'Gemmer…' : store.isDirty() ? 'Ikke gemt' : 'Gemt' }}
+        {{
+          store.saving()
+            ? 'Gemmer…'
+            : store.isDirty()
+              ? 'Ikke gemt'
+              : store.status() || 'Gemt og publiceret'
+        }}
       </div>
       <button
         class="button primary save"

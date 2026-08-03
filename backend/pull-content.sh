@@ -26,13 +26,14 @@
 
 set -euo pipefail
 
-ACCOUNT="${1:?Brug: pull-content.sh <storage-konto> [container]}"
-CONTAINER="${2:-content}"
+ACCOUNT="${1:?Brug: pull-content.sh <storage-konto> [public-container] [authoring-container]}"
+PUBLIC_CONTAINER="${2:-content}"
+AUTHORING_CONTAINER="${3:-authoring}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TARGET="$ROOT/contracts/content"
 
-echo "Henter $ACCOUNT/$CONTAINER → $TARGET"
+echo "Henter offentlig fixture fra $ACCOUNT/$PUBLIC_CONTAINER → $TARGET"
 echo
 
 # Kun pakken og medierne. `audit.jsonl` bærer navne på quizmastere og
@@ -41,8 +42,23 @@ echo
 for pattern in "*/content-pack.json" "*/media/*"; do
   az storage blob download-batch \
     --account-name "$ACCOUNT" \
-    --source "$CONTAINER" \
+    --source "$PUBLIC_CONTAINER" \
     --destination "$TARGET" \
+    --pattern "$pattern" \
+    --auth-mode login \
+    --overwrite \
+    --output none
+done
+
+# Den private kilde eksporteres særskilt. Publication-state, indeks, lease og
+# audit er driftsdata og må ikke ende i repoets fixture.
+AUTHORING_TARGET="$ROOT/contracts/authoring"
+echo "Henter gennemgåelig authoring-fixture fra $ACCOUNT/$AUTHORING_CONTAINER → $AUTHORING_TARGET"
+for pattern in "*/missions/*.json" "*/media/*.json" "*/sources/*.json"; do
+  az storage blob download-batch \
+    --account-name "$ACCOUNT" \
+    --source "$AUTHORING_CONTAINER" \
+    --destination "$AUTHORING_TARGET" \
     --pattern "$pattern" \
     --auth-mode login \
     --overwrite \
@@ -51,7 +67,7 @@ done
 
 echo "Hentet. Forskellen mod det, der stod i repoet:"
 echo
-git -C "$ROOT" status --porcelain contracts/content || true
+git -C "$ROOT" status --porcelain contracts/content contracts/authoring || true
 
 cat <<'EOF'
 

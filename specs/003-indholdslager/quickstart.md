@@ -48,10 +48,7 @@ Testene skal bevise:
 ## 3. Migrationsprøve
 
 ```bash
-cd backend
-dotnet run --project tools/ByensGaader.ContentMigration -- \
-  split ../contracts/content/da-DK/content-pack.json \
-  --locale da-DK --dry-run
+./backend/seed-content.sh --dry-run
 ```
 
 Forventet rapport:
@@ -59,7 +56,7 @@ Forventet rapport:
 - 11 missioner og 11 lokationer;
 - 31 mediebeskrivelser og 6 kilder;
 - ingen manglende eller modstridende referencer;
-- genereret pakke er semantisk identisk med fixturen;
+- alle mission/location-aggregater og katalogobjekter kan gendannes fra splittet;
 - `--dry-run` skriver ingen blobs.
 
 ## 4. Belastningsmåling

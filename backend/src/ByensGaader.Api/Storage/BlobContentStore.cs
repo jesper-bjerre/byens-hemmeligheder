@@ -41,8 +41,13 @@ internal sealed class BlobContentStore : IContentStore
     private readonly BlobContainerClient _container;
 
     public BlobContentStore(BlobServiceClient service, IOptions<ContentStoreOptions> options)
+        : this(service.GetBlobContainerClient(options.Value.Container))
     {
-        _container = service.GetBlobContainerClient(options.Value.Container);
+    }
+
+    public BlobContentStore(BlobContainerClient container)
+    {
+        _container = container;
     }
 
     public async Task<StoredFile?> ReadAsync(string relativePath, CancellationToken ct)
@@ -82,6 +87,7 @@ internal sealed class BlobContentStore : IContentStore
         }
 
         var blob = _container.GetBlobClient(name);
+        await EnsureContainerAsync(ct);
         var current = await CurrentAsync(blob, ct);
 
         // `null` betyder "filen fandtes ikke". Stemmer det ikke, har en anden
@@ -110,6 +116,7 @@ internal sealed class BlobContentStore : IContentStore
         }
 
         var blob = _container.GetBlobClient(name);
+        await EnsureContainerAsync(ct);
         var conditions = new BlobRequestConditions { IfNoneMatch = ETag.All };
 
         return await UploadAsync(blob, name, content, conditions, ct)
@@ -126,6 +133,7 @@ internal sealed class BlobContentStore : IContentStore
         }
 
         var blob = _container.GetAppendBlobClient(name);
+        await EnsureContainerAsync(ct);
         await blob.CreateIfNotExistsAsync(
             new AppendBlobCreateOptions
             {
@@ -151,6 +159,34 @@ internal sealed class BlobContentStore : IContentStore
         return response.Value;
     }
 
+    public async Task<WriteOutcome> DeleteIfMatchAsync(
+        string relativePath, string expectedETag, CancellationToken ct)
+    {
+        if (!ContentPath.TryNormalise(relativePath, out var name))
+        {
+            return WriteOutcome.Rejected;
+        }
+
+        var blob = _container.GetBlobClient(name);
+        var current = await CurrentAsync(blob, ct);
+        if (current?.ContentETag != expectedETag)
+        {
+            return WriteOutcome.Conflict;
+        }
+
+        try
+        {
+            await blob.DeleteAsync(
+                conditions: new BlobRequestConditions { IfMatch = current.BlobETag },
+                cancellationToken: ct);
+            return WriteOutcome.Written;
+        }
+        catch (RequestFailedException e) when (e.Status is 404 or 409 or 412)
+        {
+            return WriteOutcome.Conflict;
+        }
+    }
+
     public async Task<IReadOnlyList<string>> ListAsync(
         string relativeDirectory, CancellationToken ct)
     {
@@ -174,6 +210,51 @@ internal sealed class BlobContentStore : IContentStore
 
         names.Sort(StringComparer.Ordinal);
         return names;
+    }
+
+    public async Task<IContentLease> AcquireLeaseAsync(
+        string relativePath, CancellationToken ct)
+    {
+        if (!ContentPath.TryNormalise(relativePath, out var name))
+        {
+            throw new ArgumentException("Ugyldig lease-sti.", nameof(relativePath));
+        }
+
+        await EnsureContainerAsync(ct);
+        var blob = _container.GetBlobClient(name);
+        try
+        {
+            await blob.UploadAsync(
+                BinaryData.FromBytes([]),
+                new BlobUploadOptions
+                {
+                    Conditions = new BlobRequestConditions { IfNoneMatch = ETag.All },
+                },
+                ct);
+        }
+        catch (RequestFailedException e) when (e.Status is 409 or 412)
+        {
+            // Låseblobben findes allerede, som den normalt gør.
+        }
+
+        var client = blob.GetBlobLeaseClient();
+        var contended = false;
+        while (true)
+        {
+            try
+            {
+                // En tidsbegrænset lease frem for en uendelig: dør processen
+                // midt i en publicering, frigiver Azure selv låsen efter højst
+                // ét minut. Normalmålet er under to sekunder.
+                await client.AcquireAsync(TimeSpan.FromSeconds(60), cancellationToken: ct);
+                return new BlobLease(client, contended);
+            }
+            catch (RequestFailedException e) when (e.Status is 409)
+            {
+                contended = true;
+                await Task.Delay(TimeSpan.FromMilliseconds(100), ct);
+            }
+        }
     }
 
     // MARK: - Småting
@@ -240,6 +321,32 @@ internal sealed class BlobContentStore : IContentStore
             // 409: nogen nåede at oprette den. 412: nogen nåede at ændre den.
             // Begge betyder det samme for den, der skrev.
             return false;
+        }
+    }
+
+    private async Task EnsureContainerAsync(CancellationToken ct) =>
+        await _container.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: ct);
+}
+
+internal sealed class BlobLease(BlobLeaseClient client, bool wasContended) : IContentLease
+{
+    private int _released;
+
+    public bool WasContended { get; } = wasContended;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref _released, 1) is 0)
+        {
+            try
+            {
+                await client.ReleaseAsync();
+            }
+            catch (RequestFailedException exception) when (exception.Status is 409 or 412)
+            {
+                // Leasen kan være udløbet efter en usædvanligt langsom
+                // publicering. Den er da allerede frigivet af Azure.
+            }
         }
     }
 }

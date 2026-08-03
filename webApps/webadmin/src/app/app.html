@@ -83,7 +83,11 @@
       }
 
       @if (store.status()) {
-        <div class="save-banner" [class.dirty]="store.isDirty()">
+        <div
+          class="save-banner"
+          [class.dirty]="store.isDirty()"
+          [class.pending]="store.status()?.includes('afventer')"
+        >
           <span></span>{{ store.status() }}
         </div>
       }

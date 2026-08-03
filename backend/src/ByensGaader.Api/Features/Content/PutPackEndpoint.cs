@@ -32,7 +32,10 @@ namespace ByensGaader.Api.Features.Content;
 /// FR-111 kræver et spor over hvem, og et spor, klienten kan springe over,
 /// efterlader huller netop der, hvor nogen havde travlt.
 /// </remarks>
-internal sealed class PutPackEndpoint(IContentStore store, AuditTrail audit)
+internal sealed class PutPackEndpoint(
+    IContentStore store,
+    AuditTrail audit,
+    AuthoringRepository authoring)
     : EndpointWithoutRequest
 {
     /// <summary>Navnet skal kunne læses af et menneske, ikke andet.</summary>
@@ -49,6 +52,20 @@ internal sealed class PutPackEndpoint(IContentStore store, AuditTrail audit)
     {
         var locale = Route<string>("locale")!;
         var packPath = Path.Combine(locale, "content-pack.json");
+
+        // Den gamle TestFlight-admin gemmer hele pakken. Den må fortsat virke,
+        // indtil authoring-kilden er taget i brug, men derefter ville et PUT
+        // her skabe to sandheder og kunne slette kladder, den gamle app ikke
+        // længere kan se. Afvisning er den eneste sikre overgang.
+        if (await authoring.ReadStateAsync(locale, ct) is not null)
+        {
+            await SendResultAsync(Results.Problem(
+                title: "Admin-appen skal opdateres",
+                detail: "Opgaver gemmes nu enkeltvis. Installér den nyeste TestFlight-build "
+                        + "og hent opgaverne igen.",
+                statusCode: StatusCodes.Status409Conflict));
+            return;
+        }
 
         // Procentafkodet. En HTTP-header kan ikke bære andet end ASCII, og
         // halvdelen af navnene i et dansk hold har æ, ø eller å i sig.

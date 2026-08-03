@@ -95,6 +95,24 @@ den opdeling spreder én ændring ud over fire mapper.
 
 ## Lageret
 
+Den redaktionelle kilde og spillernes læsemodel er adskilt:
+
+```text
+admin-apps → API → privat authoring-container → publicering → public content-container
+                   én JSON pr. opgave                     én samlet pakke
+```
+
+En opgave og dens sted er ét aggregate. Medie- og kildemetadata har egne
+objekter. Hvert objekt har sin egen ETag, så to quizmastere kan rette hver sin
+opgave uden at konflikte. En 60-sekunders Azure-lease serialiserer den korte
+publicering; dør API'et, udløber låsen af sig selv.
+
+Publiceringen skriver først en uforanderlig
+`{locale}/versions/{contentVersion}.json` og derefter den stabile
+`{locale}/content-pack.json`. Kladder kommer ikke i spillerpakken. Fejler
+publiceringen, står den gamle pakke hel, mens `publication-state.json` forbliver
+dirty til næste automatiske forsøg.
+
 Der er to implementeringer af `IContentStore`, og de er dækket af **den samme**
 testsuite (`ContentStoreContractTests`). Grænsefladen findes for at kunne skifte
 lager uden at røre endepunkterne, og det løfte holder kun, hvis de to opfører
@@ -106,6 +124,18 @@ sig ens.
 | Samtidighed | læs, sammenlign, skriv — ikke atomisk | `If-Match` på blobbens ETag |
 | Sporet | `FileMode.Append` | append blob |
 | Adgang | mappen | managed identity |
+
+Blob-konfigurationen bruger to containere:
+
+```text
+ContentStore__Container          = content
+ContentStore__AuthoringContainer = authoring
+Authoring__ReconciliationEnabled = true
+```
+
+`authoring` skal være privat. Reconciliation slås først til, når dry-run og den
+tomme authoring-container er godkendt; ellers ville en almindelig backenddeploy
+også blive en indholdsmigration.
 
 Skiftes med `ContentStore:Provider`.
 
@@ -194,15 +224,34 @@ Versionering tilføjes, når der findes et endepunkt, der skal versioneres.
 | `GET` | `/content/{locale}/media` | Hvilke medier der ligger |
 | `GET` | `/content/{locale}/media/{fil}` | Ét billede eller én lydfil |
 | `GET` | `/content/{locale}/audit` | Sporet over ændringer. Nyeste først |
-| `PUT` | `/content/{locale}/pack` | Gemmer pakken. Kræver `If-Match` og `X-Quizmaster` |
+| `GET` | `/authoring/content/{locale}/missions` | Privat admin-indeks, også kladder |
+| `GET` | `/authoring/content/{locale}/missions/{id}` | Opgave og sted med egen ETag |
+| `PUT` | `/authoring/content/{locale}/missions/{id}` | Opretter/retter én opgave |
+| `DELETE` | `/authoring/content/{locale}/missions/{id}` | Sletter én opgave med `If-Match` |
+| `GET/PUT/DELETE` | `/authoring/content/{locale}/media/{id}` | Mediemetadata med egen ETag |
+| `GET/PUT/DELETE` | `/authoring/content/{locale}/sources/{id}` | Kildemetadata med egen ETag |
+| `PUT` | `/content/{locale}/pack` | Kun overgang for ældre admin-builds; afvises efter aktivering |
 | `POST` | `/content/{locale}/media/{fil}` | Lægger et medie op. `409` på et kendt navn |
 | `POST` | `/content/{locale}/narration/{fil}.mp3` | Konverterer en lydfil til kompakt MP3 og lægger den op |
 | `DELETE` | `/content/{locale}/media/{fil}` | Fjerner et medie |
 
-`PUT` bruger **optimistisk samtidighed**: klienten sender den ETag, pakken blev
-hentet med. Har en anden gemt i mellemtiden, svares `412`, og klienten skal
-hente igen. Alle quizmastere kan rette i alt, så uden det taber den, der gemmer
-sidst, den andens arbejde uden at nogen opdager det.
+Authoring-`PUT` bruger **optimistisk samtidighed pr. objekt**. En eksisterende
+blob kræver `If-Match`; en ny kræver `If-None-Match: *`. Har en anden rettet
+samme objekt, svares `412`. Forskellige opgaver deler ikke længere ETag.
+
+### Migreringsprøve
+
+```bash
+./backend/seed-content.sh --dry-run
+```
+
+Den splitter og validerer fixturen i en midlertidig mappe og skriver ingen
+blobs. Scriptets skrivefunktion er kun til at så en helt tom DEV-konto; den må
+ikke bruges som migration mod den eksisterende konto, fordi public-fixturen kan
+være ældre end Blob-kilden. Den rigtige migration udføres af API'ets idempotente
+bootstrap fra den aktuelle offentlige blob, når reconciliation senere slås til.
+`pull-content.sh` eksporterer kun gennemgåelige mission/media/source-filer.
+Audit, lås, indeks og publication-state forlader ikke serveren.
 
 Serveren kontrollerer, at kroppen er gyldig JSON med `contentVersion` og
 `missions` — ikke kontrakten i dybden. Den grænse er bevidst: serveren beskytter

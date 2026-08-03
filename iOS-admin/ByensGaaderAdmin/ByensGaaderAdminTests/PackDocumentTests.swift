@@ -87,6 +87,33 @@ struct PackDocumentTests {
         #expect(try document.serialised() == (try document.serialised()))
     }
 
+    @Test("En titelrettelse serialiseres som ét opgaveaggregate")
+    func oneMissionBecomesOneAggregate() throws {
+        let document = try ContractFixtures.document()
+        let id = document.string(at: .mission(0, .key("id")))
+        document.setValue("Ny titel", at: .mission(0, .key("title")))
+
+        let changes = try document.authoringChanges()
+
+        #expect(changes.missions.updates.count == 1)
+        #expect(changes.missions.updates.first?.id == id)
+        #expect(changes.missions.updates.first?.json["mission"] is [String: Any])
+        #expect(changes.missions.updates.first?.json["location"] is [String: Any])
+        #expect(changes.media.updates.isEmpty)
+        #expect(changes.sources.updates.isEmpty)
+    }
+
+    @Test("En koordinatrettelse gemmes sammen med den tilhørende opgave")
+    func locationChangeBelongsToMission() throws {
+        let document = try ContractFixtures.document()
+        let location = try #require(document.locationIndex(forMissionAt: 0))
+        document.setValue(55.7, at: .location(location, .key("latitude")))
+
+        let changes = try document.authoringChanges()
+
+        #expect(changes.missions.updates.count == 1)
+    }
+
     // MARK: - Lister
 
     @Test("Et kort kan tilføjes, flyttes og fjernes, og order følger med")

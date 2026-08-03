@@ -9,8 +9,8 @@ opgave. Medie- og kildemetadata får tilsvarende egne blobs. En kort lease
 serialiserer gemning og generering af admin-indeks og offentlig
 `content-pack.json`. ETag pr. blob giver optimistisk samtidighed pr. objekt.
 
-Azure SQL indføres ikke. Planen er et designgrundlag og kræver accept af den
-reviderede research og ADR 0007 før implementering.
+Azure SQL indføres ikke. Den reviderede research og ADR 0007 er accepteret;
+implementationen følger denne Blob-baserede afvigelse eksplicit.
 
 ## Technical Context
 
@@ -44,23 +44,21 @@ komprimering, konvertering og offentlige mediestier ændres ikke.
 | Modulær monolit | Bestået | Ingen ny deploybar tjeneste. |
 | API-first/OpenAPI | Bestået | Kontrakten ligger i `contracts/content-authoring-api.yaml`. |
 | Lavt pilotbudget | Bestået | Eksisterende Storage-konto genbruges; ingen ny fast pris. |
-| Relationel primær database | **Begrundet afvigelse** | Opgaveindholdet er et lille dokumentdomæne uden aktuelle relationelle krav. ADR 0007 skal eksplicit acceptere afvigelsen og SQL-tærsklerne. |
+| Relationel primær database | **Accepteret afvigelse** | Opgaveindholdet er et lille dokumentdomæne uden aktuelle relationelle krav. ADR 0007 accepterer afvigelsen og SQL-tærsklerne. |
 
-Implementering må ikke begynde, før ADR-afvigelsen er accepteret. Der er ingen
-øvrige forfatningsafvigelser eller uafklarede tekniske spørgsmål.
+ADR-afvigelsen er accepteret. Der er ingen øvrige forfatningsafvigelser eller
+uafklarede tekniske spørgsmål.
 
 ## Project Structure
 
 ```text
 backend/src/ByensGaader.Api/
-├── Features/Content/       # endpoints og publiceringsorkestrering
-└── Storage/
-    ├── Authoring/          # opgave-, media-, source- og indeksblobs
-    └── Publishing/         # lease, dirty-state og pakkegenerator
+├── Features/Content/       # repositories, endpoints og publiceringsorkestrering
+└── Storage/                # fælles fil/blob-abstraktion, ETags og leases
 
 backend/tests/ByensGaader.Api.Tests/
-├── Storage/                # ETags, blobstier og migration
-└── Publishing/             # determinisme, lease og recovery
+├── ContentStoreContractTests.cs  # samme lagerkontrakt mod fil og Blob
+└── *Authoring*/*Publisher*Tests.cs # endpoints, determinisme og recovery
 
 iOS-admin/                  # skiftes til opgavevise endpoints
 webApps/webadmin/           # skiftes til opgavevise endpoints

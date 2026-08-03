@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Options;
 
 namespace ByensGaader.Api.Storage;
@@ -17,6 +18,7 @@ internal sealed class FileSystemContentStore(IOptions<ContentStoreOptions> optio
 
     /// <summary>Én tilføjelse ad gangen. Se <see cref="AppendAsync"/>.</summary>
     private static readonly SemaphoreSlim AppendLock = new(1, 1);
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> Leases = new();
 
     public async Task<StoredFile?> ReadAsync(string relativePath, CancellationToken ct)
     {
@@ -126,6 +128,20 @@ internal sealed class FileSystemContentStore(IOptions<ContentStoreOptions> optio
         return Task.FromResult(true);
     }
 
+    public async Task<WriteOutcome> DeleteIfMatchAsync(
+        string relativePath, string expectedETag, CancellationToken ct)
+    {
+        var current = await ReadAsync(relativePath, ct);
+        if (current is null || current.ETag != expectedETag)
+        {
+            return WriteOutcome.Conflict;
+        }
+
+        return await DeleteAsync(relativePath, ct)
+            ? WriteOutcome.Written
+            : WriteOutcome.Conflict;
+    }
+
     public Task<IReadOnlyList<string>> ListAsync(string relativeDirectory, CancellationToken ct)
     {
         if (!TryResolve(relativeDirectory, out var fullPath) || !Directory.Exists(fullPath))
@@ -141,6 +157,23 @@ internal sealed class FileSystemContentStore(IOptions<ContentStoreOptions> optio
             .ToArray();
 
         return Task.FromResult<IReadOnlyList<string>>(names);
+    }
+
+    public async Task<IContentLease> AcquireLeaseAsync(
+        string relativePath, CancellationToken ct)
+    {
+        if (!TryResolve(relativePath, out var fullPath))
+        {
+            throw new ArgumentException("Ugyldig lease-sti.", nameof(relativePath));
+        }
+
+        var gate = Leases.GetOrAdd(fullPath, static _ => new SemaphoreSlim(1, 1));
+        var immediate = await gate.WaitAsync(TimeSpan.Zero, ct);
+        if (!immediate)
+        {
+            await gate.WaitAsync(ct);
+        }
+        return new FileLease(gate, !immediate);
     }
 
     /// <summary>
@@ -172,6 +205,22 @@ internal sealed class FileSystemContentStore(IOptions<ContentStoreOptions> optio
 
 }
 
+internal sealed class FileLease(SemaphoreSlim gate, bool wasContended) : IContentLease
+{
+    private int _released;
+
+    public bool WasContended { get; } = wasContended;
+
+    public ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref _released, 1) is 0)
+        {
+            gate.Release();
+        }
+        return ValueTask.CompletedTask;
+    }
+}
+
 internal sealed class ContentStoreOptions
 {
     public const string Section = "ContentStore";
@@ -189,6 +238,9 @@ internal sealed class ContentStoreOptions
     /// <summary>Mappen, indhold læses fra. Absolut eller relativ til arbejdsmappen.</summary>
     public string RootPath { get; set; } = "content";
 
+    /// <summary>Privat, redaktionel JSON. Skal være gitignoreret lokalt.</summary>
+    public string AuthoringRootPath { get; set; } = ".local/authoring";
+
     /// <summary>
     /// Fx <c>https://byensgaaderdev.blob.core.windows.net</c>. Aldrig en
     /// connection string — der er ingen nøgle at lække med managed identity.
@@ -196,6 +248,9 @@ internal sealed class ContentStoreOptions
     public string StorageAccountUri { get; set; } = string.Empty;
 
     public string Container { get; set; } = "content";
+
+    /// <summary>Privat container; spilleridentiteten får aldrig læseadgang.</summary>
+    public string AuthoringContainer { get; set; } = "authoring";
 }
 
 internal enum ContentStoreProvider
