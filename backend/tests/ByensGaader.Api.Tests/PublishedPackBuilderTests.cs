@@ -36,6 +36,41 @@ public sealed class PublishedPackBuilderTests
         Assert.Equal(first.Index, second.Index);
     }
 
+    [Fact]
+    public void Kortmedier_med_wire_feltet_mediaId_publiceres()
+    {
+        var snapshot = SnapshotFromFixture();
+        var missionDocument = snapshot.Missions[0];
+        var mission = missionDocument.Json["mission"]!.AsObject();
+        var cardOnlyMedia = snapshot.Media[0];
+        var mediaId = cardOnlyMedia.Json["id"]!.GetValue<string>();
+
+        // Mediet refereres kun fra et kort. Wire-navnet begynder med lille m,
+        // mens de ældre topfelter hedder fx moodMediaId. En versalfølsom
+        // suffikstest publicerede derfor kun det første/toprefererede billede.
+        foreach (var property in mission.ToArray())
+        {
+            if (property.Key.EndsWith("MediaId", StringComparison.OrdinalIgnoreCase))
+            {
+                mission[property.Key] = null;
+            }
+        }
+        mission["cards"] = new JsonArray(new JsonObject
+        {
+            ["id"] = "card.kun-medie.1",
+            ["order"] = 1,
+            ["mediaId"] = mediaId,
+            ["text"] = "Kortets billede skal med i den publicerede pakke.",
+        });
+
+        var published = PublishedPackBuilder.Build(snapshot, DateTimeOffset.UnixEpoch);
+        var root = JsonNode.Parse(published.Pack)!.AsObject();
+
+        Assert.Contains(
+            root["media"]!.AsArray(),
+            media => media!["id"]!.GetValue<string>() == mediaId);
+    }
+
     private static AuthoringSnapshot SnapshotFromFixture()
     {
         var path = Path.Combine(App.FindContentRootForTests(), "da-DK", "content-pack.json");

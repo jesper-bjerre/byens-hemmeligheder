@@ -33,6 +33,17 @@ final class BoelgenFlowTests: FlowTestCase {
 
         continueNarrative(in: app)
 
+        // De tre billedkort skal alle være en del af opgavesiden. Backendens
+        // publicering overså tidligere kortenes `mediaId`, så kun billeder,
+        // der også var topmedier, kunne slås op i den publicerede pakke.
+        for order in 1...3 {
+            let card = app.descendants(matching: .any)["card.card.boelgen-den-femte-besked.\(order)"]
+            XCTAssertTrue(
+                card.waitForExistence(timeout: Self.uiTimeout),
+                "Bølgens billedkort \(order) mangler på opgavesiden"
+            )
+        }
+
         // De tre spor.
 
         // Registreret fejlsvar: vejledningen skal handle om rækkefølgen.

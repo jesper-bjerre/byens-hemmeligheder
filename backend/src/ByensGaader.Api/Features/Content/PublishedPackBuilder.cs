@@ -128,7 +128,7 @@ internal static class PublishedPackBuilder
         {
             foreach (var property in obj)
             {
-                if (property.Key.EndsWith("MediaId", StringComparison.Ordinal)
+                if (property.Key.EndsWith("MediaId", StringComparison.OrdinalIgnoreCase)
                     && property.Value is JsonValue media
                     && media.TryGetValue<string>(out var mediaId)
                     && !string.IsNullOrWhiteSpace(mediaId))

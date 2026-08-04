@@ -288,7 +288,7 @@ internal sealed partial class AuthoringRepository(ContentStores stores)
             foreach (var property in obj)
             {
                 if (media
-                    && property.Key.EndsWith("MediaId", StringComparison.Ordinal)
+                    && property.Key.EndsWith("MediaId", StringComparison.OrdinalIgnoreCase)
                     && property.Value?.GetValue<string>() == id)
                 {
                     return true;
