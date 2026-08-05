@@ -69,6 +69,7 @@ struct ChallengeView: View {
 
                 // Svar og hint i bunden — efter kortene, som i spillet.
                 VStack(alignment: .leading, spacing: BHSpacing.snug) {
+                    answerQuestion
                     answerControl
                     feedback
                     hintButton
@@ -103,6 +104,22 @@ struct ChallengeView: View {
     }
 
     // MARK: - Svaret
+
+    /// Quizmasterens spørgsmål står samme sted for alle svartyper.
+    ///
+    /// Det lå tidligere inde i fritekstfeltet. Derfor forsvandt det, når det
+    /// samme indhold blev besvaret som talkode eller med svarmuligheder.
+    @ViewBuilder
+    private var answerQuestion: some View {
+        if let question = step.prompt?.question?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !question.isEmpty {
+            Text(question)
+                .font(BHFont.heading)
+                .foregroundStyle(BHColor.ink)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("challenge.question")
+        }
+    }
 
     /// Det eneste, der afhænger af svartypen.
     @ViewBuilder
@@ -199,15 +216,6 @@ struct ChallengeView: View {
 
     private func textField(_ step: FreeTextStep) -> some View {
         VStack(alignment: .leading, spacing: BHSpacing.snug) {
-            if let question = step.question,
-               !question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                Text(question)
-                    .font(BHFont.heading)
-                    .foregroundStyle(BHColor.ink)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("challenge.question")
-            }
-
             TextField(step.placeholder ?? "", text: $typedText)
                 .font(BHFont.heading)
                 .textInputAutocapitalization(.never)

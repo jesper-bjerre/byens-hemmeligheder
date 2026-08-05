@@ -132,6 +132,16 @@ class FlowTestCase: XCTestCase {
         XCTAssertTrue(cards.waitForExistence(timeout: Self.uiTimeout), "Opgavesiden kom ikke frem")
     }
 
+    /// Quizmasterens spørgsmål skal stå over svaret uanset svartype.
+    func assertQuestion(_ text: String, in app: XCUIApplication) {
+        let question = app.descendants(matching: .any)["challenge.question"]
+        XCTAssertTrue(
+            question.waitForExistence(timeout: Self.uiTimeout),
+            "Quizmasterens spørgsmål mangler ved svarfeltet"
+        )
+        XCTAssertEqual(question.label, text)
+    }
+
     func chooseOption(_ label: String, in app: XCUIApplication) {
         let option = app.buttons["option.\(label)"]
         XCTAssertTrue(option.waitForExistence(timeout: Self.uiTimeout), "Svarmuligheden '\(label)' mangler")

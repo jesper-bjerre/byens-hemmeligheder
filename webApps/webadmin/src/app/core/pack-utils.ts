@@ -160,10 +160,6 @@ function normaliseStep(step: MissionStep, missionTitle: string): void {
   const first = step.answerRule.acceptedAnswers[0];
   if (first) step.answerRule.canonicalAnswer = first;
   step.answerRule.kind = step.kind === 'numericCode' ? 'digitsOnly' : 'exact';
-  if (step.kind === 'numericCode' && first) {
-    const digits = [...first].filter((character) => /\p{Number}/u.test(character)).length;
-    if (digits > 0) step.length = digits;
-  }
 }
 
 function finaliseNewMissionIds(pack: ContentPack, base: ContentPack): void {

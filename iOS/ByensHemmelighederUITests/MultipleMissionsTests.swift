@@ -48,6 +48,7 @@ final class MultipleMissionsTests: FlowTestCase {
         openMission(vera, in: app)
         waitForPresence(in: app)
         continueNarrative(in: app)
+        assertQuestion("Hvilket hul bor Vera i?", in: app)
         // Vera var en fritekstgåde om en gulerod. Den er skrevet om til en
         // logisk gåde med fire huller, og svaret vælges nu blandt fire
         // muligheder.

@@ -33,6 +33,8 @@ final class BoelgenFlowTests: FlowTestCase {
 
         continueNarrative(in: app)
 
+        assertQuestion("Hvilken trecifret kode åbner beskeden?", in: app)
+
         // De tre billedkort skal alle være en del af opgavesiden. Backendens
         // publicering overså tidligere kortenes `mediaId`, så kun billeder,
         // der også var topmedier, kunne slås op i den publicerede pakke.
@@ -73,7 +75,9 @@ final class BoelgenFlowTests: FlowTestCase {
         enterCode("592", in: app)
         submitCode(in: app)
 
-        assertReward(points: 100, in: app)
+        // Det registrerede fejlsvar 529 koster 2 point. Det ufærdige svar 59
+        // koster fortsat intet.
+        assertReward(points: 98, in: app)
 
         // Uden inventory (FR-050).
         XCTAssertFalse(

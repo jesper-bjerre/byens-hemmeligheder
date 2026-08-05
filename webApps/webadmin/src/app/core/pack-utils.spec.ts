@@ -31,6 +31,21 @@ describe('pack-utils', () => {
     expect(mission.steps[0].answerRule.acceptedAnswers).toEqual(['42', '4 2']);
   });
 
+  it('bevarer quizmasterens valgte antal cifre for en talkode', () => {
+    const pack = emptyPack();
+    const base = clone(pack);
+    const mission = createMission(pack);
+    const step = mission.steps[0];
+    step.kind = 'numericCode';
+    step.length = 6;
+    step.answerRule.acceptedAnswers = ['42'];
+
+    normaliseBeforeSave(pack, base);
+
+    expect(step.length).toBe(6);
+    expect(step.answerRule.kind).toBe('digitsOnly');
+  });
+
   it('fletter rettelser i forskellige felter uden konflikt', () => {
     const base = emptyPack();
     const mission = createMission(base);
