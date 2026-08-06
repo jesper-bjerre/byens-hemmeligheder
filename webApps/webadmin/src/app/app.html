@@ -141,18 +141,18 @@
                     @for (mission of place.missions; track mission.id) {
                       <article
                         class="mission-card"
-                        [class.released]="mission.status === 'fieldTestReady'"
+                        [class.released]="mission.status === 'publishReady'"
                       >
                         <button class="mission-main" type="button" (click)="openMission(mission)">
                           <div class="mission-icon" aria-hidden="true">
-                            {{ mission.status === 'fieldTestReady' ? '✓' : '✎' }}
+                            {{ mission.status === 'publishReady' ? '✓' : '✎' }}
                           </div>
                           <div class="mission-copy">
                             <div class="mission-title-row">
                               <h3>{{ mission.title || 'Ny opgave' }}</h3>
                               <span
                                 class="badge"
-                                [class.ready]="mission.status === 'fieldTestReady'"
+                                [class.ready]="mission.status === 'publishReady'"
                                 >{{ statusName(mission.status) }}</span
                               >
                             </div>

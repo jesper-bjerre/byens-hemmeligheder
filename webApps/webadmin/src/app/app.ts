@@ -40,7 +40,7 @@ export class App implements OnInit {
 
   readonly releasedCount = computed(
     () =>
-      this.store.pack()?.missions.filter((mission) => mission.status === 'fieldTestReady').length ??
+      this.store.pack()?.missions.filter((mission) => mission.status === 'publishReady').length ??
       0,
   );
 

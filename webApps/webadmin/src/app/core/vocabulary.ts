@@ -15,8 +15,8 @@ export const regions = [
 const names: Record<string, string> = {
   draft: 'Kladde',
   researchReady: 'Research på plads',
-  fieldTestReady: 'Frigivet',
-  publishReady: 'Klar til udgivelse',
+  fieldTestReady: 'Klar til udgivelse',
+  publishReady: 'Frigivet',
   paused: 'På pause',
   byenKoebenhavn: 'Byen København',
   koebenhavnsOmegn: 'Københavns omegn',
@@ -54,7 +54,7 @@ export function displayName(value: string): string {
 }
 
 export function statusChoices(current: string): string[] {
-  const standard = ['draft', 'fieldTestReady'];
+  const standard = ['draft', 'fieldTestReady', 'publishReady'];
   return standard.includes(current) || !current ? standard : [...standard, current];
 }
 

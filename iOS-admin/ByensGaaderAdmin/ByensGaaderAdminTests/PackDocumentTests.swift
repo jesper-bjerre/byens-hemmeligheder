@@ -463,9 +463,10 @@ struct PackDocumentTests {
 @Suite("Ordbogen")
 struct VocabularyTests {
 
-    @Test("fieldTestReady vises som Frigivet")
+    @Test("Statusser vises i quizmasterens rækkefølge")
     func statusNamesFollowFR104() {
-        #expect(Vocabulary.statusName("fieldTestReady") == "Frigivet")
+        #expect(Vocabulary.statusName("fieldTestReady") == "Klar til udgivelse")
+        #expect(Vocabulary.statusName("publishReady") == "Frigivet")
         #expect(Vocabulary.statusName("draft") == "Kladde")
     }
 
@@ -477,13 +478,13 @@ struct VocabularyTests {
         #expect(Vocabulary.regionName("marsjylland") == "marsjylland")
     }
 
-    /// Quizmasteren arbejder kun med to. Bærer en opgave alligevel en af de tre
-    /// andre, skal den kunne flyttes — ellers er den låst fast for altid.
+    /// En ukendt status bevares som valgmulighed, så en nyere kontrakt ikke
+    /// kan låse opgaven fast i en ældre app.
     @Test("Statusvælgeren viser den værdi, opgaven faktisk står i")
     func theCurrentStatusIsAlwaysOffered() {
-        #expect(Vocabulary.statusChoices(current: "draft") == ["draft", "fieldTestReady"])
+        #expect(Vocabulary.statusChoices(current: "draft") == ["draft", "fieldTestReady", "publishReady"])
         #expect(Vocabulary.statusChoices(current: "paused").contains("paused"))
-        #expect(Vocabulary.statusChoices(current: "paused").count == 3)
+        #expect(Vocabulary.statusChoices(current: "paused").count == 4)
     }
 
     @Test("Danske titler bliver til id'er, kontrakten accepterer")

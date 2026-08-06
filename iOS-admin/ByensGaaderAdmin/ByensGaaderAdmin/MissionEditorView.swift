@@ -91,7 +91,7 @@ struct MissionTab: View {
                     }
                 }
 
-                if document.string(at: .mission(index, .key("status"))) == "fieldTestReady" {
+                if document.string(at: .mission(index, .key("status"))) == "publishReady" {
                     Image("EmptyState-ReadyForTest")
                         .resizable()
                         .scaledToFit()

@@ -14,14 +14,10 @@ enum Vocabulary {
 
     // MARK: - Opgavens status
 
-    /// De to, en quizmaster arbejder med.
-    ///
-    /// Kontrakten kender fem — `researchReady`, `publishReady` og `paused`
-    /// findes stadig og afkodes fint af spillerappen. De er bare ikke noget,
-    /// nogen skal tage stilling til: en opgave er enten under arbejde eller
-    /// frigivet. Bærer en opgave alligevel en af de tre, vises den som et
-    /// ekstra valg, så den ikke bliver umulig at flytte (se ``statusChoices``).
-    static let statuses = ["draft", "fieldTestReady"]
+    /// De tre statusser, en quizmaster bruger i den almindelige arbejdsgang.
+    /// De engelske værdier er kontraktens wire-navne og må ikke oversættes i
+    /// den gemte pakke.
+    static let statuses = ["draft", "fieldTestReady", "publishReady"]
 
     /// Valgene for en opgave, der står i `raw` netop nu.
     static func statusChoices(current raw: String) -> [String] {
@@ -32,9 +28,8 @@ enum Vocabulary {
         switch raw {
         case "draft": "Kladde"
         case "researchReady": "Research på plads"
-        // Navnet står i FR-104 og er quizmasterens ord for det, ikke kontraktens.
-        case "fieldTestReady": "Frigivet"
-        case "publishReady": "Klar til udgivelse"
+        case "fieldTestReady": "Klar til udgivelse"
+        case "publishReady": "Frigivet"
         case "paused": "På pause"
         default: raw
         }

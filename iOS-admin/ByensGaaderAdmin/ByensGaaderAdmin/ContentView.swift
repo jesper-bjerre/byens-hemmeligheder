@@ -174,7 +174,7 @@ struct ContentView: View {
         HStack(spacing: 10) {
             // Publicér-mærket kun på det, der faktisk er frigivet. Sad det på
             // alle rækker, ville det ikke sige noget.
-            if mission.status == "fieldTestReady" {
+            if mission.status == "publishReady" {
                 Image("Icon-Publish")
                     .resizable()
                     .scaledToFit()
