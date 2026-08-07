@@ -84,7 +84,7 @@ final class MissionEngine {
         guard let pack else { return [] }
         return pack.missions.filter { mission in
             switch mission.status.known {
-            case .fieldTestReady, .publishReady: true
+            case .fieldTestReady, .published, .publishReady: true
             default: false
             }
         }
@@ -267,7 +267,6 @@ final class MissionEngine {
         return configuration.centre
     }
 
-    #if BH_DEV_TOOLS
     /// Sletter al progression: løste opgaver, brugte hints og point.
     ///
     /// ## Hvorfor det ikke bare er en test-genvej
@@ -308,8 +307,6 @@ final class MissionEngine {
     var locationSwitch: SwitchableLocationProvider? {
         locationProvider as? SwitchableLocationProvider
     }
-    #endif
-
     /// Spilleren bekræfter selv efter for lang tid uden fix (FR-027).
     func acceptSoftOverride(now: Date = Date()) async {
         guard gate != nil else { return }

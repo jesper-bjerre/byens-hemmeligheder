@@ -1,21 +1,14 @@
 import XCTest
 
-/// Pointskærmen: spillerens egne tal er ægte, ranglisten er en attrap.
-///
-/// Attrappen er det, der kan gå galt. Vises den uden mærkning, tror en tester,
-/// at hen er nummer fire i Vejle — og har så fået en forkert idé om både
-/// spillet og sin egen indsats (FR-055).
+/// Egne point og highscore er to forskellige skærme.
 final class ScoreboardTests: FlowTestCase {
 
     private let missionId = "mission.boelgen.den-femte-besked"
 
     func testTotalStartsAtZeroAndCountsUpAfterAMission() {
-        let app = launchApp(
-            atLatitude: Vantage.boelgen.latitude,
-            longitude: Vantage.boelgen.longitude
-        )
+        let app = launchAtHome()
 
-        app.buttons["scoreboard.open"].tap()
+        app.buttons["home.points"].tap()
         let total = app.descendants(matching: .any)["scoreboard.total"]
         XCTAssertTrue(total.waitForExistence(timeout: Self.uiTimeout), "Pointskærmen kom ikke frem")
         XCTAssertTrue(
@@ -24,6 +17,7 @@ final class ScoreboardTests: FlowTestCase {
         )
 
         app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["map.open"].tap()
 
         // Løs Bølgen og se tallet følge med.
         tapMission(missionId, in: app)
@@ -34,7 +28,7 @@ final class ScoreboardTests: FlowTestCase {
         assertReward(points: 100, in: app)
         app.buttons["reward.done"].tap()
 
-        app.buttons["scoreboard.open"].tap()
+        app.buttons["home.points"].tap()
         XCTAssertTrue(total.waitForExistence(timeout: Self.uiTimeout))
         XCTAssertTrue(
             total.label.contains("100 point"),
@@ -42,12 +36,19 @@ final class ScoreboardTests: FlowTestCase {
         )
     }
 
+    private func launchAtHome() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-BHResetProgress",
+            "-BHSimulatedLocation", "\(Vantage.boelgen.latitude),\(Vantage.boelgen.longitude)",
+        ]
+        app.launch()
+        return app
+    }
+
     /// FR-055. Det vigtigste på skærmen.
     func testTheLeaderboardIsMarkedAsAnExample() {
-        let app = launchApp(
-            atLatitude: Vantage.boelgen.latitude,
-            longitude: Vantage.boelgen.longitude
-        )
+        let app = launchAtHome()
 
         app.buttons["scoreboard.open"].tap()
         let board = app.descendants(matching: .any)["scoreboard.leaderboard"]

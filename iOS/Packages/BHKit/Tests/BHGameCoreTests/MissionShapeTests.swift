@@ -104,7 +104,9 @@ struct MissionShapeTests {
             guard accepted.contains(MissionShape.unsetFacit) else { continue }
 
             #expect(
-                mission.status != .known(.fieldTestReady) && mission.status != .known(.publishReady),
+                mission.status != .known(.fieldTestReady)
+                    && mission.status != .known(.published)
+                    && mission.status != .known(.publishReady),
                 "\(mission.id) kan spilles, men har intet facit"
             )
         }

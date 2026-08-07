@@ -1,31 +1,26 @@
-name: Webadmin — udrul
+name: Webadmin — udrul PROD
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "webApps/webadmin/**"
-      - ".github/workflows/azure-static-web-apps-salmon-grass-0b3946003.yml"
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches: [main]
-    paths:
-      - "webApps/webadmin/**"
-      - ".github/workflows/azure-static-web-apps-salmon-grass-0b3946003.yml"
+  workflow_dispatch:
+    inputs:
+      dev_verificeret:
+        description: "Jeg har verificeret login og redigering i DEV"
+        required: true
+        type: boolean
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
-  group: webadmin-${{ github.event.pull_request.number || 'produktion' }}
-  cancel-in-progress: true
+  group: webadmin-produktion
+  cancel-in-progress: false
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: inputs.dev_verificeret == true
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    environment: production
+    name: Byg og udrul PROD
     steps:
       - uses: actions/checkout@v4
 
@@ -37,6 +32,10 @@ jobs:
 
       - name: Installér afhængigheder
         run: npm ci
+        working-directory: webApps/webadmin
+
+      - name: Kontrollér produktionsafhængigheder
+        run: npm audit --omit=dev
         working-directory: webApps/webadmin
 
       - name: Test og byg
@@ -57,15 +56,3 @@ jobs:
           api_location: ""
           output_location: ""
           skip_app_build: true
-
-  close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    name: Close Pull Request Job
-    steps:
-      - name: Luk preview-miljø
-        id: closepullrequest
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_GRASS_0B3946003 }}
-          action: "close"

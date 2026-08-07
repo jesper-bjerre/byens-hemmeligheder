@@ -1,0 +1,203 @@
+openapi: 3.1.0
+info:
+  title: Byens Gåder authentication og brugeradministration
+  version: 1.0.0-draft
+servers:
+  - url: https://byensgaader-api-d.azurewebsites.net
+paths:
+  /auth/apple/notifications:
+    post:
+      summary: Modtager signerede kontoændringer fra Apple
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [payload]
+              properties:
+                payload: { type: string }
+      responses:
+        '204': { description: Gyldig notifikation behandlet idempotent }
+        '400': { description: Signatur eller claims kunne ikke valideres }
+  /auth/apple/native/exchange:
+    post:
+      summary: Veksler et native Apple-login til en intern session
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NativeAppleExchangeRequest'
+      responses:
+        '200':
+          description: Eksisterende konto og ny session
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionResponse' }
+        '201':
+          description: Ny konto og session
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionResponse' }
+        '400': { description: Ugyldig request }
+        '401': { description: Apple-beviset kunne ikke valideres eller blev genafspillet }
+        '503': { description: Authentication er ikke sikkert konfigureret }
+  /auth/refresh:
+    post:
+      summary: Roterer en native refresh-session
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200':
+          description: Roteret session
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionResponse' }
+        '401': { description: Udløbet, tilbagekaldt eller genbrugt token }
+  /auth/apple/web/exchange:
+    post:
+      summary: Veksler Apple-webpopupens engangskode til en kort websession
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clientId, identityToken, authorizationCode, nonce, redirectUri, clientKind]
+              properties:
+                clientId: { type: string }
+                identityToken: { type: string }
+                authorizationCode: { type: string }
+                nonce: { type: string, minLength: 32 }
+                redirectUri: { type: string, format: uri }
+                clientKind: { type: string, enum: [WebAdmin] }
+      responses:
+        '200':
+          description: Eksisterende konto og kort session uden refresh-token
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionResponse' }
+        '201': { description: Ny konto og kort session uden refresh-token }
+        '400': { description: Ukendt klient eller ikke-tilladt return URL }
+        '401': { description: Apple-beviset eller engangskoden kunne ikke valideres }
+  /auth/logout:
+    post:
+      summary: Tilbagekalder den aktuelle session
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204': { description: Sessionen er tilbagekaldt }
+        '401': { description: Ingen gyldig session }
+  /auth/me:
+    get:
+      summary: Returnerer den aktuelle konto og rolle
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Aktuel konto
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '401': { description: Ingen gyldig session }
+    delete:
+      summary: Sletter en User-konto og tilbagekalder alle sessions
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204': { description: Kontoen er anonymiseret }
+        '409': { description: Designer/Admin skal håndteres administrativt }
+  /admin/accounts:
+    get:
+      summary: Søger konti til brugeradministration
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: query
+          schema: { type: string, maxLength: 100 }
+      responses:
+        '200':
+          description: Kontoresultater uden provider-subject
+        '403': { description: Kræver Admin }
+  /admin/accounts/{accountId}/role:
+    put:
+      summary: Skifter mellem User og Designer
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role: { type: string, enum: [User, Designer] }
+                reason: { type: string, maxLength: 200 }
+      responses:
+        '200':
+          description: Opdateret konto
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '403': { description: Kræver Admin }
+        '409': { description: Konflikt eller beskyttet sidste Admin }
+  /authoring/content/{locale}/preview:
+    get:
+      summary: Returnerer fieldTestReady og published til Designer/Admin
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: locale
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Beskyttet previewpakke }
+        '403': { description: Kræver Designer eller Admin }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    NativeAppleExchangeRequest:
+      type: object
+      required: [clientId, identityToken, authorizationCode, nonce, clientKind]
+      properties:
+        clientId: { type: string }
+        identityToken: { type: string }
+        authorizationCode: { type: string }
+        nonce: { type: string, minLength: 32 }
+        clientKind: { type: string, enum: [IOSPlayer, IOSAdmin] }
+        email: { type: string, format: email }
+    SessionResponse:
+      type: object
+      required: [accessToken, accessExpiresAt, account]
+      properties:
+        accessToken: { type: string }
+        accessExpiresAt: { type: string, format: date-time }
+        refreshToken: { type: string }
+        refreshExpiresAt: { type: string, format: date-time }
+        account: { $ref: '#/components/schemas/Account' }
+    Account:
+      type: object
+      required: [accountId, role, state]
+      properties:
+        accountId: { type: string, format: uuid }
+        publicName: { type: [string, 'null'] }
+        email: { type: [string, 'null'], description: Kun egen konto eller Admin }
+        role: { type: string, enum: [User, Designer, Admin] }
+        state: { type: string, enum: [Active, Blocked, Deleted] }

@@ -49,7 +49,7 @@ Stedet. Bærer alt, der gør princip I og IV håndhævelige.
 | `id` | string | ✅ | Fx `loc.vejle-havn.boelgen` |
 | `postalCode` | string | ✅ | Fire cifre. By og landsdel slås op i quizmasterappens tabel (002) |
 | `name`, `address` | string | ✅ | |
-| `latitude`, `longitude` | number \| null | ✅ | **Foreløbige i 001.** `null` er tilladt af skemaet, men blokerer status `publishReady` |
+| `latitude`, `longitude` | number \| null | ✅ | **Foreløbige i 001.** `null` er tilladt af skemaet, men blokerer status `published` |
 | `activationRadiusMetres` | number \| null | ✅ | Projektgrundlagets interval er 20–60 m |
 | `maxAcceptableAccuracyMetres` | number \| null | ✅ | Skal være `≤ activationRadiusMetres` (R-010) |
 | `dwellSeconds` | number | ✅ | Hvor længe spilleren skal opholde sig. Forhindrer at en forbipasserende låser op (FR-025, SC-010) |
@@ -85,7 +85,8 @@ Den fritstående opgave. Én mission hører til én lokation.
 | `id`, `slug` | string | ✅ | |
 | `locationId` | string | ✅ | Skal resolve (FR-046) |
 | `title`, `shortTitle`, `description` | string | ✅ | `description` hed `teaser` indtil feature 002 |
-| `status` | enum | ✅ | `draft` \| `researchReady` \| `fieldTestReady` \| `publishReady` \| `paused`. Begge missioner i 001 er `fieldTestReady`. Quizmasterens app tilbyder kun `draft` og `fieldTestReady` (002) |
+| `status` | enum | ✅ | `draft` \| `researchReady` \| `fieldTestReady` \| `published` \| `paused`, plus den midlertidige legacy-værdi `publishReady`. Begge missioner i 001 er `fieldTestReady` |
+| `releasedAt` | ISO 8601 string \| null | valgfri | API-styret tidspunkt for seneste skift fra ikke-frigivet til frigivet; driver "Nye oplevelser" |
 | `difficulty` | int 1–5 | ✅ | Mental udfordring. Aldrig fysisk risiko (princip VII) |
 | `estimatedMinutes` | int | ✅ | |
 | `basePoints` | int | ✅ | 100 for begge |
@@ -228,7 +229,7 @@ Håndhæves af skema plus selvkonsistenstest. Hver regel svarer til et krav.
 | V-07 | Hvert medie har `kind` sat | FR-048 |
 | V-08 | `maxAcceptableAccuracyMetres ≤ activationRadiusMetres` | R-010 |
 | V-09 | `hints` har præcis 3 elementer med `order` 1, 2, 3 | FR-017 |
-| V-10 | `status: "publishReady"` kræver `fieldVerified == true`, koordinat, radius og `lastPhysicallyVerified`. **Blokerer begge missioner i 001** — de er `fieldTestReady` | Princip IV |
+| V-10 | `status: "published"` kræver `fieldVerified == true`, koordinat, radius og `lastPhysicallyVerified`. Samme gate gælder legacy-værdien `publishReady`. **Blokerer begge missioner i 001** — de er `fieldTestReady` | Princip IV |
 
 V-10 er den regel, der gør spec.md's antagelse om foreløbige koordinater til en
 maskinel sandhed frem for en note: pakken kan bygges og spilles, men den kan ikke

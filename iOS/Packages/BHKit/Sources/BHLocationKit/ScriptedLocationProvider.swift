@@ -1,16 +1,13 @@
-#if BH_DEV_TOOLS
-
 import BHGameCore
 import Foundation
 
 /// Simuleret position, styrbar mens appen kører.
 ///
-/// ## Findes ikke i en udgivelsesbygning
+/// ## Rollebeskyttet i en udgivelsesbygning
 ///
-/// Hele filen ligger bag `BH_DEV_TOOLS`, som kun sættes i Debug — både på
-/// app-targetet og på dette SPM-target. FR-051 kræver, at udviklerværktøjer
-/// ikke kan nå en udgivelse, og den eneste garanti, der holder, er at koden
-/// ikke bliver oversat.
+/// Appen bruger kilden fra det synlige GPS-værktøj, som kun vises for en
+/// verificeret Designer/Admin. Et launch-argument kan kun vælge kilden i
+/// Debug; Release kræver altid den rollebeskyttede handling i UI'et.
 ///
 /// ## Hvorfor tidsstemplerne er ægte
 ///
@@ -222,5 +219,3 @@ public final class ScriptedLocationProvider: LocationProviding {
         GeoPoint(latitude: point.latitude + northMetres / 111_320, longitude: point.longitude)
     }
 }
-
-#endif

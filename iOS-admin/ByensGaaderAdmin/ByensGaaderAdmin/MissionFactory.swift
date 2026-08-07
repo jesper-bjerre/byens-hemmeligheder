@@ -365,6 +365,7 @@ extension PackDocument {
             "shortTitle": title,
             "description": "Beskrivelsen mangler.",
             "status": "draft",
+            "releasedAt": NSNull(),
             "difficulty": 3,
             "estimatedMinutes": 15,
             "basePoints": 100,

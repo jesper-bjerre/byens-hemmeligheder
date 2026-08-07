@@ -13,7 +13,7 @@ internal sealed class ListMissionsEndpoint(
     public override void Configure()
     {
         Get("/authoring/content/{locale}/missions");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -41,7 +41,7 @@ internal sealed class GetMissionEndpoint(
     public override void Configure()
     {
         Get("/authoring/content/{locale}/missions/{missionId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -73,12 +73,13 @@ internal sealed class GetMissionEndpoint(
 internal sealed class PutMissionEndpoint(
     ContentPublisher publisher,
     AuthoringRepository repository,
-    AuditTrail audit) : EndpointWithoutRequest
+    AuditTrail audit,
+    TimeProvider time) : EndpointWithoutRequest
 {
     public override void Configure()
     {
         Put("/authoring/content/{locale}/missions/{missionId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -90,11 +91,7 @@ internal sealed class PutMissionEndpoint(
             await AuthoringHttp.SendPreconditionRequiredAsync(HttpContext);
             return;
         }
-        if (!AuthoringHttp.TryQuizmaster(HttpContext.Request.Headers, out var by))
-        {
-            await AuthoringHttp.SendMissingQuizmasterAsync(HttpContext);
-            return;
-        }
+        var by = AuthoringHttp.Actor(User);
 
         try
         {
@@ -103,6 +100,7 @@ internal sealed class PutMissionEndpoint(
             var aggregate = await AuthoringHttp.ReadObjectAsync(HttpContext.Request, ct);
             await publisher.EnsureReadyAsync(locale, ct);
             var before = await repository.ReadMissionAsync(locale, id, ct);
+            SetReleasedAt(aggregate, before?.Json, time.GetUtcNow());
             var result = await publisher.ExecuteAsync(
                 locale,
                 id,
@@ -156,6 +154,43 @@ internal sealed class PutMissionEndpoint(
                 statusCode: StatusCodes.Status400BadRequest));
         }
     }
+
+    /// <summary>
+    /// Publiceringsdatoen er en serverkendsgerning. En klient må hverken kunne
+    /// tilbagedatere en ny opgave eller nulstille datoen ved en almindelig
+    /// tekstrettelse af en allerede frigivet opgave.
+    /// </summary>
+    internal static void SetReleasedAt(
+        JsonObject aggregate,
+        JsonObject? previousAggregate,
+        DateTimeOffset now)
+    {
+        var mission = aggregate["mission"]?.AsObject()
+            ?? throw new JsonException("Opgaveaggregatet mangler mission.");
+        var currentStatus = mission["status"]?.GetValue<string>();
+        var previousMission = previousAggregate?["mission"]?.AsObject();
+        var previousStatus = previousMission?["status"]?.GetValue<string>();
+        var isReleased = currentStatus is "published" or "publishReady";
+        var wasReleased = previousStatus is "published" or "publishReady";
+
+        if (isReleased && !wasReleased)
+        {
+            mission["releasedAt"] = now;
+        }
+        else if (isReleased && wasReleased)
+        {
+            mission["releasedAt"] = previousMission?["releasedAt"]?.DeepClone()
+                ?? mission["releasedAt"]?.DeepClone()
+                ?? JsonValue.Create(now);
+        }
+        else
+        {
+            // Datoen bevares som historik. En senere genfrigivelse overskriver
+            // den med det nye tidspunkt gennem grenen ovenfor.
+            mission["releasedAt"] = previousMission?["releasedAt"]?.DeepClone()
+                ?? mission["releasedAt"]?.DeepClone();
+        }
+    }
 }
 
 internal sealed class DeleteMissionAuthoringEndpoint(
@@ -166,7 +201,7 @@ internal sealed class DeleteMissionAuthoringEndpoint(
     public override void Configure()
     {
         Delete("/authoring/content/{locale}/missions/{missionId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -178,11 +213,7 @@ internal sealed class DeleteMissionAuthoringEndpoint(
             await AuthoringHttp.SendPreconditionRequiredAsync(HttpContext);
             return;
         }
-        if (!AuthoringHttp.TryQuizmaster(HttpContext.Request.Headers, out var by))
-        {
-            await AuthoringHttp.SendMissingQuizmasterAsync(HttpContext);
-            return;
-        }
+        var by = AuthoringHttp.Actor(User);
 
         try
         {
@@ -231,8 +262,6 @@ internal sealed class DeleteMissionAuthoringEndpoint(
 
 internal static class AuthoringHttp
 {
-    private const int MaxNameLength = 60;
-
     public static (bool Present, string? ExpectedETag) Precondition(IHeaderDictionary headers)
     {
         var ifMatch = headers.IfMatch.FirstOrDefault();
@@ -240,11 +269,10 @@ internal static class AuthoringHttp
         return (!string.IsNullOrWhiteSpace(ifMatch) || create, create ? null : ifMatch);
     }
 
-    public static bool TryQuizmaster(IHeaderDictionary headers, out string by)
-    {
-        by = Uri.UnescapeDataString(headers["X-Quizmaster"].FirstOrDefault() ?? string.Empty).Trim();
-        return by.Length is > 0 and <= MaxNameLength;
-    }
+    public static string Actor(System.Security.Claims.ClaimsPrincipal user) =>
+        user.Identity?.Name
+        ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+        ?? throw new InvalidOperationException("Det beskyttede endpoint mangler en kontoidentitet.");
 
     public static async Task<JsonObject> ReadObjectAsync(HttpRequest request, CancellationToken ct)
     {
@@ -266,12 +294,6 @@ internal static class AuthoringHttp
             title: "Samtidighedsbetingelse mangler",
             detail: "Send If-Match ved rettelse eller If-None-Match: * ved oprettelse.",
             statusCode: StatusCodes.Status428PreconditionRequired).ExecuteAsync(context);
-
-    public static Task SendMissingQuizmasterAsync(HttpContext context) =>
-        Results.Problem(
-            title: "Ingen quizmaster på gemningen",
-            detail: $"Send dit navn i X-Quizmaster, højst {MaxNameLength} tegn.",
-            statusCode: StatusCodes.Status400BadRequest).ExecuteAsync(context);
 
     public static Task SendConflictAsync(
         HttpContext context, string subject, CancellationToken ct) =>

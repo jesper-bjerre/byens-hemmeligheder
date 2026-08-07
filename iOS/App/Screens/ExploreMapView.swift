@@ -4,7 +4,7 @@ import BHGameCore
 import MapKit
 import SwiftUI
 
-/// Forsiden. Kortet er skærmen.
+/// Det åbne kort over opgaverne.
 ///
 /// ## Kortet er det primære element
 ///
@@ -28,7 +28,6 @@ import SwiftUI
 struct ExploreMapView: View {
     @Environment(MissionEngine.self) private var engine
     @Environment(Router.self) private var router
-    @Environment(AmbiencePlayer.self) private var ambience
 
     @State private var camera: MapCameraPosition = .region(Self.vejleHarbour)
     /// Følger kortet spilleren? Slås fra, når brugeren selv panorerer.
@@ -50,7 +49,6 @@ struct ExploreMapView: View {
     /// Hvilken opgave der allerede er poppet op ved ankomst. Nulstilles, når
     /// spilleren går væk igen, så et gensyn giver et nyt pop.
     @State private var announcedMissionId: String?
-    @State private var showsDevPanel = false
 
     /// Vejle Havn. Kun et startudsnit, indtil spillerens position kendes.
     static let vejleHarbour = MKCoordinateRegion(
@@ -63,30 +61,47 @@ struct ExploreMapView: View {
     }
 
     private var content: some View {
-        VStack(spacing: 0) {
-            BHBrandHeader {
-                HStack(spacing: BHSpacing.tight) {
-                    ambienceButton
-                    scoreboardButton
-                    headerTrailing
-                }
+        VStack(alignment: .leading, spacing: BHSpacing.snug) {
+            VStack(alignment: .leading, spacing: BHSpacing.tight) {
+                Text("Find en opgave")
+                    .font(BHFont.title)
+                    .foregroundStyle(BHColor.ink)
+                    .accessibilityAddTraits(.isHeader)
+                Text("Udforsk Vejle, find en markør i nærheden, og gå hen til stedet for at låse opgaven op.")
+                    .font(BHFont.body)
+                    .foregroundStyle(BHColor.inkMuted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+
             map
                 .overlay(alignment: .topTrailing) { mapActions }
                 .overlay(alignment: .bottom) { preview }
+                .clipShape(RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous)
+                        .strokeBorder(BHColor.separator)
+                }
         }
-        .background(BHColor.brand)
-        .ignoresSafeArea(edges: .bottom)
-        // Egen header frem for navigationslinjens titel. SwiftUI giver
-        // værktøjslinje- og titelelementer faste fontstørrelser, der ikke
-        // følger Dynamic Type — det fandt tilgængelighedsauditten allerede
-        // én gang i HintSheet.
-        .toolbar(.hidden, for: .navigationBar)
+        .padding(.horizontal, BHSpacing.regular)
+        .padding(.bottom, BHSpacing.regular)
+        .background(BHColor.canvas.ignoresSafeArea())
+        .navigationTitle("Kort")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.visible, for: .navigationBar)
+        .accessibilityIdentifier("map.screen")
             .task {
                 // Kun hvis spilleren allerede har sagt ja. En prompt ved opstart
                 // er netop dét, FR-030 forbyder.
                 if engine.hasLocationAuthorization {
                     engine.startLocationUpdates()
+                }
+
+                // Positionen kan allerede være kendt fra startsiden, når
+                // kortet bliver oprettet. I så fald kommer der ikke nødvendigvis
+                // en ny onChange-hændelse, og kortet ville blive stående ved
+                // standardudsnittet i stedet for at vise spilleren.
+                if !hasCentredOnce, let location = engine.currentLocation {
+                    centre(on: location)
                 }
             }
             .onChange(of: engine.currentLocation) { _, location in
@@ -94,73 +109,6 @@ struct ExploreMapView: View {
                 if !hasCentredOnce, let location { centre(on: location) }
                 announceArrivalIfNeeded()
             }
-            .sheet(isPresented: $showsDevPanel) {
-                #if BH_DEV_TOOLS
-                DevLocationPanel()
-                #endif
-            }
-    }
-
-    /// Slår baggrundsstemningen fra. Ét tryk, og valget huskes.
-    ///
-    /// Knappen er ikke gemt i en indstillingsskærm. Spilleren står udendørs,
-    /// måske ved siden af andre — lyden skal kunne slukkes dér, hvor den
-    /// generer, ikke tre menuer nede.
-    private var ambienceButton: some View {
-        Button {
-            ambience.toggle()
-        } label: {
-            Image(systemName: ambience.isEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                .font(BHFont.heading)
-                .foregroundStyle(BHColor.onBrand)
-                .frame(width: BHMetrics.minimumTapTarget, height: BHMetrics.minimumTapTarget)
-                .overlay(Circle().strokeBorder(BHColor.onBrand, lineWidth: 1.5))
-        }
-        .accessibilityLabel(ambience.isEnabled ? "Slå baggrundslyd fra" : "Slå baggrundslyd til")
-        .accessibilityIdentifier("ambience.toggle")
-    }
-
-    /// Udviklerknappen findes **kun** i Debug.
-    ///
-    /// `#if` skal omslutte hele grenen og ikke kun dens indhold: en tom
-    /// `ViewBuilder`-gren er gyldig, men en tom `ToolbarContentBuilder` er ikke
-    /// — og dét viste sig først i en Release-bygning, dengang knappen sad i
-    /// værktøjslinjen.
-    @ViewBuilder
-    /// Vejen til point og rangliste.
-    ///
-    /// I headeren og ikke i en fanebjælke: appen har én skærm, kortet, og en
-    /// fanebjælke ville tage plads fra det uden at føre nogen steder hen, man
-    /// ikke kan komme med ét tryk.
-    private var scoreboardButton: some View {
-        Button {
-            router.push(.scoreboard)
-        } label: {
-            Image(systemName: "rosette")
-                .font(BHFont.heading)
-                .foregroundStyle(BHColor.onBrand)
-                .frame(width: BHMetrics.minimumTapTarget, height: BHMetrics.minimumTapTarget)
-                .overlay(Circle().strokeBorder(BHColor.onBrand, lineWidth: 1.5))
-        }
-        .accessibilityLabel("Dine point")
-        .accessibilityIdentifier("scoreboard.open")
-    }
-
-    private var headerTrailing: some View {
-        #if BH_DEV_TOOLS
-        Button {
-            showsDevPanel = true
-        } label: {
-            Image(systemName: "hammer")
-                .font(BHFont.heading)
-                .foregroundStyle(BHColor.onBrand)
-                .frame(width: BHMetrics.minimumTapTarget, height: BHMetrics.minimumTapTarget)
-                .overlay(Circle().strokeBorder(BHColor.onBrand, lineWidth: 1.5))
-        }
-        .accessibilityLabel("Simuler position")
-        #else
-        EmptyView()
-        #endif
     }
 
     // MARK: - Kort

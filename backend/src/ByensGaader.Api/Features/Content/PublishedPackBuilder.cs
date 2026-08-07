@@ -13,9 +13,28 @@ internal static class PublishedPackBuilder
     };
 
     private static readonly HashSet<string> PublicStatuses =
-        new(StringComparer.Ordinal) { "fieldTestReady", "publishReady" };
+        // publishReady er en midlertidig læsealias, så eksisterende indhold
+        // forbliver offentligt, indtil lagret er migreret til published.
+        new(StringComparer.Ordinal) { "published", "publishReady" };
+
+    private static readonly HashSet<string> PreviewStatuses =
+        new(StringComparer.Ordinal) { "fieldTestReady", "published", "publishReady" };
 
     public static PublishedContent Build(AuthoringSnapshot source, DateTimeOffset generatedAt)
+        => Build(source, generatedAt, PublicStatuses, useLegacyPublishedStatus: true);
+
+    /// <summary>Bygger den pakke, en verificeret Designer eller Admin må afprøve.
+    /// Kladder er fortsat skjult, mens felttestklare opgaver bevarer deres
+    /// status, så klienten kan give dem en særskilt farve.</summary>
+    public static PublishedContent BuildPreview(
+        AuthoringSnapshot source, DateTimeOffset generatedAt)
+        => Build(source, generatedAt, PreviewStatuses, useLegacyPublishedStatus: false);
+
+    private static PublishedContent Build(
+        AuthoringSnapshot source,
+        DateTimeOffset generatedAt,
+        IReadOnlySet<string> includedStatuses,
+        bool useLegacyPublishedStatus)
     {
         var aggregates = source.Missions
             .Select(ParseAggregate)
@@ -23,7 +42,7 @@ internal static class PublishedPackBuilder
             .ToArray();
 
         var publicAggregates = aggregates
-            .Where(item => PublicStatuses.Contains(item.Mission["status"]?.GetValue<string>() ?? ""))
+            .Where(item => includedStatuses.Contains(item.Mission["status"]?.GetValue<string>() ?? ""))
             .ToArray();
 
         var mediaIds = new HashSet<string>(StringComparer.Ordinal);
@@ -44,7 +63,9 @@ internal static class PublishedPackBuilder
                     .Select(item => item.Location.DeepClone())
                     .ToArray()),
             ["missions"] = new JsonArray(
-                publicAggregates.Select(item => item.Mission.DeepClone()).ToArray()),
+                publicAggregates
+                    .Select(item => ClientMission(item.Mission, useLegacyPublishedStatus))
+                    .ToArray()),
             ["media"] = new JsonArray(
                 source.Media
                     .Where(item => mediaIds.Contains(item.Json["id"]?.GetValue<string>() ?? ""))
@@ -95,6 +116,23 @@ internal static class PublishedPackBuilder
     {
         var canonical = Canonicalise(node);
         return Encoding.UTF8.GetBytes(canonical.ToJsonString(Format) + "\n");
+    }
+
+    private static JsonNode ClientMission(JsonObject mission, bool useLegacyPublishedStatus)
+    {
+        var copy = mission.DeepClone().AsObject();
+
+        // De spillerbuilds, der allerede ligger i TestFlight, kender ikke
+        // published og ville ellers skjule opgaven. Authoring-lageret bruger
+        // det nye navn; kun den offentlige kompatibilitetspakke oversætter,
+        // indtil de gamle builds er udfaset.
+        if (useLegacyPublishedStatus
+            && copy["status"]?.GetValue<string>() == "published")
+        {
+            copy["status"] = "publishReady";
+        }
+
+        return copy;
     }
 
     private static JsonNode Canonicalise(JsonNode node) => node switch

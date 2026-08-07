@@ -260,20 +260,20 @@ struct ContentConsistencyTests {
 
     /// Feature 001 arbejder med foreløbige, ikke-feltverificerede værdier.
     /// Gaten skal derfor bide på begge missioner.
-    @Test("V-10: publishReady kræver feltbesøg — og ingen mission er der endnu")
-    func publishReadyRequiresFieldVerification() {
+    @Test("V-10: published kræver feltbesøg — og ingen mission er der endnu")
+    func publishedRequiresFieldVerification() {
         for mission in pack.missions {
             guard let location = pack.location(id: mission.locationId) else { continue }
 
-            let mayBePublishReady =
+            let mayBePublished =
                 location.fieldVerified
                 && location.latitude != nil
                 && location.longitude != nil
                 && location.activationRadiusMetres != nil
                 && location.lastPhysicallyVerified != nil
 
-            if mission.status == .known(.publishReady) {
-                #expect(mayBePublishReady, "\(mission.id) er publishReady uden feltbesøg")
+            if mission.status == .known(.published) || mission.status == .known(.publishReady) {
+                #expect(mayBePublished, "\(mission.id) er published uden feltbesøg")
             }
             // Ikke alle opgaver er nået lige langt. "Den forsvundne landevej"
             // er researchklar: dens facit kan først fastlægges efter opmåling
@@ -283,8 +283,8 @@ struct ContentConsistencyTests {
             // var en tilfældighed ved feature 001 gjort til en regel, og den
             // ville have tvunget en ufærdig opgave op i status for at bestå.
             #expect(
-                mission.status != .known(.publishReady),
-                "\(mission.id) er publiceringsklar, før felten er besøgt"
+                mission.status != .known(.published) && mission.status != .known(.publishReady),
+                "\(mission.id) er frigivet, før felten er besøgt"
             )
             #expect(location.fieldVerified == false, "\(location.id) er ikke besøgt endnu")
         }

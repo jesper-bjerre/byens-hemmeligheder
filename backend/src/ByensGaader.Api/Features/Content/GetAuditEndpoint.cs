@@ -21,7 +21,7 @@ internal sealed class GetAuditEndpoint(AuditTrail audit) : EndpointWithoutReques
     public override void Configure()
     {
         Get("/content/{locale}/audit");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(b => b.WithTags("Indhold"));
     }
 

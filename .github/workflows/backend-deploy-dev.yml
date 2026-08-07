@@ -124,3 +124,24 @@ jobs:
 
           echo "::error::DEV /health svarede aldrig 200."
           exit 1
+
+      - name: Smoke-test adgangskontrollen i DEV
+        run: |
+          host=$(az webapp show -n "$APP_NAME" -g "$RESOURCE_GROUP" \
+            --query defaultHostName -o tsv)
+
+          authoring=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
+            "https://$host/authoring/content/da-DK/missions")
+          if [ "$authoring" != "401" ]; then
+            echo "::error::Redaktion uden session gav $authoring; forventede 401."
+            exit 1
+          fi
+
+          insecure=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
+            "http://$host/health")
+          case "$insecure" in
+            301|302|307|308) ;;
+            *) echo "::error::HTTP gav $insecure; forventede HTTPS-redirect."; exit 1 ;;
+          esac
+
+          echo "DEV afviser anonyme redaktionskald og kræver HTTPS."

@@ -7,12 +7,17 @@ import Observation
 /// efter fuld terminering til en serialisering af selve stien frem for et sæt
 /// løse flag, der skal gættes rigtigt igen (FR-036).
 enum Route: Hashable, Codable, Sendable {
+    /// Det eksisterende, åbne kort. Forsiden er nu en opdagelsesside, så
+    /// kortet er et selvstændigt mål i navigationen.
+    case map
     case missionDetail(missionId: String)
     case approach(missionId: String)
     case step(missionId: String, stepId: String)
     case reward(missionId: String)
-    /// Point og rangliste. Hører ikke til en opgave.
+    /// Spillerens egne point. Hører ikke til en opgave.
     case scoreboard
+    /// Highscorelister på tværs af spillere. Hører ikke til en opgave.
+    case leaderboards
 
     var missionId: String {
         switch self {
@@ -20,7 +25,7 @@ enum Route: Hashable, Codable, Sendable {
             id
         case .step(let id, _):
             id
-        case .scoreboard:
+        case .map, .scoreboard, .leaderboards:
             // Ruten hører ikke til en opgave. Genskabelsen validerer mod
             // kendte opgave-id'er, og en tom streng falder derfor bevidst
             // igennem — pointskærmen genåbnes ikke efter en genstart.

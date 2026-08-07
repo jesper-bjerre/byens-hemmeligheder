@@ -1,5 +1,3 @@
-#if BH_DEV_TOOLS
-
 import BHContracts
 import BHDesignSystem
 import BHGameCore
@@ -8,8 +6,9 @@ import SwiftUI
 
 /// Udviklerpanel til at bevæge sig uden at gå udenfor.
 ///
-/// Findes kun i Debug (FR-051). Panelet snyder **ikke** gaten: dwell skal
-/// stadig optjenes, hygiejnefiltrene gælder, og "gå forbi" verificerer aldrig.
+/// Oversættes kun, når de rollebegrænsede testværktøjer er med. Panelet
+/// snyder **ikke** gaten: dwell skal stadig optjenes, hygiejnefiltrene gælder,
+/// og "gå forbi" verificerer aldrig.
 /// Det eneste, panelet gør, er at flytte de fixes, telefonen ellers ville få
 /// fra satellitterne — så tilstandsmaskinen kan afprøves ærligt ved et
 /// skrivebord.
@@ -325,5 +324,3 @@ struct DevLocationPanel: View {
         }
     }
 }
-
-#endif

@@ -101,14 +101,14 @@ den hører til, når der er tre.
 listen lukker det, når man ruller. Uden det kan man ikke skifte faneblad, mens
 man skriver — fanebladene ligger under tastaturet.
 
-### To statusser, ikke fem
+### Tre statusser i arbejdsgangen
 
-Kontrakten kender `draft`, `researchReady`, `fieldTestReady`, `publishReady` og
-`paused`. Appen tilbyder **Kladde** og **Frigivet**. De tre andre beskriver en
-redaktionel proces, der ikke findes: der er ingen godkendelsesgang (FR-110), og
-"pauseret" og "kladde" har nøjagtig samme virkning for spilleren.
+Appen tilbyder **Kladde** (`draft`), **Klar til udgivelse** (`fieldTestReady`)
+og **Frigivet** (`published`). Navnene beskriver både redaktionens næste skridt
+og spillerens adgang. Kontrakten accepterer fortsat `researchReady`, `paused`
+og den ældre `publishReady`, men nye admin-klienter opretter dem ikke.
 
-Bærer en opgave alligevel en af de tre — fordi den blev skrevet i hånden, eller
+Bærer en opgave alligevel en ældre status — fordi den blev skrevet i hånden, eller
 fordi kontrakten er nyere end appen — vises den med sit rigtige navn og lægges
 til som et ekstra valg. En status, quizmasteren ikke kan se, er værre end en,
 hen ikke forstår; en opgave, hen ikke kan flytte, er værst.
@@ -221,14 +221,14 @@ kontraktændring, der kun bliver lavet ét af stederne, får tests til at fejle.
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |---|---|---|
-| **Princip IV: API'et har ingen adgangskontrol.** Hvert endepunkt står med `AllowAnonymous()` — også `PUT` og `DELETE`. Enhver, der finder adressen, kan omskrive pakken | Accepteret bevidst, mens quizmasterne tester på TestFlight. Alternativet var at udskyde al felttest, indtil brugerkonti fandtes, og dermed teste appen uden nogen, der havde brugt den | Ikke afvist — **udskudt**. Skal lukkes, før quizmasterne for alvor opretter indhold. Den mindste løsning, der virker for fem personer, er en delt nøgle i `Info.plist` sendt som header |
+| **Princip IV: API'et har ingen adgangskontrol.** Hvert endepunkt står med `AllowAnonymous()` — også `PUT` og `DELETE`. Enhver, der finder adressen, kan omskrive pakken | Accepteret bevidst, mens quizmasterne testede på TestFlight. Alternativet var at udskyde al felttest, indtil brugerkonti fandtes, og dermed teste appen uden nogen, der havde brugt den | Den midlertidige idé om en delt nøgle er forkastet. Næste feature implementerer direkte Log ind med Apple, egne sessions og de serverstyrede roller User, Designer og Admin. Se [`docs/plans/authentication-og-roller.md`](../../docs/plans/authentication-og-roller.md) |
 | **Princip II: V-02 beviser mindre end før.** `canonicalAnswer` skrives af det første accepterede svar, så selvkonsistenstesten er sand pr. konstruktion for indhold fra appen | To felter, hvor det ene skal være en kopi af en linje i det andet, er to steder at tage fejl. Fejlen forhindres nu ved kilden i stedet for at blive fanget bagefter | At beholde facit som et redigerbart felt ville bevare testens beviskraft, men først indføre den fejl, den skulle fange. Svækkelsen står skrevet i `answer-normalization.md`, i svarmotorens kommentar og i ADR 0006, så ingen senere læser V-02 som en garanti |
 | **Formkravene i BHKits tests gælder kun `isPlayable`-opgaver** | Da pakken blev håndredigeret, var enhver ufærdig opgave en fejl. Nu er en kladde under arbejde normal, og spillerappen viser den ikke | At kræve detaljer og miniature af alle opgaver ville gøre testsuiten rød, hver gang en quizmaster begyndte på noget. Referencer, id-entydighed, hints, svarregler og rettigheder holdes stadig for **alle** opgaver |
 
 ## Hvad der mangler
 
-- **Fase 5**: PROD-storage og adgangskontrol. Se
-  [udrulning.md](../../docs/drift/udrulning.md).
+- **Fase 5**: Authentication, serverstyrede roller og lukning af authoring-API.
+  Se [authentication-og-roller.md](../../docs/plans/authentication-og-roller.md).
 - **`BH_DEV_TOOLS` er stadig tændt i spillerappens Release.** Spec'en siger, den
   kan slukkes, når GPS-simulering og nulstilling er flyttet herover. Det er de.
 - **De syv `mission.ny-opgave-N`-id'er** skal have rigtige slugs, når titlerne

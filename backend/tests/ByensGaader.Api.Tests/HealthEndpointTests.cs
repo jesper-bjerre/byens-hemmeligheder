@@ -1,7 +1,11 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using ByensGaader.Api.Features.Authentication;
+using ByensGaader.Api.Security;
 using FastEndpoints.Testing;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ByensGaader.Api.Tests;
@@ -118,9 +122,45 @@ public class WritableApp : AppFixture<Program>
 
     protected override void ConfigureApp(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Development");
         builder.UseSetting("ContentStore:Provider", "FileSystem");
         builder.UseSetting("ContentStore:RootPath", _root);
         builder.UseSetting("ContentStore:AuthoringRootPath", _authoringRoot);
+        builder.UseSetting("Authentication:Enabled", "true");
+        builder.UseSetting("Authentication:Provider", "InMemory");
+    }
+
+    protected override async ValueTask SetupAsync()
+    {
+        var repository = Services.GetRequiredService<IAuthenticationRepository>();
+        var now = DateTimeOffset.UtcNow;
+        var account = new Account(
+            Guid.NewGuid(),
+            "testdesigner@example.invalid",
+            "Testdesigner",
+            AccountRole.Designer,
+            AccountState.Active,
+            now,
+            now);
+        var token = OpaqueTokenService.Create();
+        var session = new AuthenticationSession(
+            token.Id,
+            account.AccountId,
+            AuthenticationClientKind.IOSAdmin,
+            token.SecretHash,
+            now.AddMinutes(15),
+            null,
+            null,
+            null,
+            now,
+            now);
+        if (!await repository.CreateAccountAsync(account, CancellationToken.None)
+            || !await repository.CreateSessionAsync(session, CancellationToken.None))
+        {
+            throw new InvalidOperationException("Testens Designer-session kunne ikke oprettes.");
+        }
+        Client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token.Value);
     }
 
     protected override ValueTask TearDownAsync()

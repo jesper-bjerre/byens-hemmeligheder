@@ -22,6 +22,8 @@ struct RewardView: View {
 
     @Environment(MissionEngine.self) private var engine
     @Environment(Router.self) private var router
+    @Environment(PlayerAuthentication.self) private var authentication
+    @Environment(PlayerScoresStore.self) private var scores
 
     private var transactions: [ScoreTransaction] { engine.transactions(for: mission) }
 
@@ -31,6 +33,7 @@ struct RewardView: View {
                 headline
                 message
                 scoreBreakdown
+                scoreSyncNotice
                 historyFact
                 provenance
                 presenceNote
@@ -42,6 +45,9 @@ struct RewardView: View {
         .navigationTitle("Løst")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .task(id: mission.id) {
+            await scores.submit(missionId: mission.id, from: engine, using: authentication)
+        }
     }
 
     private var headline: some View {
@@ -111,6 +117,17 @@ struct RewardView: View {
         }
     }
 
+    @ViewBuilder
+    private var scoreSyncNotice: some View {
+        if authentication.state == .signedIn, let message = scores.scoreSyncMessage {
+            Label(message, systemImage: "arrow.triangle.2.circlepath")
+                .font(BHFont.caption)
+                .foregroundStyle(BHColor.inkMuted)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("reward.score-sync")
+        }
+    }
+
     private var historyFact: some View {
         BHCard {
             VStack(alignment: .leading, spacing: BHSpacing.tight) {
@@ -161,9 +178,13 @@ struct RewardView: View {
     @ViewBuilder
     private var provenance: some View {
         let sources = mission.sourceIds.compactMap { engine.pack?.source(id: $0) }
-        let media = [mission.heroMediaId, mission.narrationMediaId]
+        let media = ([mission.heroMediaId, mission.narrationMediaId]
+            + mission.orderedCards.map(\.mediaId))
             .compactMap { $0 }
             .compactMap { engine.pack?.media(id: $0) }
+            .reduce(into: [MediaAsset]()) { result, asset in
+                if !result.contains(where: { $0.id == asset.id }) { result.append(asset) }
+            }
 
         if !sources.isEmpty || !media.isEmpty {
             BHCard {
@@ -221,7 +242,7 @@ struct RewardView: View {
     }
 
     private var doneButton: some View {
-        Button("Tilbage til kortet") {
+        Button("Tilbage til startsiden") {
             router.popToRoot()
         }
         .buttonStyle(.bhPrimary)

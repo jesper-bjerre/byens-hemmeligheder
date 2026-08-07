@@ -5,15 +5,9 @@ import Foundation
 /// Kun i Debug. En udgivelsesbygning må ikke kunne nulstille progression eller
 /// ændre adfærd ud fra noget, der kan sendes ind udefra (FR-051).
 ///
-/// ## Hvorfor `DEBUG` og ikke `BH_DEV_TOOLS`
-///
-/// De to flag betød tidligere det samme. Nu gør de ikke: `BH_DEV_TOOLS` tænder
-/// admin-siden **også i en udgivelse**, fordi alle brugere indtil videre er
-/// testere. Men det, der kan sendes ind udefra, må ikke følge med — en
-/// launch-argument-parameter kan sættes af hvem som helst, der kan starte
-/// appen, og skal blive i Debug.
-///
-/// Den ene er en knap, brugeren selv trykker på. Den anden er en bagdør.
+/// GPS-simuleringen findes også i Release som en synlig funktion for en
+/// verificeret Designer/Admin. Launch-argumenter er noget andet: de kan sættes
+/// udefra og må derfor kun have virkning i Debug.
 enum LaunchArguments {
 
     #if DEBUG

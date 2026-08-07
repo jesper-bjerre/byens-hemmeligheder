@@ -44,6 +44,14 @@ final class BoelgenFlowTests: FlowTestCase {
                 card.waitForExistence(timeout: Self.uiTimeout),
                 "Bølgens billedkort \(order) mangler på opgavesiden"
             )
+            let loaded = XCTNSPredicateExpectation(
+                predicate: NSPredicate(format: "value == %@", "Billedet vises"),
+                object: card)
+            XCTAssertEqual(
+                XCTWaiter.wait(for: [loaded], timeout: Self.uiTimeout),
+                .completed,
+                "Bølgens billedkort \(order) havde overlay, men intet indlæst billede"
+            )
         }
 
         // De tre spor.

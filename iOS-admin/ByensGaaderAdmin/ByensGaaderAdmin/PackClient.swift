@@ -1,3 +1,4 @@
+import BHAuthenticationKit
 import Foundation
 
 /// Taler med backenden om redaktionelle objekter og deres medier.
@@ -13,20 +14,7 @@ import Foundation
 /// samme grund.
 struct PackClient {
 
-    /// Egen session frem for `URLSession.shared`.
-    ///
-    /// Standardens 60 sekunder er for længe at stirre på en spinner ved
-    /// Bølgen og for lidt til at lægge et billede op over mobilnet. De to tal
-    /// skal være forskellige: et kald, der ikke svarer på tyve sekunder,
-    /// svarer ikke — men en overførsel, der er i gang, skal have lov at blive
-    /// færdig.
-    private static let session: URLSession = {
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 20
-        configuration.timeoutIntervalForResource = 180
-        configuration.waitsForConnectivity = false
-        return URLSession(configuration: configuration)
-    }()
+    private let authentication = AdminAuthentication.shared.client
 
     private var base: URL { AdminConfiguration.backendURL }
 
@@ -103,7 +91,6 @@ struct PackClient {
 
     /// Gemmer kun de objekter, der er ændret siden indlæsningen.
     func save(_ document: PackDocument) async throws -> AuthoringSaveSummary {
-        guard AdminConfiguration.isReady else { throw AdminError.noQuizmaster }
         let changes = try document.authoringChanges()
         var revisions = document.revisions
         var summary = AuthoringSaveSummary(revisions: revisions)
@@ -173,9 +160,6 @@ struct PackClient {
             url: authoringURL.appending(path: collection).appending(path: object.id))
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(
-            AdminConfiguration.quizmaster.percentEncodedForHeader,
-            forHTTPHeaderField: "X-Quizmaster")
         if let etag {
             request.setValue(etag, forHTTPHeaderField: "If-Match")
         } else {
@@ -184,7 +168,7 @@ struct PackClient {
         request.httpBody = try JSONSerialization.data(
             withJSONObject: object.json, options: [.sortedKeys, .withoutEscapingSlashes])
 
-        let (data, response) = try await Self.session.data(for: request)
+        let (data, response) = try await authentication.authorizedData(for: request)
         let http = try Self.http(response)
         if http.statusCode == 412 { throw AdminError.conflict }
         guard http.statusCode == 200 || http.statusCode == 201,
@@ -205,10 +189,7 @@ struct PackClient {
             url: authoringURL.appending(path: collection).appending(path: id))
         request.httpMethod = "DELETE"
         request.setValue(etag, forHTTPHeaderField: "If-Match")
-        request.setValue(
-            AdminConfiguration.quizmaster.percentEncodedForHeader,
-            forHTTPHeaderField: "X-Quizmaster")
-        let (_, response) = try await Self.session.data(for: request)
+        let (_, response) = try await authentication.authorizedData(for: request)
         let http = try Self.http(response)
         if http.statusCode == 412 { throw AdminError.conflict }
         guard http.statusCode == 204 else {
@@ -224,7 +205,7 @@ struct PackClient {
     private func get(_ url: URL) async throws -> (Data, HTTPURLResponse) {
         var request = URLRequest(url: url)
         request.cachePolicy = .reloadIgnoringLocalCacheData
-        let (data, response) = try await Self.session.data(for: request)
+        let (data, response) = try await authentication.authorizedData(for: request)
         let http = try Self.http(response)
         guard http.statusCode == 200 else {
             throw AdminError.message("Serveren svarede \(http.statusCode).")
@@ -252,7 +233,7 @@ struct PackClient {
         request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         request.httpBody = data
 
-        let (_, response) = try await Self.session.data(for: request)
+        let (_, response) = try await authentication.authorizedData(for: request)
         let http = try Self.http(response)
 
         switch http.statusCode {
@@ -282,7 +263,7 @@ struct PackClient {
         request.setValue(sourceExtension, forHTTPHeaderField: "X-Source-Format")
         request.httpBody = data
 
-        let (_, response) = try await Self.session.data(for: request)
+        let (_, response) = try await authentication.authorizedData(for: request)
         let http = try Self.http(response)
 
         switch http.statusCode {
@@ -308,7 +289,7 @@ struct PackClient {
         var request = URLRequest(url: mediaURL.appending(path: filename))
         request.httpMethod = "DELETE"
 
-        let (_, response) = try await Self.session.data(for: request)
+        let (_, response) = try await authentication.authorizedData(for: request)
         let http = try Self.http(response)
         guard http.statusCode == 204 || http.statusCode == 404 else {
             throw AdminError.message("Sletningen blev afvist med \(http.statusCode).")
@@ -325,7 +306,7 @@ struct PackClient {
         var request = URLRequest(url: url)
         request.cachePolicy = .reloadIgnoringLocalCacheData
 
-        let (data, response) = try await Self.session.data(for: request)
+        let (data, response) = try await authentication.authorizedData(for: request)
         let http = try Self.http(response)
         guard http.statusCode == 200 else {
             throw AdminError.message("Sporet svarede \(http.statusCode).")
@@ -420,15 +401,12 @@ extension String {
 enum AdminError: LocalizedError {
     case message(String)
     case conflict
-    case noQuizmaster
 
     var errorDescription: String? {
         switch self {
         case .message(let text): text
         case .conflict:
             "En anden quizmaster har gemt, siden du hentede. Hent igen, og læg dine rettelser oveni."
-        case .noQuizmaster:
-            "Skriv dit navn under Quizmaster, før du gemmer. Sporet skal kunne svare på hvem."
         }
     }
 }

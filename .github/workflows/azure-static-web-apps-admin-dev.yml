@@ -32,6 +32,10 @@ jobs:
         run: npm ci
         working-directory: webApps/webadmin
 
+      - name: Kontrollér produktionsafhængigheder
+        run: npm audit --omit=dev
+        working-directory: webApps/webadmin
+
       # dev-cloud er stadig et optimeret produktionsbuild. Den eneste forskel
       # er, at buildet peger på DEV-API'et og aldrig på PROD-data.
       - name: Test og byg til DEV

@@ -35,6 +35,19 @@ class FlowTestCase: XCTestCase {
             app.launchArguments.append("-BHResetProgress")
         }
         app.launch()
+
+        // Forsiden er nu Explore. De eksisterende gennemløbstests begynder på
+        // kortet, så de bruger den samme synlige genvej som spilleren. Ved
+        // genoptagelse må vi ikke trykke: den gemte rute skal selv føre tilbage
+        // til opgaven efter fuld terminering.
+        if resettingProgress {
+            let openMap = app.buttons["map.open"]
+            XCTAssertTrue(
+                openMap.waitForExistence(timeout: Self.uiTimeout),
+                "Kortknappen på den nye forside kom ikke frem"
+            )
+            openMap.tap()
+        }
         return app
     }
 
@@ -51,9 +64,8 @@ class FlowTestCase: XCTestCase {
 
     /// Trykker på opgavens markør på kortet og åbner den fra popuppen.
     ///
-    /// Forsiden er kortet — der findes ingen liste. Markøren er en knap med sit
-    /// eget id, netop så den kan findes her uden at gå gennem MapKits
-    /// markeringsbinding.
+    /// Kortet åbnes fra Explore. Markøren er en knap med sit eget id, netop så
+    /// den kan findes her uden at gå gennem MapKits markeringsbinding.
     func tapMission(_ missionId: String, in app: XCUIApplication) {
         tapMissionPin(missionId, in: app)
 

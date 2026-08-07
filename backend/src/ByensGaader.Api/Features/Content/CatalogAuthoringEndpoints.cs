@@ -11,7 +11,7 @@ internal sealed class ListMediaMetadataEndpoint(
     public override void Configure()
     {
         Get("/authoring/content/{locale}/media");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -33,7 +33,7 @@ internal sealed class ListSourcesEndpoint(
     public override void Configure()
     {
         Get("/authoring/content/{locale}/sources");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -55,7 +55,7 @@ internal sealed class GetMediaMetadataEndpoint(
     public override void Configure()
     {
         Get("/authoring/content/{locale}/media/{mediaId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -76,7 +76,7 @@ internal sealed class GetSourceEndpoint(
     public override void Configure()
     {
         Get("/authoring/content/{locale}/sources/{sourceId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -98,7 +98,7 @@ internal sealed class PutMediaMetadataEndpoint(
     public override void Configure()
     {
         Put("/authoring/content/{locale}/media/{mediaId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -123,7 +123,7 @@ internal sealed class PutSourceEndpoint(
     public override void Configure()
     {
         Put("/authoring/content/{locale}/sources/{sourceId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -148,7 +148,7 @@ internal sealed class DeleteMediaMetadataEndpoint(
     public override void Configure()
     {
         Delete("/authoring/content/{locale}/media/{mediaId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -175,7 +175,7 @@ internal sealed class DeleteSourceEndpoint(
     public override void Configure()
     {
         Delete("/authoring/content/{locale}/sources/{sourceId}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(builder => builder.WithTags("Redaktionelt indhold"));
     }
 
@@ -253,11 +253,7 @@ internal static class CatalogEndpoints
             await AuthoringHttp.SendPreconditionRequiredAsync(context);
             return;
         }
-        if (!AuthoringHttp.TryQuizmaster(context.Request.Headers, out var by))
-        {
-            await AuthoringHttp.SendMissingQuizmasterAsync(context);
-            return;
-        }
+        var by = AuthoringHttp.Actor(context.User);
 
         try
         {
@@ -336,11 +332,7 @@ internal static class CatalogEndpoints
             await AuthoringHttp.SendPreconditionRequiredAsync(context);
             return;
         }
-        if (!AuthoringHttp.TryQuizmaster(context.Request.Headers, out var by))
-        {
-            await AuthoringHttp.SendMissingQuizmasterAsync(context);
-            return;
-        }
+        var by = AuthoringHttp.Actor(context.User);
 
         await publisher.EnsureReadyAsync(locale, ct);
         var before = await read(locale, id, ct);

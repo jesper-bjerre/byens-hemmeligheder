@@ -9,6 +9,9 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
     public let shortTitle: String
     public let description: String
     public let status: Tolerant<MissionStatus>
+    /// Tidspunktet, hvor opgaven senest blev frigivet fra en ikke-offentlig
+    /// status. API'et sætter værdien; klienterne bruger den til "Nye oplevelser".
+    public let releasedAt: String?
     /// Mental udfordring. Aldrig fysisk risiko (forfatningens princip VII).
     public let difficulty: Int
     public let estimatedMinutes: Int
@@ -70,6 +73,7 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         shortTitle: String,
         description: String,
         status: Tolerant<MissionStatus>,
+        releasedAt: String? = nil,
         difficulty: Int,
         estimatedMinutes: Int,
         basePoints: Int,
@@ -96,6 +100,7 @@ public struct Mission: Codable, Hashable, Sendable, Identifiable {
         self.shortTitle = shortTitle
         self.description = description
         self.status = status
+        self.releasedAt = releasedAt
         self.difficulty = difficulty
         self.estimatedMinutes = estimatedMinutes
         self.basePoints = basePoints
@@ -160,7 +165,7 @@ extension Mission {
     /// quizmasterne dem løbende i det indhold, der er i drift.
     public var isPlayable: Bool {
         switch status.known {
-        case .fieldTestReady, .publishReady: true
+        case .fieldTestReady, .published, .publishReady: true
         case .draft, .researchReady, .paused, nil: false
         }
     }
@@ -170,7 +175,10 @@ public enum MissionStatus: String, TolerantEnum {
     case draft
     case researchReady
     case fieldTestReady
-    /// Kræver feltbesøg. V-10 blokerer den bevidst i feature 001.
+    /// Opgaven er frigivet til alle spillere.
+    case published
+    /// Ældre wire-værdi for ``published``. Beholdes, mens allerede udgivne
+    /// klienter og produktionsindhold migreres.
     case publishReady
     case paused
 }

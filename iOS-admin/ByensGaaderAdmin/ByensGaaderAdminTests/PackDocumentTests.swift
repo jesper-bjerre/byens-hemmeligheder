@@ -466,7 +466,8 @@ struct VocabularyTests {
     @Test("Statusser vises i quizmasterens rækkefølge")
     func statusNamesFollowFR104() {
         #expect(Vocabulary.statusName("fieldTestReady") == "Klar til udgivelse")
-        #expect(Vocabulary.statusName("publishReady") == "Frigivet")
+        #expect(Vocabulary.statusName("published") == "Frigivet")
+        #expect(Vocabulary.statusName("publishReady") == "Frigivet (ældre status)")
         #expect(Vocabulary.statusName("draft") == "Kladde")
     }
 
@@ -482,7 +483,8 @@ struct VocabularyTests {
     /// kan låse opgaven fast i en ældre app.
     @Test("Statusvælgeren viser den værdi, opgaven faktisk står i")
     func theCurrentStatusIsAlwaysOffered() {
-        #expect(Vocabulary.statusChoices(current: "draft") == ["draft", "fieldTestReady", "publishReady"])
+        #expect(Vocabulary.statusChoices(current: "draft") == ["draft", "fieldTestReady", "published"])
+        #expect(Vocabulary.statusChoices(current: "publishReady").contains("publishReady"))
         #expect(Vocabulary.statusChoices(current: "paused").contains("paused"))
         #expect(Vocabulary.statusChoices(current: "paused").count == 4)
     }

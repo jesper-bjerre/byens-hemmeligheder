@@ -16,7 +16,8 @@ const names: Record<string, string> = {
   draft: 'Kladde',
   researchReady: 'Research på plads',
   fieldTestReady: 'Klar til udgivelse',
-  publishReady: 'Frigivet',
+  published: 'Frigivet',
+  publishReady: 'Frigivet (ældre status)',
   paused: 'På pause',
   byenKoebenhavn: 'Byen København',
   koebenhavnsOmegn: 'Københavns omegn',
@@ -54,7 +55,7 @@ export function displayName(value: string): string {
 }
 
 export function statusChoices(current: string): string[] {
-  const standard = ['draft', 'fieldTestReady', 'publishReady'];
+  const standard = ['draft', 'fieldTestReady', 'published'];
   return standard.includes(current) || !current ? standard : [...standard, current];
 }
 

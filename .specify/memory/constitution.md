@@ -1,78 +1,41 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version: 2.0.0 → 3.0.0
-Bump-type: MAJOR (princip I omdefineret bagudinkompatibelt)
+Version: 3.0.0 → 4.0.0
+Bump-type: MAJOR (princip VI og den bindende identitetsmodel er omdefineret
+bagudinkompatibelt)
 
-Ændring 2026-07-31 — princip I:
-  Var:  "et registreret, præcist standpunkt (GPS + kigretning + sikker ståflade)"
-  Nu:   "et registreret, præcist startsted — ét GPS-koordinat på en sikker
-        ståflade"
-  Hvorfor: kontrakten bar to koordinater for det samme sted — lokationens og
-        standpunktets — plus en fast kigretning. To koordinater kan pege hver
-        sin vej uden at nogen opdager det, og den faste kigretning kunne stå og
-        pege forkert, længe efter at koordinatet var rettet. Retningspilen
-        regnes nu ud af spillerens position og opgavens koordinat.
-  Pris: ståvejledningen ("Stå på promenaden med fjorden på din venstre side")
-        er væk fra kontrakten. Skal den tilbage, hører den til som indhold på
-        opgaven og ikke som et andet koordinat.
-  Samme ændring i kvalitetsrubrikken: "Præcist standpunkt" → "Præcist startsted".
+Ændring 2026-08-06:
+  - Princip VI: e-mail + engangskode erstattes af valgfri, dataminimeret ekstern
+    identitet, internt konto-id og egne kortlivede sessioner.
+  - Tekniske rammer / Identitet: direkte Log ind med Apple bliver version 1's
+    primære kontologin; e-mail er aldrig teknisk id, og gæstespil bevares.
+  - Formål, behandlingsgrundlag, offentlighed og konkrete slettefrister er nu
+    bindende krav for konto-, identity-, session- og sikkerhedsdata.
 
-Ændring 2026-07-31 — princip VII:
-  Nyt:  et forkert svar SKAL koste point, fradraget SKAL være mindre end eller
-        lig med hintbudgettet, og point MÅ ALDRIG kunne gå i nul på en
-        gennemført opgave.
-  Hvorfor: et gæt var gratis. Den billigste vej gennem en opgave med fire
-        svarmuligheder var at klikke sig igennem dem, og den, der tænkte sig om,
-        fik ikke mere for det end den, der ikke gjorde.
-  Se `contracts/spec/scoring.md` og `contracts/spec/scoring-testvectors.json`.
-
-Historik:
-Version: 1.0.0 → 2.0.0
-Bump-type: MAJOR (princip V omdefineret bagudinkompatibelt)
-
-Ændring 2026-07-27 — princip V:
-  Var:  "Offline-tolerant og versionsfastholdt afvikling" — sessionen SKULLE
-        kunne gennemføres uden netværk, og indholdet var bundlet med appen.
-  Nu:   "Serverbåret og versionsfastholdt afvikling" — alt indhold hentes fra en
-        central tjeneste, og appen kræver forbindelse.
-  Hvorfor: to kilder til indhold (bundle + server) kan drive fra hinanden, og
-        princip IV's krav om øjeblikkelig pause uden deploy er umuligt, når
-        facit ligger i en binær på tusind telefoner. Se docs/ADR/0004.
-  Pris: en tur uden dækning kan ikke gennemføres. Bevidst byttehandel.
-  Uændret: progression skrives lokalt først og synkroniseres idempotent;
-        GameSession fastholder sin indholdsversion.
-
-Historik:
-Version: TEMPLATE (ikke-udfyldt) → 1.0.0
-Bump-type: MAJOR (første ratificering — alle principper defineret fra bunden)
-
-Principper (nye):
-  I.   Stedet er spillet (lokationsspecificitet) — NON-NEGOTIABLE
-  II.  Entydigt og bevisbart facit — NON-NEGOTIABLE
-  III. AI assisterer, mennesker udgiver — NON-NEGOTIABLE
-  IV.  Sikkerhed, adgang og rettigheder går forud for spilværdi — NON-NEGOTIABLE
-  V.   Serverbåret og versionsfastholdt afvikling
-  VI.  Privatliv ved design og dataminimering — NON-NEGOTIABLE
-  VII. Tilgængelig familieoplevelse uden tidspres
-
-Tilføjede sektioner:
-  - Tekniske rammer (erstatter [SECTION_2_NAME])
-  - Udviklings- og redaktionelt workflow (erstatter [SECTION_3_NAME])
-  - Governance (udfyldt)
-
+Tilføjede sektioner: ingen
 Fjernede sektioner: ingen
 
 Templates og afhængige artefakter:
-  ✅ .specify/templates/plan-template.md — "Constitution Check" udleder gates
-     dynamisk fra denne fil; ingen ændring nødvendig
-  ✅ .specify/templates/spec-template.md — generisk; ingen ændring nødvendig
-  ✅ .specify/templates/tasks-template.md — generisk; ingen ændring nødvendig
+  ✅ .specify/templates/plan-template.md — dynamisk Constitution Check; ingen
+     tekstændring nødvendig
+  ✅ .specify/templates/spec-template.md — krav til persondata og livscyklus
+     tilføjet
+  ✅ .specify/templates/tasks-template.md — privacy-, slette- og negative
+     authorizationtests tilføjet
   ✅ .specify/templates/checklist-template.md — generisk; ingen ændring nødvendig
-  ⚠ README.md — indeholder endnu ingen henvisning til forfatningen (afventer,
-     opdateres når første feature-spec oprettes)
+  ✅ README.md — henviser allerede til forfatningen
+  ✅ specs/004-authentication-og-roller/plan.md — gate markeret godkendt
+  ✅ docs/plans/authentication-og-roller.md — gate markeret godkendt
+  ✅ docs/plans/koereplan.md — beslutningen markeret gennemført
 
-Udskudte punkter (TODO): ingen
+Historik:
+  - 3.0.0 (2026-07-31): ét startkoordinat og pointtab ved forkerte svar.
+  - 2.0.0 (2026-07-27): serverbåret frem for bundlet/offline indhold.
+  - 1.0.0 (2026-07-25): første ratificering.
+
+Udskudte punkter (TODO): juridisk/privacy review af den konkrete
+privatlivstekst og interesseafvejning før offentlig App Store-release.
 -->
 
 # Byens Hemmeligheder — Forfatning
@@ -220,11 +183,35 @@ er børn og unge, hvilket hæver kravet, ikke sænker det.
 
 Konkrete krav:
 
-- Piloten indsamler kun: e-mail til identifikation og engangskode, valgt
-  profilnavn, progression/score/achievements/inventory samt nødvendig teknisk
-  telemetry og fejlrapportering.
+- Offentligt indhold SKAL kunne bruges uden konto. En konto er valgfri for
+  spillere og må kun kræves til personlige eller synkroniserede funktioner som
+  profil, progression og highscore. Redaktionelle klienter SKAL kræve konto.
+- Version 1 må kun indsamle: et internt tilfældigt konto-id, en pseudonymiseret
+  identitetsnøgle hos den valgte identitetsudsteder, verificeret e-mail når den
+  er nødvendig for bootstrap eller kontoadministration, valgfrit profilnavn,
+  serverstyret rolle og kontotilstand, kortlivede sessionsmetadata,
+  progression/score/achievements/inventory samt nødvendig sikkerheds-,
+  drifts- og fejltelemetry.
+- Det eksterne subject og rå adgangs-, identity-, authorization- og
+  refresh-tokens MÅ IKKE lagres i klartekst. Persistente opslag SKAL bruge en
+  envejs-hash eller tilsvarende pseudonymisering; sessionshemmeligheder SKAL
+  kun lagres som kryptografiske hashes.
+- Formålet med konto- og identitydata er login, adgangskontrol og levering af
+  de kontofunktioner, brugeren aktivt vælger. Det tilsigtede behandlingsgrundlag
+  er nødvendighed for den ønskede kontotjeneste. Sikkerhedslogning baseres på
+  en dokumenteret legitim interesse og SKAL have en særskilt interesseafvejning,
+  der tillægger børns rettigheder særlig vægt. Grundlag og informationstekst
+  SKAL gennemgås af den GDPR-ansvarlige før offentlig release.
 - Kun det valgte profilnavn MÅ vises offentligt. E-mail MÅ ALDRIG vises på
-  highscorelister eller i anden offentlig visning.
+  highscorelister eller i anden offentlig visning. Profilnavn er tomt som
+  standard og kræver en aktiv brugerhandling, før det vises offentligt.
+- Konto og ekstern identitet SKAL slettes eller irreversibelt anonymiseres
+  senest 30 dage efter en gyldig sletteanmodning og efter højst 24 måneders
+  inaktivitet. Udløbne eller tilbagekaldte sessionsrækker SKAL slettes senest
+  syv dage efter udløb/tilbagekaldelse. Engangsbeviser SKAL udløbe på højst ti
+  minutter og slettes senest efter 24 timer. Authentication-sikkerhedslogs MÅ
+  højst opbevares 90 dage, medmindre en konkret sikkerhedshændelse dokumenterer
+  behovet for længere opbevaring.
 - GPS anvendes primært **på enheden** til at afgøre nærhed. Løbende historisk
   sporing af præcise positioner SKAL IKKE gemmes, medmindre et konkret og
   dokumenteret formål kræver det. Som standard gemmes kun, at en lokation blev
@@ -234,7 +221,8 @@ Konkrete krav:
   og profiloffentlighed før implementering.
 - Referencefotos og mockups BØR undgå identificerbare personer.
 - Enhver ny datakategori SKAL begrundes i pull requestet med formål,
-  behandlingsgrundlag og slettefrist, før feltet implementeres.
+  behandlingsgrundlag, offentlighed, adgang og slettefrist, før feltet
+  implementeres. Felter uden dokumenteret nødvendighed SKAL slettes.
 
 *Begrundelse:* Dataminimering er billigere at designe ind end at rette bagud, og en
 platform for børn har ingen margin for fejl på dette område.
@@ -300,8 +288,20 @@ forfatningsændring eller en ADR, der eksplicit henviser til dette afsnit.
 
 **Identitet:**
 
-- E-mail med engangskode er den primære loginmetode. Face ID/Touch ID MÅ kun
-  genåbne en eksisterende session og erstatter ALDRIG backend-identiteten.
+- Version 1 bruger direkte **Log ind med Apple** som primær kontologin på iOS og
+  web. API'et SKAL validere Apples signatur og claims samt veksle den
+  engangsbaserede authorization code server-side, før en intern konto/session
+  udstedes. Apples stabile user identifier — ikke e-mail — er identitetsnøglen.
+- API'et udsteder egne korte opaque access-sessioner. Native refresh-sessioner
+  må højst leve 30 dage og SKAL roteres; webklienter må ikke lægge langlivede
+  tokens i `localStorage`. Rolle og kontotilstand SKAL slås op server-side på
+  hver beskyttet request.
+- E-mail er en valgfri, verificeret kontakt-/administrationsattribut og MÅ
+  ALDRIG være teknisk primærnøgle. Andre identitetsudstedere kan tilføjes senere
+  som separate konti; automatisk eller manuel kontosammenkædning er ikke del af
+  version 1.
+- Face ID/Touch ID MÅ kun genåbne en eksisterende session og erstatter ALDRIG
+  backend-identiteten. Spillerens gæsteflow SKAL fungere uden login.
 
 **Bevidst uden for MVP:** socialt netværk og chat, formelle hold/holdkoder/
 hold-highscore, omfattende antisnydesystem, tidsbaseret konkurrence, avanceret AR,
@@ -401,4 +401,4 @@ prioritering, historisk/redaktionel kvalitet, fysisk sikkerhed, GDPR og
 rettigheder, teknik og drift samt support og indholdsfejl. Uden en navngiven ejer
 for et område må der ikke publiceres indhold, som falder inden for det område.
 
-**Version**: 3.0.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-31
+**Version**: 4.0.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-08-06

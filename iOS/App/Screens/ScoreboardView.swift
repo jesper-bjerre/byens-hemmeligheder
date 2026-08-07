@@ -3,21 +3,11 @@ import BHDesignSystem
 import BHGameCore
 import SwiftUI
 
-/// Spillerens point og en rangliste.
+/// Spillerens egne point og løste opgaver.
 ///
-/// ## Halvdelen er ægte, halvdelen er en attrap — og det skal kunne ses
-///
-/// Spillerens egne point er **rigtige**. De udledes af hændelsesloggen på
-/// samme måde som på belønningsskærmen, og de holder på tværs af genstart.
-///
-/// Ranglisten er **opdigtet**. Der findes ingen server, ingen konti og ingen
-/// andre spillere — FR-050 holdt bevidst highscore ude af feature 001. Den er
-/// her for at vise testerne, hvad version 1 skal kunne.
-///
-/// Derfor står der "Eksempel" på ranglisten, og navnene er tydeligt fiktive.
-/// Forfatningens princip III forbyder at præsentere noget opdigtet som ægte, og
-/// en tester, der tror, hen er nummer fire i Vejle, har fået en forkert idé om
-/// både spillet og sin egen indsats.
+/// Tallene er rigtige og udledes af hændelsesloggen på samme måde som på
+/// belønningsskærmen. Highscorelisterne ligger på deres egen skærm; konto og
+/// logout hører kun hjemme under Profil.
 struct ScoreboardView: View {
     @Environment(MissionEngine.self) private var engine
 
@@ -26,7 +16,6 @@ struct ScoreboardView: View {
             VStack(alignment: .leading, spacing: BHSpacing.loose) {
                 totalCard
                 solvedMissions
-                leaderboard
             }
             .padding(BHSpacing.regular)
         }
@@ -102,56 +91,4 @@ struct ScoreboardView: View {
         }
     }
 
-    // MARK: - Attrappen
-
-    /// Opdigtede spillere. Navnene er hverken rigtige personer eller testere.
-    private static let example: [(name: String, points: Int)] = [
-        ("Detektiv Lupin", 512),
-        ("Familien Nord", 448),
-        ("Kaninen Vera", 390),
-        ("Havnens Skygge", 275),
-    ]
-
-    private var leaderboard: some View {
-        VStack(alignment: .leading, spacing: BHSpacing.snug) {
-            HStack(spacing: BHSpacing.tight) {
-                Text("Bedste i Vejle")
-                    .font(BHFont.heading)
-                    .foregroundStyle(BHColor.ink)
-                BHChip("Eksempel", systemImage: "wrench.and.screwdriver.fill", tint: BHColor.caution)
-            }
-
-            // Sagt med ord og ikke kun med et mærkat. Et mærkat kan overses;
-            // en sætning kan ikke misforstås.
-            Text("Ranglisten er opdigtet og viser, hvordan den kommer til at se ud. "
-                 + "Der er endnu ingen server og ingen andre spillere.")
-                .font(BHFont.caption)
-                .foregroundStyle(BHColor.inkMuted)
-                .fixedSize(horizontal: false, vertical: true)
-
-            ForEach(Array(Self.example.enumerated()), id: \.offset) { index, entry in
-                BHCard {
-                    HStack(spacing: BHSpacing.regular) {
-                        Text("\(index + 1)")
-                            .font(BHFont.heading)
-                            .foregroundStyle(BHColor.inkMuted)
-                            .monospacedDigit()
-                            .frame(minWidth: 28, alignment: .leading)
-                        Text(entry.name)
-                            .font(BHFont.body)
-                            .foregroundStyle(BHColor.ink)
-                            .fixedSize(horizontal: false, vertical: true)
-                        Spacer(minLength: BHSpacing.snug)
-                        Text("\(entry.points)")
-                            .font(BHFont.heading)
-                            .foregroundStyle(BHColor.inkMuted)
-                            .monospacedDigit()
-                    }
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Eksempel, nummer \(index + 1): \(entry.name), \(entry.points) point")
-            }
-        }
-        .accessibilityIdentifier("scoreboard.leaderboard")
-    }
 }

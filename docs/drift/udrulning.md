@@ -14,15 +14,18 @@ tenant-id står i GitHub-secrets og ikke her — repoet er public.
 | API (DEV) | `byensgaader-api-d` | `DOTNETCORE:10.0`, samme App Service Plan som PROD |
 | Storage (PROD) | `byensgaaderp` | ressourcegruppe `byensgaader-p_rg`, containere `content` og `authoring` |
 | Storage (DEV/lokal) | `byensgaaderd` | DEV bruger `content`/`authoring`; lokal bruger `content-local`/`authoring-local` |
-| API-identiteter | system-assigned pr. API | hver har kun *Storage Blob Data Contributor* på sit eget miljø |
+| API-identitet (DEV) | system-assigned | Blob- og Table Data Contributor på `byensgaaderd`; Secrets User på DEV Key Vault |
+| API-identitet (PROD) | system-assigned | Blob Data Contributor på `byensgaaderp`; Table- og Key Vault-roller mangler før aktivering |
+| Key Vault (DEV) | `byensgaader-kv-d` | RBAC, purge protection og 7 dages soft delete |
 | Udrulningens identitet | `oidc-msi-8800` | user-assigned, *Website Contributor* på de to API'er alene |
 
 **Planen deles af seks apps.** B1 er én kerne og 1,75 GB til dem alle.
 Bliver API'et langsomt, er det dér, der skal kigges — ikke i koden.
 
-**B1 har ingen deployment slots.** En udrulning går direkte i luften. Relevante
-ændringer på `main` udrulles i den aktuelle testfase automatisk til både DEV og
-PROD; begge API-workflows kan også genkøres manuelt.
+**B1 har ingen deployment slots.** En udrulning går direkte i det valgte miljø.
+Relevante ændringer på `main` udrulles automatisk til DEV. PROD-workflowet er
+kun manuelt og kræver en menneskelig bekræftelse af, at samme commit er testet
+i DEV.
 
 ## App-indstillinger
 
@@ -45,6 +48,12 @@ ContentStore__Container         = content
 ContentStore__AuthoringContainer = authoring
 ASPNETCORE_ENVIRONMENT          = Development
 ```
+
+DEV-vaulten indeholder den genererede `provider-token-encryption-key` og har en
+versionløs App Service-reference til `apple-sign-in-private-key`. Sidstnævnte
+oprettes først, når den tidligere eksponerede Apple-nøgle er tilbagekaldt og en
+ny `.p8` er hentet direkte fra Apple. Authentication forbliver slået fra indtil
+referencen er grøn, Key ID er sat, og loginflowet kan testes ende-til-ende.
 
 `Authoring__ReconciliationEnabled` står på `false`, fordi migrationen til
 opgavevise blobs er afsluttet. En almindelig kodeudrulning må ikke forsøge at
@@ -73,12 +82,12 @@ managed identity i Azure.
 
 ## Sådan udrulles der
 
-Et push til `main`, der rører `backend/`, kører både
-[`backend-deploy-dev.yml`](../../.github/workflows/backend-deploy-dev.yml) og
-[`backend-deploy.yml`](../../.github/workflows/backend-deploy.yml). De tester,
-publicerer og udruller til henholdsvis DEV og PROD og kontrollerer derefter, at
-miljøets `/health` svarer 200. De to workflows kører indtil videre parallelt.
-Planen er senere at indsætte API-tests mod DEV som gate før PROD-udrulningen.
+Et push til `main`, der rører `backend/`, kører
+[`backend-deploy-dev.yml`](../../.github/workflows/backend-deploy-dev.yml). Det
+tester, publicerer, udruller til DEV og smoke-tester sundhed, HTTPS og anonym
+adgangskontrol. [`backend-deploy.yml`](../../.github/workflows/backend-deploy.yml)
+startes derefter manuelt af et menneske med inputtet `dev_verificeret=true`.
+Workflowet er desuden bundet til GitHub-environmentet `production`.
 
 Uden det sidste trin kan en udrulning melde grønt, mens app'en svarer 503. Det
 er ikke hypotetisk — nabo-app'en `quizmaster-api-p` stod sådan i ugevis, uden at
@@ -88,6 +97,9 @@ Der publiceres **framework-dependent**. App Service Linux har `DOTNETCORE|10.0`,
 så runtimen behøver ikke pakkes med.
 
 ### I hånden, hvis pipelinen er nede
+
+Kommandoen nedenfor er en PROD-udrulning og må kun køres af den menneskelige
+releaseansvarlige efter samme DEV-gate som workflowet:
 
 ```bash
 cd backend
@@ -121,6 +133,10 @@ forsøge at detektere og bygge monorepoet med Oryx; portalens første automatisk
 genererede workflow valgte både en forkert kildemappe og en outputmappe fra et
 andet projekt.
 
+DEV-webadminen udrulles automatisk ved relevante push til `main`.
+PROD-workflowet er manuelt og kræver `dev_verificeret=true`, så loginfladen ikke
+kan komme foran den backendversion og Apple-konfiguration, den afhænger af.
+
 API'ets App Service har denne app-indstilling, så browseren må kalde skrivevejen
 og læse dens `ETag`-header:
 
@@ -128,8 +144,10 @@ og læse dens `ETag`-header:
 Cors__AllowedOrigins__3=https://salmon-grass-0b3946003.7.azurestaticapps.net
 ```
 
-Der er fortsat ingen authentication eller authorization. Webadressen er
-offentlig, og dette er kun accepteret under den interne test.
+Webadressen er offentlig, men redigeringsfladen kræver Apple-login som
+Designer/Admin, når miljøets authentication-indstillinger aktiveres. API'et
+afviser redaktionelle kald uden en gyldig session også ved mangelfuld
+authentication-konfiguration.
 
 ## Byens Gåder web på Azure Static Web Apps
 
@@ -205,18 +223,18 @@ Workflowet bruger derfor `az webapp deploy`, som bruger den bearer-token,
 | 3 | Indholdet flytter fra repo til blob | ✅ — se [ADR 0005](../ADR/0005-blob-er-kilden-til-indholdet.md) |
 | 4 | Spillerappen henter fra tjenesten | ✅ — var allerede gjort i ADR 0004 |
 | 5a | PROD-storage | ✅ — `byensgaaderp`, cutover 3. august 2026 |
-| 5b | Adgangskontrol | ⬜ — bevidst udskudt under intern test |
+| 5b | Adgangskontrol | 🟡 — implementeret; Apple-konfiguration og miljøaktivering mangler |
 
 PROD peger kun på `byensgaaderp`; DEV peger kun på `byensgaaderd`. PROD-appens
 rolle på D-kontoen er fjernet. Lokal backend deler D-kontoen, men bruger de
 isolerede lokalcontainere.
 
-### Fase 5b — planlagt, ikke lavet
+### Fase 5b — implementeret, afventer miljøaktivering
 
-**Der er ingen adgangskontrol.** Hvert endepunkt står med `AllowAnonymous()` —
-også `PUT` og `DELETE`. Enhver, der finder adressen, kan omskrive
-indholdspakken eller slette billederne. `X-Quizmaster` er et navn, klienten selv
-skriver; det er et spor, ikke en spærring.
+Authoring-endpoints kræver nu Designer/Admin, brugeradministration kræver Admin,
+og audit bruger den verificerede konto. Authentication er fortsat slået fra i
+Azure, indtil de roterede Apple-hemmeligheder, App IDs, Services ID og return
+URLs er konfigureret og det fulde loginflow er bevist i DEV.
 
 **PRODs `httpsOnly` står på `false`.** En forespørgsel over almindelig HTTP bliver
 besvaret. Det skal rettes, *før* der indføres en nøgle — ellers kan nøglen
@@ -230,11 +248,11 @@ Før indholdet ikke længere må smides væk, skal en lifecycle-regel begrænse 
 versioner, og gentagne dirty publication-states skal give alarm. Det er fortsat
 bevidst udskudt under den interne test.
 
-Løsningen er skrevet ud i [køreplanens mål 1](../plans/koereplan.md) med de
-kommandoer, der mangler at blive kørt. Kort: en delt nøgle som header på alt
-andet end `GET`, som en spærring mod tilfældige — ikke som en rettighedsmodel.
-Rigtige konti og roller håndhævet server-side følger forfatningens princip IV og
-venter på [ADR 0007](../ADR/0007-blob-nu-relationelt-naar-der-er-konti.md).
+Løsningen er beskrevet i
+[authentication-og-roller.md](../plans/authentication-og-roller.md) og
+[ADR 0010](../ADR/0010-direkte-apple-login-og-egne-sessioner.md). Konti og
+sessions gemmes i miljøets Table Storage; hemmeligheder hører kun til i Key
+Vault/App Service-settings.
 
 ## Testene mod Azure
 

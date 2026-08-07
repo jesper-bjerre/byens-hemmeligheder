@@ -52,7 +52,7 @@ enum ContentEndpoint {
     /// Et nedbrud ved opstart er hårdt, men det er ærligt: en app uden
     /// indholdskilde kan ikke gøre nogen af de ting, den er til for. Alternativet
     /// er en tom skærm, ingen ved hvorfor viser sig.
-    private static var requiredBaseURL: URL {
+    static var requiredBaseURL: URL {
         guard let baseURL else {
             fatalError(
                 "BH_CONTENT_BASE_URL mangler. Sæt den i Config/Local.xcconfig, "

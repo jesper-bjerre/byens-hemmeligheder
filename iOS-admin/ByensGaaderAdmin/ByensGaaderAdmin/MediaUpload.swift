@@ -213,7 +213,7 @@ struct MediaUploadSheet: View {
                     // kontrakten kræver dem, og forfatningens princip IV sætter
                     // rettigheder over spilværdi. Men det er ikke et spørgsmål,
                     // der skal stilles fem gange pr. opgave.
-                    "owner": AdminConfiguration.quizmaster,
+                    "owner": "Byens Gåder",
                     "licence": "Eget materiale — Byens Gåder ejer rettighederne",
                     "credit": "Byens Gåder",
                     "creditLine": NSNull(),

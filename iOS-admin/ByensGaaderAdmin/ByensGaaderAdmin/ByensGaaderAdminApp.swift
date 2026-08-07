@@ -9,9 +9,23 @@ import SwiftUI
 
 @main
 struct ByensGaaderAdminApp: App {
+    @State private var authentication = AdminAuthentication.shared
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if authentication.state == .signedIn {
+                    ContentView()
+                } else {
+                    AdminLoginView()
+                }
+            }
+            .environment(authentication)
+            .task {
+                if authentication.state == .checking {
+                    await authentication.restore()
+                }
+            }
         }
     }
 }

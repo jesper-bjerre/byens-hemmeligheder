@@ -17,7 +17,7 @@ enum Vocabulary {
     /// De tre statusser, en quizmaster bruger i den almindelige arbejdsgang.
     /// De engelske værdier er kontraktens wire-navne og må ikke oversættes i
     /// den gemte pakke.
-    static let statuses = ["draft", "fieldTestReady", "publishReady"]
+    static let statuses = ["draft", "fieldTestReady", "published"]
 
     /// Valgene for en opgave, der står i `raw` netop nu.
     static func statusChoices(current raw: String) -> [String] {
@@ -29,7 +29,8 @@ enum Vocabulary {
         case "draft": "Kladde"
         case "researchReady": "Research på plads"
         case "fieldTestReady": "Klar til udgivelse"
-        case "publishReady": "Frigivet"
+        case "published": "Frigivet"
+        case "publishReady": "Frigivet (ældre status)"
         case "paused": "På pause"
         default: raw
         }

@@ -13,6 +13,7 @@
 		BH000000000000000000001A /* BHPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000014 /* BHPersistence */; };
 		BH000000000000000000001B /* BHLocationKit in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000015 /* BHLocationKit */; };
 		BH000000000000000000001C /* BHDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000016 /* BHDesignSystem */; };
+		BH0000000000000000000031 /* BHAuthenticationKit in Frameworks */ = {isa = PBXBuildFile; productRef = BH0000000000000000000030 /* BHAuthenticationKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +69,7 @@
 				BH000000000000000000001A /* BHPersistence in Frameworks */,
 				BH000000000000000000001B /* BHLocationKit in Frameworks */,
 				BH000000000000000000001C /* BHDesignSystem in Frameworks */,
+				BH0000000000000000000031 /* BHAuthenticationKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -126,6 +128,7 @@
 				BH0000000000000000000014 /* BHPersistence */,
 				BH0000000000000000000015 /* BHLocationKit */,
 				BH0000000000000000000016 /* BHDesignSystem */,
+				BH0000000000000000000030 /* BHAuthenticationKit */,
 			);
 			productName = ByensHemmeligheder;
 			productReference = BH0000000000000000000005 /* ByensHemmeligheder.app */;
@@ -252,7 +255,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG BH_DEV_TOOLS";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
@@ -269,7 +272,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = BH_DEV_TOOLS;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;
@@ -281,11 +283,12 @@
 			baseConfigurationReference = BH000000000000000000002B /* Shared.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 5;
+				CODE_SIGN_ENTITLEMENTS = App/ByensHemmeligheder.entitlements;
+				CURRENT_PROJECT_VERSION = 6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Byens Gåder";
+				INFOPLIST_KEY_CFBundleDisplayName = "Vejles Gåder";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -304,11 +307,12 @@
 			baseConfigurationReference = BH000000000000000000002B /* Shared.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 5;
+				CODE_SIGN_ENTITLEMENTS = App/ByensHemmeligheder.entitlements;
+				CURRENT_PROJECT_VERSION = 6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Byens Gåder";
+				INFOPLIST_KEY_CFBundleDisplayName = "Vejles Gåder";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -332,7 +336,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dk.hyldenbrandt.byensgaader.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG BH_DEV_TOOLS";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = ByensHemmeligheder;
 			};
@@ -416,6 +420,10 @@
 		BH0000000000000000000016 /* BHDesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BHDesignSystem;
+		};
+		BH0000000000000000000030 /* BHAuthenticationKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BHAuthenticationKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

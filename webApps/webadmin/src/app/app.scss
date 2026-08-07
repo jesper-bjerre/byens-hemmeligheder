@@ -2,6 +2,34 @@
   display: block;
   min-height: 100dvh;
 }
+.auth-shell {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 80% 10%, rgb(221 236 229 / 85%), transparent 32rem),
+    var(--canvas);
+}
+.auth-card {
+  width: min(430px, 100%);
+  padding: clamp(2rem, 6vw, 3rem);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+.auth-card .brand-mark { margin: 0 auto 1.5rem; }
+.auth-card h1 {
+  margin: .25rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  line-height: 1;
+}
+.auth-card h2 { margin: 1.5rem 0 .5rem; }
+.auth-card p { color: var(--muted); }
+.auth-card .button { margin-top: 1.25rem; }
 .app-shell {
   min-height: 100dvh;
   background:

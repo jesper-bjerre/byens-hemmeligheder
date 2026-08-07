@@ -115,26 +115,6 @@ enum AdminConfiguration {
         #endif
     }
 
-    // MARK: - Hvem der retter
-
-    private static let quizmasterKey = "bh.admin.quizmaster"
-
-    /// Navnet, der følger med hver gemning i `X-Quizmaster` (FR-111).
-    ///
-    /// Dette **er** et felt i UI'et, og det er ikke en modsigelse af FR-102:
-    /// serveradressen er den samme for alle fem, mens navnet pr. definition er
-    /// forskelligt. Uden det kan sporet ikke svare på hvem, og serveren afviser
-    /// gemningen.
-    static var quizmaster: String {
-        get { UserDefaults.standard.string(forKey: quizmasterKey) ?? "" }
-        set {
-            UserDefaults.standard.set(
-                newValue.trimmingCharacters(in: .whitespacesAndNewlines), forKey: quizmasterKey)
-        }
-    }
-
-    static var isReady: Bool { !quizmaster.isEmpty }
-
     /// Sproget, der redigeres. Der findes én pakke endnu, og et faneblad til at
     /// vælge mellem én ting er kun i vejen.
     static let locale = "da-DK"

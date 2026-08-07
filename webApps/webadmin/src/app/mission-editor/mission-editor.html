@@ -98,7 +98,7 @@
                 <span class="eyebrow">Status</span>
                 <h3>Hvor langt er opgaven?</h3>
               </div>
-              @if (mission.status === 'publishReady') {
+              @if (mission.status === 'published' || mission.status === 'publishReady') {
                 <span class="badge ready">Frigivet</span>
               }
             </div>
@@ -110,7 +110,7 @@
                 }
               </select>
             </div>
-            <p class="help">Frigivne opgaver bliver tilgængelige for feltprøven.</p>
+            <p class="help">Frigivne opgaver bliver tilgængelige for alle spillere.</p>
           </section>
 
           <section class="panel">

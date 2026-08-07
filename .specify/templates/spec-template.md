@@ -103,6 +103,14 @@
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
+### Privacy and data lifecycle *(mandatory when personal data is involved)*
+
+- **Data category**: [exact fields and whether they are identifying, pseudonymous, public, or secret]
+- **Purpose and legal basis**: [why each category is necessary and the approved basis]
+- **Access and public exposure**: [who can read or change the data; what can be public]
+- **Retention and deletion**: [expiry, deletion/anonymisation deadline, and revocation behavior]
+- **Children**: [specific impact and safeguards, or why the feature does not affect children]
+
 ## Success Criteria *(mandatory)*
 
 <!--

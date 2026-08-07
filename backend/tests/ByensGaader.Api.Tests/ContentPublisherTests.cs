@@ -34,11 +34,11 @@ public sealed class ContentPublisherTests
 
             var snapshot = await repository.ReadSnapshotAsync(
                 "da-DK", TestContext.Current.CancellationToken);
-            var original = snapshot.Missions.First(item =>
-                item.Json["mission"]!["status"]!.GetValue<string>() == "fieldTestReady");
+            var original = snapshot.Missions.First();
             var id = original.Json["mission"]!["id"]!.GetValue<string>();
             var changed = original.Json.DeepClone().AsObject();
             changed["mission"]!["title"] = "Publicering efter udfald";
+            changed["mission"]!["status"] = "published";
             publicStore.FailNextStableWrite = true;
 
             var result = await publisher.ExecuteAsync(

@@ -24,24 +24,79 @@ struct MissionCardView: View {
     let card: MissionCard
     let onZoom: () -> Void
 
+    @Environment(MissionEngine.self) private var engine
+    @State private var image: Image?
+    @State private var didFinishLoading = false
+
+    private var asset: MediaAsset? {
+        guard let mediaId = card.mediaId else { return nil }
+        return engine.pack?.media(id: mediaId)
+    }
+
     var body: some View {
         ZStack(alignment: .bottom) {
-            image
+            imageLayer
             if !card.text.isEmpty { caption }
+
+            if asset?.kind == .known(.aiGenerated) {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Label("AI-illustration", systemImage: "sparkles")
+                            .font(BHFont.caption)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, BHSpacing.tight)
+                            .padding(.vertical, BHSpacing.hairline)
+                            .background(Capsule().fill(.black.opacity(0.65)))
+                    }
+                    Spacer()
+                }
+                .padding(BHSpacing.snug)
+            }
         }
+        .aspectRatio(4 / 3, contentMode: .fit)
+        .frame(maxWidth: .infinity)
         .clipShape(RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: BHRadius.card, style: .continuous))
         .onTapGesture(perform: onZoom)
         .accessibilityElement(children: .combine)
         .accessibilityHint("Tryk for at forstørre billedet")
         .accessibilityAddTraits(.isButton)
+        .accessibilityValue(image == nil ? "Billedet mangler" : "Billedet vises")
         .accessibilityIdentifier("card.\(card.id)")
+        .task(id: card.mediaId) {
+            image = nil
+            didFinishLoading = false
+            guard let asset, asset.resolvedMediaType == .image else {
+                didFinishLoading = true
+                return
+            }
+            image = await ImageCache.shared.image(for: asset)
+            didFinishLoading = true
+        }
     }
 
     @ViewBuilder
-    private var image: some View {
-        if let mediaId = card.mediaId {
-            MissionHeroImage(mediaId: mediaId, fillsWidth: true, isSquared: true)
+    private var imageLayer: some View {
+        if let image {
+            image
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+                .accessibilityHidden(true)
+        } else {
+            Rectangle()
+                .fill(BHColor.surface)
+                .overlay {
+                    if didFinishLoading {
+                        Image(systemName: "photo.badge.exclamationmark")
+                            .font(.largeTitle)
+                            .foregroundStyle(BHColor.inkMuted)
+                    } else {
+                        ProgressView()
+                    }
+                }
         }
     }
 

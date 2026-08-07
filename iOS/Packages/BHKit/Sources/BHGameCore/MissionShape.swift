@@ -174,7 +174,10 @@ public enum MissionShape {
         // ``MissionStatus/researchReady`` og vises ikke. Denne regel er det,
         // der gør, at et uskyldigt statusskift ikke sender en uløselig opgave
         // ud til en familie, der står ved en bro i regnvejr.
-        let isPlayable = mission.status.known == .fieldTestReady || mission.status.known == .publishReady
+        let isPlayable =
+            mission.status.known == .fieldTestReady
+            || mission.status.known == .published
+            || mission.status.known == .publishReady
         let accepted = mission.challengeStep?.answerRule?.acceptedAnswers ?? []
         if isPlayable, accepted.isEmpty || accepted.contains(unsetFacit) {
             found.append(.playableWithoutAnswer)

@@ -13,7 +13,10 @@ export class ContentService {
     : environment.apiBaseUrl;
   readonly playableMissions = computed(() =>
     (this.pack()?.missions ?? []).filter(
-      (mission) => mission.status === 'fieldTestReady' || mission.status === 'publishReady',
+      (mission) =>
+        mission.status === 'fieldTestReady' ||
+        mission.status === 'published' ||
+        mission.status === 'publishReady',
     ),
   );
 

@@ -1,3 +1,4 @@
+import BHAuthenticationKit
 import SwiftUI
 
 /// Quizmasterens forside: opgaverne, grupperet som landsdel → postnummer.
@@ -9,7 +10,6 @@ struct ContentView: View {
     @State private var document: PackDocument?
     @State private var status: String?
     @State private var isBusy = false
-    @State private var showsQuizmaster = false
     @State private var showsAudit = false
     @State private var newMission: MissionSummary?
     @State private var pendingDeletion: MissionSummary?
@@ -19,6 +19,7 @@ struct ContentView: View {
     @State private var drafts = DraftWriter()
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(AdminAuthentication.self) private var authentication
 
     private let client = PackClient()
 
@@ -51,7 +52,6 @@ struct ContentView: View {
             .navigationTitle("Byens Gåder")
             .toolbar { toolbar }
             .overlay(alignment: .bottom) { banner }
-            .sheet(isPresented: $showsQuizmaster) { QuizmasterSheet() }
             // Sletningen bekræftes. Den fjerner opgaven, dens sted og alt, der
             // stod i dem — og der er ingen fortrydelse ud over at lade være med
             // at gemme.
@@ -136,7 +136,6 @@ struct ContentView: View {
             }
             .task {
                 if document == nil { load() }
-                showsQuizmaster = !AdminConfiguration.isReady
             }
         }
     }
@@ -174,7 +173,7 @@ struct ContentView: View {
         HStack(spacing: 10) {
             // Publicér-mærket kun på det, der faktisk er frigivet. Sad det på
             // alle rækker, ville det ikke sige noget.
-            if mission.status == "publishReady" {
+            if mission.status == "published" || mission.status == "publishReady" {
                 Image("Icon-Publish")
                     .resizable()
                     .scaledToFit()
@@ -194,12 +193,15 @@ struct ContentView: View {
     private var toolbar: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
             Menu {
-                Button {
-                    showsQuizmaster = true
+                Label(
+                    authentication.account?.publicName
+                        ?? authentication.account?.email
+                        ?? "Verificeret konto",
+                    systemImage: "person.crop.circle.badge.checkmark")
+                Button(role: .destructive) {
+                    Task { await authentication.logout() }
                 } label: {
-                    Label(
-                        AdminConfiguration.isReady ? AdminConfiguration.quizmaster : "Sæt dit navn",
-                        systemImage: "person.crop.circle")
+                    Label("Log ud", systemImage: "rectangle.portrait.and.arrow.right")
                 }
                 Button {
                     showsAudit = true
@@ -388,37 +390,5 @@ struct ContentView: View {
         newMission = document.createMission()
         drafts.schedule(document)
         status = "Giv opgaven en titel — så kan den gemmes."
-    }
-}
-
-/// Hvem der retter. Navnet følger med hver gemning (FR-111).
-struct QuizmasterSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var name = AdminConfiguration.quizmaster
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    TextField("Dit navn", text: $name)
-                        .textContentType(.name)
-                } footer: {
-                    Text("Alle quizmastere kan rette i alt, og der er ingen godkendelsesgang. "
-                         + "Navnet er derfor det eneste, der bagefter kan svare på, hvem der "
-                         + "flyttede en opgave — og serveren afviser en gemning uden det.")
-                }
-            }
-            .navigationTitle("Quizmaster")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Gem") {
-                        AdminConfiguration.quizmaster = name
-                        dismiss()
-                    }
-                    .disabled(name.trimmed.isEmpty)
-                }
-            }
-        }
     }
 }

@@ -12,6 +12,9 @@ struct ByensHemmelighederApp: App {
     @State private var router = Router()
     @State private var ambience = AmbiencePlayer()
     @State private var narration = NarrationPlayer()
+    @State private var authentication = PlayerAuthentication.shared
+    @State private var favorites = MissionFavoritesStore()
+    @State private var scores = PlayerScoresStore()
 
     init() {
         let repository = ContentRepository(source: ContentEndpoint.makeContentPackSource())
@@ -33,7 +36,7 @@ struct ByensHemmelighederApp: App {
 
     /// Positionskilden.
     ///
-    /// Altid en ``SwitchableLocationProvider``, så en quizmaster kan slå
+    /// I Debug en ``SwitchableLocationProvider``, så en tester kan slå
     /// simuleret position til hvor som helst — også på en telefon i felten.
     /// Det var før kun muligt i simulatoren, og en quizmaster måtte derfor gå
     /// hen til opgaven for at afprøve en rettelse.
@@ -48,6 +51,8 @@ struct ByensHemmelighederApp: App {
     @MainActor
     private static func makeLocationProvider() -> any LocationProviding {
         #if DEBUG
+        // Launch-argumentet er kun et test-fixture. En Release-bygning må
+        // kun skifte til simulering gennem det synlige, rollebegrænsede UI.
         if let scripted = ScriptedLocationProvider.fromLaunchArguments() {
             return scripted
         }
@@ -78,7 +83,14 @@ struct ByensHemmelighederApp: App {
                 .environment(router)
                 .environment(ambience)
                 .environment(narration)
+                .environment(authentication)
+                .environment(favorites)
+                .environment(scores)
                 .tint(BHColor.accent)
+                .task {
+                    await authentication.restore()
+                    await favorites.refresh(using: authentication)
+                }
         }
     }
 }
@@ -94,7 +106,7 @@ struct RootView: View {
         @Bindable var router = router
 
         NavigationStack(path: $router.path) {
-            ExploreMapView()
+            PlayerHomeShell()
                 .navigationDestination(for: Route.self) { route in
                     destination(for: route)
                 }
@@ -140,10 +152,18 @@ struct RootView: View {
 
     @ViewBuilder
     private func destination(for route: Route) -> some View {
-        if case .scoreboard = route {
+        if case .map = route {
+            ExploreMapView()
+        } else if case .leaderboards = route {
+            LeaderboardView()
+        } else if case .scoreboard = route {
             ScoreboardView()
         } else if let mission = engine.pack?.mission(id: route.missionId) {
             switch route {
+            case .map:
+                ExploreMapView()
+            case .leaderboards:
+                LeaderboardView()
             case .missionDetail:
                 MissionSheet(mission: mission)
             case .approach:

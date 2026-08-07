@@ -8,6 +8,11 @@ import Foundation
 /// altid kasseres og genopbygges (FR-034).
 public struct PlayerState: Hashable, Sendable {
     public var completedMissionIds: Set<String> = []
+    /// Metadata fra den lokale completion-hændelse. Bruges til idempotent
+    /// synkronisering uden at oprette en parallel lokal sandhed.
+    public var completionEventIds: [String: UUID] = [:]
+    public var completionDates: [String: Date] = [:]
+    public var completionContentVersions: [String: String] = [:]
     /// Hints spilleren har åbnet, pr. mission. Genåbning tæller ikke med igen.
     public var usedHintIds: [String: [String]] = [:]
     public var transactions: [ScoreTransaction] = []
@@ -84,6 +89,9 @@ public enum StateProjection {
             case .missionCompleted:
                 guard state.completedMissionIds.insert(missionId).inserted else { continue }
                 completionEventId[missionId] = event.id.uuidString
+                state.completionEventIds[missionId] = event.id
+                state.completionDates[missionId] = event.occurredAt
+                state.completionContentVersions[missionId] = event.contentVersion
 
             case .answerSubmitted:
                 // Kun `incorrect` og `nearMiss` koster. Et tomt felt eller en

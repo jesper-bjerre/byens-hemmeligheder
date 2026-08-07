@@ -60,14 +60,18 @@ struct StateProjectionTests {
 
     @Test("En gennemført mission uden hints giver fulde point")
     func completionWithoutHints() {
+        let completionId = UUID()
         let events = [
             event(.missionOpened, sequence: 1),
-            event(.missionCompleted, sequence: 2),
+            event(.missionCompleted, sequence: 2, id: completionId),
         ]
         let state = StateProjection.fold(events, pack: pack)
 
         #expect(state.completedMissionIds == [mission.id])
         #expect(state.points(forMission: mission.id) == 100)
+        #expect(state.completionEventIds[mission.id] == completionId)
+        #expect(state.completionDates[mission.id] == Self.epoch.addingTimeInterval(2))
+        #expect(state.completionContentVersions[mission.id] == pack.contentVersion)
     }
 
     @Test("Alle tre hints giver 88 point — SC-005")

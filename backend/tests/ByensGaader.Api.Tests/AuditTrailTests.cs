@@ -63,7 +63,7 @@ public sealed class AuditTrailTests(AuditApp app) : FastEndpoints.Testing.TestBa
         // Nyeste først, så den seneste flytning er den, quizmasteren ser først.
         var move = trail[0];
         Assert.Equal("status", move.GetProperty("change").GetString());
-        Assert.Equal("Bo", move.GetProperty("by").GetString());
+        Assert.Equal("Testdesigner", move.GetProperty("by").GetString());
         Assert.Equal("mission.proeve", move.GetProperty("missionId").GetString());
         Assert.Equal("draft", move.GetProperty("from").GetString());
         Assert.Equal("fieldTestReady", move.GetProperty("to").GetString());
@@ -75,7 +75,7 @@ public sealed class AuditTrailTests(AuditApp app) : FastEndpoints.Testing.TestBa
         var created = trail.Single(e =>
             e.GetProperty("change").GetString() == "created"
             && e.GetProperty("missionId").GetString() == "mission.proeve");
-        Assert.Equal("Ida", created.GetProperty("by").GetString());
+        Assert.Equal("Testdesigner", created.GetProperty("by").GetString());
         Assert.Equal("draft", created.GetProperty("to").GetString());
         Assert.False(created.TryGetProperty("from", out _), "en ny opgave kommer ikke fra en status");
     }
@@ -98,17 +98,16 @@ public sealed class AuditTrailTests(AuditApp app) : FastEndpoints.Testing.TestBa
     }
 
     /// <summary>
-    /// Halvdelen af navnene i et dansk hold har æ, ø eller å i sig, og en
-    /// HTTP-header kan ikke bære andet end ASCII. Kom navnet forvansket frem,
-    /// ville sporet svare på hvem med noget, ingen hedder.
+    /// Klienten må ikke kunne forfalske revisionssporet ved at sende et andet
+    /// navn end den verificerede kontos navn.
     /// </summary>
     [Fact]
-    public async Task Et_dansk_navn_staar_uforvansket_i_sporet()
+    public async Task Et_klientvalgt_navn_kan_ikke_forfalske_revisionssporet()
     {
         await SaveAsync(PackWith("draft"), Uri.EscapeDataString("Søren Ødegård"));
 
         var trail = await TrailAsync();
-        Assert.Equal("Søren Ødegård", trail[0].GetProperty("by").GetString());
+        Assert.Equal("Testdesigner", trail[0].GetProperty("by").GetString());
     }
 
     /// <summary>Sporet må kun kunne læses. Et revisionsspor, der kan rettes af

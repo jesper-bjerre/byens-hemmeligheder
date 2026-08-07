@@ -287,9 +287,18 @@
             "draft",
             "researchReady",
             "fieldTestReady",
+            "published",
             "publishReady",
             "paused"
           ]
+        },
+        "releasedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Serverstyret tidspunkt for seneste skift fra ikke-frigivet til frigivet."
         },
         "difficulty": {
           "type": "integer",

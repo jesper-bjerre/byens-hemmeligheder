@@ -24,8 +24,9 @@ fast driftsomkostning.
   privat authoring-container med mission og lokation.
 - **FR-202**: `GET`, `PUT` og `DELETE` MUST arbejde på én opgave, og `If-Match`
   MUST bruge den opgaveblobs ETag. Oprettelse MUST bruge `If-None-Match: *`.
-- **FR-203**: Serveren MUST generere `{locale}/content-pack.json` af de opgaver,
-  der er spilbare (`fieldTestReady`, `publishReady`).
+- **FR-203**: Serveren MUST generere `{locale}/content-pack.json` af frigivne
+  opgaver (`published`). Den ældre værdi `publishReady` accepteres under
+  migrationen; `fieldTestReady` hører kun til i beskyttet Designer-preview.
 - **FR-204**: Den genererede pakke MUST NOT indeholde kladder eller deres svar.
 - **FR-205**: `GET /content/{locale}/pack` MUST bevare adresse, form og
   ETag-adfærd, så spillerapps ikke skal ændres.

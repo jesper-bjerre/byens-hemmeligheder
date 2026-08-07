@@ -6,6 +6,8 @@ import { ContentStoreService } from './core/content-store.service';
 import { PostalCodesService } from './core/postal-codes.service';
 import { auditChangeName, displayName, regions } from './core/vocabulary';
 import { MissionEditor } from './mission-editor/mission-editor';
+import { AuthService } from './auth/auth.service';
+import { UsersPanel } from './users/users-panel';
 
 interface PlaceGroup {
   postalCode: string;
@@ -22,17 +24,19 @@ interface RegionGroup {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, MissionEditor],
+  imports: [CommonModule, FormsModule, MissionEditor, UsersPanel],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App implements OnInit {
   readonly store = inject(ContentStoreService);
   readonly postcodes = inject(PostalCodesService);
+  readonly authentication = inject(AuthService);
   readonly selectedMissionIndex = signal<number | null>(null);
   readonly showQuizmaster = signal(false);
   readonly showSettings = signal(false);
   readonly showAudit = signal(false);
+  readonly showUsers = signal(false);
   readonly auditEntries = signal<AuditEntry[]>([]);
   readonly auditLoading = signal(false);
   readonly auditError = signal<string | null>(null);
@@ -40,8 +44,11 @@ export class App implements OnInit {
 
   readonly releasedCount = computed(
     () =>
-      this.store.pack()?.missions.filter((mission) => mission.status === 'publishReady').length ??
-      0,
+      this.store
+        .pack()
+        ?.missions.filter(
+          (mission) => mission.status === 'published' || mission.status === 'publishReady',
+        ).length ?? 0,
   );
 
   readonly hierarchy = computed<RegionGroup[]>(() => {
@@ -80,8 +87,17 @@ export class App implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.postcodes.load();
+  }
+
+  async login(): Promise<void> {
+    if (!(await this.authentication.login())) return;
     await this.store.load();
     if (!this.store.quizmaster()) this.showQuizmaster.set(true);
+  }
+
+  async logout(): Promise<void> {
+    await this.authentication.logout();
+    this.selectedMissionIndex.set(null);
   }
 
   statusName(status: string): string {

@@ -1,12 +1,92 @@
+using Azure.Data.Tables;
 using Azure.Storage.Blobs;
+using ByensGaader.Api.Features.Accounts;
+using ByensGaader.Api.Features.Authentication;
+using ByensGaader.Api.Features.Engagement;
+using ByensGaader.Api.Features.Scoring;
+using ByensGaader.Api.Security;
 using ByensGaader.Api.Storage;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Microsoft.AspNetCore.Authentication;
+using NSwag;
+using ProjectAuthenticationOptions = ByensGaader.Api.Features.Authentication.AuthenticationOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .Configure<ContentStoreOptions>(builder.Configuration.GetSection(ContentStoreOptions.Section));
+
+var authentication = builder.Configuration
+    .GetSection(ProjectAuthenticationOptions.Section)
+    .Get<ProjectAuthenticationOptions>() ?? new ProjectAuthenticationOptions();
+authentication.ValidateForStartup(builder.Environment);
+builder.Services.Configure<ProjectAuthenticationOptions>(
+    builder.Configuration.GetSection(ProjectAuthenticationOptions.Section));
+
+TableServiceClient? accountTables = null;
+if (authentication.Provider is AuthenticationStoreProvider.Table)
+{
+    accountTables = new TableServiceClient(
+        new Uri(authentication.TableServiceUri!),
+        new Azure.Identity.DefaultAzureCredential());
+    builder.Services.AddSingleton(accountTables);
+}
+
+builder.Services.AddSingleton<IAuthenticationRepository>(services => authentication.Provider switch
+{
+    AuthenticationStoreProvider.Disabled or AuthenticationStoreProvider.InMemory =>
+        new InMemoryAuthenticationRepository(),
+    AuthenticationStoreProvider.Table => new TableAuthenticationRepository(
+        services.GetRequiredService<TableServiceClient>(), authentication),
+    _ => throw new InvalidOperationException("Ukendt authentication-provider."),
+});
+builder.Services.AddSingleton<IMissionEngagementRepository>(services => authentication.Provider switch
+{
+    AuthenticationStoreProvider.Table => new TableMissionEngagementRepository(
+        services.GetRequiredService<TableServiceClient>(), authentication),
+    _ => new InMemoryMissionEngagementRepository(),
+});
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<MissionEngagementService>();
+builder.Services.AddSingleton<IScoreRepository>(services => authentication.Provider switch
+{
+    AuthenticationStoreProvider.Table => new TableScoreRepository(
+        services.GetRequiredService<TableServiceClient>(), authentication),
+    _ => new InMemoryScoreRepository(),
+});
+builder.Services.AddSingleton<ScoreService>();
+builder.Services.AddSingleton<SessionAuthenticator>();
+builder.Services.AddHttpClient<IAppleIdentityValidator, AppleIdentityValidator>(client =>
+    client.Timeout = TimeSpan.FromSeconds(15));
+builder.Services.AddHttpClient<IAppleTokenClient, AppleTokenClient>(client =>
+    client.Timeout = TimeSpan.FromSeconds(15));
+builder.Services.AddSingleton<IProviderTokenProtector, ProviderTokenProtector>();
+builder.Services.AddSingleton<SessionService>();
+builder.Services.AddSingleton<AccountService>();
+builder.Services.AddSingleton<AccountAdministrationService>();
+builder.Services.AddSingleton<AccountLifecycleService>();
+builder.Services.AddSingleton<IAccountAuditRepository>(services => authentication.Provider switch
+{
+    AuthenticationStoreProvider.Table => new TableAccountAuditRepository(
+        services.GetRequiredService<TableServiceClient>(), authentication),
+    _ => new InMemoryAccountAuditRepository(),
+});
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = AuthenticationPolicies.Scheme;
+        options.DefaultChallengeScheme = AuthenticationPolicies.Scheme;
+    })
+    .AddScheme<AuthenticationSchemeOptions, OpaqueBearerHandler>(
+        AuthenticationPolicies.Scheme, _ => { });
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(AuthenticationPolicies.User, policy => policy
+        .RequireAuthenticatedUser())
+    .AddPolicy(AuthenticationPolicies.DesignerOrAdmin, policy => policy
+        .RequireRole(AccountRole.Designer.ToString(), AccountRole.Admin.ToString()))
+    .AddPolicy(AuthenticationPolicies.AdminOnly, policy => policy
+        .RequireRole(AccountRole.Admin.ToString()));
 
 // Webadminen kører på en anden origin end API'et — lokalt på port 4200 og
 // senere som Azure Static Web App. Listen er konfiguration, så den fremtidige
@@ -101,13 +181,24 @@ builder.Services
             s.Version = "v1";
             s.Description =
                 "Skrivevejen. Spillernes læsevej går uden om dette API: "
-                + "indholdspakker og billeder hentes som statiske blobs med ETag.";
+                + "indholdspakker og billeder hentes som statiske blobs med ETag. "
+                + "User kræver login, DesignerOrAdmin beskytter redaktionelle ruter, "
+                + "og AdminOnly beskytter bruger- og rolleadministration.";
+            s.AddAuth("bearerAuth", new OpenApiSecurityScheme
+            {
+                Type = OpenApiSecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "opaque",
+                Description = "Kortlivet session udstedt af Byens Gåder-API'et.",
+            });
         };
     });
 
 var app = builder.Build();
 
 app.UseCors("WebAdmin");
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Ingen globalt rutepræfiks og ingen versionering endnu.
 //

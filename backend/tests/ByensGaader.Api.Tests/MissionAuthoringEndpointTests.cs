@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Nodes;
+using ByensGaader.Api.Features.Content;
 using Xunit;
 
 namespace ByensGaader.Api.Tests;
@@ -26,7 +27,9 @@ public sealed class MissionAuthoringEndpointTests(MissionAuthoringApp app)
 
         var pack = await app.Client.GetStringAsync(
             "/content/da-DK/pack", TestContext.Current.CancellationToken);
-        Assert.Equal(4, JsonNode.Parse(pack)!["missions"]!.AsArray().Count);
+        Assert.DoesNotContain(
+            JsonNode.Parse(pack)!["missions"]!.AsArray(),
+            mission => mission!["status"]!.GetValue<string>() is "draft" or "fieldTestReady");
     }
 
     [Fact]
@@ -37,6 +40,7 @@ public sealed class MissionAuthoringEndpointTests(MissionAuthoringApp app)
         var aggregate = JsonNode.Parse(await get.Content.ReadAsStringAsync(
             TestContext.Current.CancellationToken))!.AsObject();
         aggregate["mission"]!["title"] = "En opgavevis rettelse";
+        aggregate["mission"]!["status"] = "published";
 
         using var save = Request(HttpMethod.Put, $"{Base}/{Id}", aggregate, etag);
         var saved = await app.Client.SendAsync(save, TestContext.Current.CancellationToken);
@@ -60,6 +64,27 @@ public sealed class MissionAuthoringEndpointTests(MissionAuthoringApp app)
         var response = await app.Client.SendAsync(request, TestContext.Current.CancellationToken);
 
         Assert.Equal((HttpStatusCode)428, response.StatusCode);
+    }
+
+    [Fact]
+    public void Frigivelsestid_sættes_ved_statusskift_og_bevares_ved_tekstrettelse()
+    {
+        var now = new DateTimeOffset(2026, 8, 7, 10, 0, 0, TimeSpan.Zero);
+        var before = new JsonObject
+        {
+            ["mission"] = new JsonObject { ["status"] = "draft" },
+        };
+        var released = new JsonObject
+        {
+            ["mission"] = new JsonObject { ["status"] = "published" },
+        };
+
+        PutMissionEndpoint.SetReleasedAt(released, before, now);
+        Assert.Equal(now, released["mission"]!["releasedAt"]!.GetValue<DateTimeOffset>());
+
+        var edit = released.DeepClone().AsObject();
+        PutMissionEndpoint.SetReleasedAt(edit, released, now.AddDays(1));
+        Assert.Equal(now, edit["mission"]!["releasedAt"]!.GetValue<DateTimeOffset>());
     }
 
     private static HttpRequestMessage Request(

@@ -33,7 +33,7 @@ internal sealed class PostMediaEndpoint(IContentStore store) : EndpointWithoutRe
     public override void Configure()
     {
         Post("/content/{locale}/media/{filename}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         // **Ikke** `AllowFileUploads()` — den forventer multipart og afviser en
         // rå krop med 415, før handleren overhovedet kører. Her er kroppen
         // filens bytes, og filnavnet står i stien.
@@ -98,7 +98,7 @@ internal sealed class ListMediaEndpoint(IContentStore store) : EndpointWithoutRe
     public override void Configure()
     {
         Get("/content/{locale}/media");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(b => b.WithTags("Indhold"));
     }
 
@@ -116,7 +116,7 @@ internal sealed class DeleteMediaEndpoint(IContentStore store) : EndpointWithout
     public override void Configure()
     {
         Delete("/content/{locale}/media/{filename}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(b => b.WithTags("Indhold"));
     }
 

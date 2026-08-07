@@ -116,7 +116,7 @@ struct NarrationUploadSection: View {
                     "id": mediaId,
                     "filename": filename,
                     "altText": "Fortælling til \(title)",
-                    "owner": AdminConfiguration.quizmaster,
+                    "owner": "Byens Gåder",
                     "licence": "Eget materiale — Byens Gåder ejer rettighederne",
                     "credit": "Byens Gåder",
                     "creditLine": NSNull(),

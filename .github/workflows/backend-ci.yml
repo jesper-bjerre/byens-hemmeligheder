@@ -30,6 +30,10 @@ jobs:
         run: dotnet build --no-restore --configuration Release
         working-directory: backend
 
+      - name: Kontrollér sårbare afhængigheder
+        run: dotnet list package --vulnerable --include-transitive
+        working-directory: backend
+
       # Blob-kontrakttestene springer over uden BH_TEST_BLOB_URI. De kræver en
       # Azure-konto, og en test, der kræver et abonnement, hører ikke til i en
       # pull request fra en fremmed.

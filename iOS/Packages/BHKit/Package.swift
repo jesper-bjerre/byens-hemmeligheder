@@ -11,6 +11,7 @@ import PackageDescription
 //   BHPersistence   → BHContracts, BHGameCore         (hændelseslog og fold)
 //   BHLocationKit   → BHContracts, BHGameCore + CoreLocation
 //   BHDesignSystem  → SwiftUI
+//   BHAuthenticationKit → Foundation, Security
 //
 // macOS står på platformslisten alene for at gøre `swift test` muligt uden
 // simulator. Appen bygges og udgives kun til iOS (plan.md, Target Platform).
@@ -28,21 +29,22 @@ let package = Package(
         .library(name: "BHPersistence", targets: ["BHPersistence"]),
         .library(name: "BHLocationKit", targets: ["BHLocationKit"]),
         .library(name: "BHDesignSystem", targets: ["BHDesignSystem"]),
+        .library(name: "BHAuthenticationKit", targets: ["BHAuthenticationKit"]),
     ],
     targets: [
         .target(name: "BHContracts"),
         .target(name: "BHGameCore", dependencies: ["BHContracts"]),
         .target(name: "BHContentKit", dependencies: ["BHContracts"]),
         .target(name: "BHPersistence", dependencies: ["BHContracts", "BHGameCore"]),
-        // `BH_DEV_TOOLS` sættes kun i Debug. Det er dét, der gør FR-051 til en
-        // egenskab ved oversættelsen frem for en aftale: `ScriptedLocationProvider`
-        // findes ikke i en udgivelsesbygning, fordi koden ikke bliver oversat.
         .target(
             name: "BHLocationKit",
-            dependencies: ["BHContracts", "BHGameCore"],
-            swiftSettings: [.define("BH_DEV_TOOLS")]
+            dependencies: ["BHContracts", "BHGameCore"]
         ),
         .target(name: "BHDesignSystem"),
+        .target(
+            name: "BHAuthenticationKit",
+            linkerSettings: [.linkedFramework("Security")]
+        ),
 
         // Kun til test. Finder `contracts/` på disk, så testene læser præcis de
         // filer, der shipper, frem for en kopi der kan nå at drive fra hinanden.
@@ -52,13 +54,13 @@ let package = Package(
         .testTarget(name: "BHGameCoreTests", dependencies: ["BHGameCore", "BHTestSupport"]),
         .testTarget(name: "BHContentKitTests", dependencies: ["BHContentKit", "BHGameCore", "BHTestSupport"]),
         .testTarget(name: "BHPersistenceTests", dependencies: ["BHPersistence", "BHTestSupport"]),
-        // Testtargetet skal have samme flag som det target, det tester.
-        // Uden det er `#if BH_DEV_TOOLS` altid falsk her, og FR-051-testen
-        // ville bestå uden nogensinde at have kørt.
         .testTarget(
             name: "BHLocationKitTests",
-            dependencies: ["BHLocationKit"],
-            swiftSettings: [.define("BH_DEV_TOOLS")]
+            dependencies: ["BHLocationKit"]
+        ),
+        .testTarget(
+            name: "BHAuthenticationKitTests",
+            dependencies: ["BHAuthenticationKit"]
         ),
     ]
 )

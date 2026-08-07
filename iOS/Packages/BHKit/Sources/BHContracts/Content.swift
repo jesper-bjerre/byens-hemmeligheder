@@ -57,7 +57,7 @@ public struct Location: Codable, Hashable, Sendable, Identifiable {
     /// to koordinater for det samme sted kunne pege hver sin vej uden at nogen
     /// opdagede det.
     ///
-    /// `nil` er tilladt, men blokerer `publishReady` (V-10).
+    /// `nil` er tilladt, men blokerer `published` (V-10).
     public let latitude: Double?
     public let longitude: Double?
     public let activationRadiusMetres: Double?

@@ -20,7 +20,7 @@ internal sealed class PostNarrationEndpoint(
     public override void Configure()
     {
         Post("/content/{locale}/narration/{filename}");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(b => b.WithTags("Indhold"));
     }
 

@@ -10,7 +10,7 @@ public struct BHWordmark: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: -2) {
-            Text("Byens")
+            Text("Vejles")
                 .foregroundStyle(BHColor.onBrandPrimary)
             Text("Gåder")
                 .foregroundStyle(BHColor.onBrand)
@@ -18,7 +18,7 @@ public struct BHWordmark: View {
         .font(.system(.title, design: .serif, weight: .regular))
         .fixedSize(horizontal: false, vertical: true)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Byens Gåder")
+        .accessibilityLabel("Vejles Gåder")
         .accessibilityAddTraits(.isHeader)
     }
 }

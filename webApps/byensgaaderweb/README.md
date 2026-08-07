@@ -1,8 +1,9 @@
 # Byens Gåder — web
 
 Angular-udgaven af spillerappen. Den bruger samme indholdspakke, svarregler og
-pointmodel som iOS-appen og viser kun opgaver med status `fieldTestReady` eller
-`publishReady`.
+pointmodel som iOS-appen. Den offentlige pakke indeholder `published`; klienten
+accepterer også `fieldTestReady` til Designer-preview og den ældre værdi
+`publishReady` under migrationen.
 
 ## Kør lokalt
 

@@ -49,6 +49,7 @@ export interface Mission {
   shortTitle: string;
   description: string;
   status: string;
+  releasedAt?: string | null;
   difficulty: number;
   estimatedMinutes: number;
   basePoints: number;

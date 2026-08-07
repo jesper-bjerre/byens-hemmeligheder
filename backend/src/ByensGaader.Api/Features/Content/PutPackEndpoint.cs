@@ -27,10 +27,9 @@ namespace ByensGaader.Api.Features.Content;
 ///
 /// ## Hvem der gemmer
 ///
-/// Quizmasterens navn står i <c>X-Quizmaster</c>, og mangler det, afvises
-/// gemningen. Det er ikke godtgørelse — der er ingen adgangskontrol endnu — men
-/// FR-111 kræver et spor over hvem, og et spor, klienten kan springe over,
-/// efterlader huller netop der, hvor nogen havde travlt.
+/// Den verificerede konto kommer fra bearer-sessionen. Klienten kan ikke selv
+/// vælge navnet i revisionssporet; ellers ville sporet kun bevise, hvad
+/// afsenderen ønskede, at det skulle sige.
 /// </remarks>
 internal sealed class PutPackEndpoint(
     IContentStore store,
@@ -38,13 +37,10 @@ internal sealed class PutPackEndpoint(
     AuthoringRepository authoring)
     : EndpointWithoutRequest
 {
-    /// <summary>Navnet skal kunne læses af et menneske, ikke andet.</summary>
-    private const int MaxNameLength = 60;
-
     public override void Configure()
     {
         Put("/content/{locale}/pack");
-        AllowAnonymous();
+        Policies(Security.AuthenticationPolicies.DesignerOrAdmin);
         Description(b => b.WithTags("Indhold"));
     }
 
@@ -67,19 +63,7 @@ internal sealed class PutPackEndpoint(
             return;
         }
 
-        // Procentafkodet. En HTTP-header kan ikke bære andet end ASCII, og
-        // halvdelen af navnene i et dansk hold har æ, ø eller å i sig.
-        var by = Uri.UnescapeDataString(
-            HttpContext.Request.Headers["X-Quizmaster"].FirstOrDefault() ?? string.Empty).Trim();
-        if (by.Length is 0 || by.Length > MaxNameLength)
-        {
-            await SendResultAsync(Results.Problem(
-                title: "Ingen quizmaster på gemningen",
-                detail: $"Send dit navn i 'X-Quizmaster', højst {MaxNameLength} tegn. "
-                        + "Alle kan rette i alt, så sporet skal kunne svare på hvem.",
-                statusCode: StatusCodes.Status400BadRequest));
-            return;
-        }
+        var by = AuthoringHttp.Actor(User);
 
         using var buffer = new MemoryStream();
         await HttpContext.Request.Body.CopyToAsync(buffer, ct);

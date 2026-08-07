@@ -14,11 +14,14 @@ public sealed class PublishedPackBuilderTests
         var published = PublishedPackBuilder.Build(snapshot, DateTimeOffset.UnixEpoch);
         var root = JsonNode.Parse(published.Pack)!.AsObject();
 
-        Assert.Equal(4, root["missions"]!.AsArray().Count);
-        Assert.Equal(4, root["locations"]!.AsArray().Count);
+        Assert.Equal(2, root["missions"]!.AsArray().Count);
+        Assert.Equal(2, root["locations"]!.AsArray().Count);
         Assert.DoesNotContain(
             root["missions"]!.AsArray(),
-            mission => mission!["status"]!.GetValue<string>() == "draft");
+            mission => mission!["status"]!.GetValue<string>() is "draft" or "fieldTestReady");
+        Assert.All(
+            root["missions"]!.AsArray(),
+            mission => Assert.Equal("publishReady", mission!["status"]!.GetValue<string>()));
         Assert.Equal(64, published.ContentVersion.Length);
         Assert.Equal(published.ContentVersion, root["contentVersion"]!.GetValue<string>());
     }
@@ -34,6 +37,25 @@ public sealed class PublishedPackBuilderTests
         Assert.Equal(first.ContentVersion, second.ContentVersion);
         Assert.Equal(first.Pack, second.Pack);
         Assert.Equal(first.Index, second.Index);
+    }
+
+    [Fact]
+    public void Preview_medtager_felttestklare_men_ikke_kladder()
+    {
+        var preview = PublishedPackBuilder.BuildPreview(
+            SnapshotFromFixture(), DateTimeOffset.UnixEpoch);
+        var missions = JsonNode.Parse(preview.Pack)!["missions"]!.AsArray();
+
+        Assert.Equal(3, missions.Count);
+        Assert.Contains(
+            missions,
+            mission => mission!["status"]!.GetValue<string>() == "fieldTestReady");
+        Assert.Contains(
+            missions,
+            mission => mission!["status"]!.GetValue<string>() == "published");
+        Assert.DoesNotContain(
+            missions,
+            mission => mission!["status"]!.GetValue<string>() == "draft");
     }
 
     [Fact]
@@ -83,13 +105,20 @@ public sealed class PublishedPackBuilderTests
 
         var missions = pack["missions"]!.AsArray().Select((node, index) =>
         {
-            var mission = node!.AsObject();
+            var mission = node!.AsObject().DeepClone().AsObject();
+            mission["status"] = index switch
+            {
+                0 => "published",
+                1 => "publishReady",
+                2 => "fieldTestReady",
+                _ => "draft",
+            };
             var locationId = mission["locationId"]!.GetValue<string>();
             return new AuthoringDocument(
                 new JsonObject
                 {
                     ["schemaVersion"] = pack["schemaVersion"]!.DeepClone(),
-                    ["mission"] = mission.DeepClone(),
+                    ["mission"] = mission,
                     ["location"] = locations[locationId],
                 },
                 $"\"mission-{index}\"");

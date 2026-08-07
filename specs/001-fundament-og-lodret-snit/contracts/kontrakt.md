@@ -75,10 +75,10 @@ og det er der, de fleste indholdsfejl ellers ville slippe igennem til felten.
 | Alle id-referencer resolver | Døde henvisninger til trin, hints, medier, kilder | FR-046 |
 | Forbudt kode fraværende | Bølgens ugyldige `541` | FR-047, SC-008 |
 | `maxAcceptableAccuracyMetres ≤ activationRadiusMetres` | Et accept-vindue bredere end selve radius | R-010 |
-| `publishReady` kræver feltdata | At uverificeret indhold erklæres publiceringsklart | Princip IV, V-10 |
+| `published` kræver feltdata | At uverificeret indhold frigives | Princip IV, V-10 |
 
 De to opgaver i feature 001 har status `fieldTestReady`. Den sidste gate blokerer
-dem bevidst fra `publishReady`, indtil koordinater, radius og standpunkt er målt
+dem bevidst fra `published`, indtil koordinater, radius og standpunkt er målt
 i felten.
 
 ## Eksempeldata

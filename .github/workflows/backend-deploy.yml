@@ -1,13 +1,14 @@
 name: Backend — udrul
 
-# Manuelt **og** på main. Manuelt, fordi B1 ikke har deployment slots: en
-# udrulning går direkte i luften, og det skal være en beslutning og ikke en
-# bivirkning af en rettet stavefejl i en README.
+# Kun manuelt. B1 har ingen deployment slots, og forfatningen kræver et
+# menneskeligt release-gate før kode går i produktion.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['backend/**', '.github/workflows/backend-deploy.yml']
+    inputs:
+      dev_verificeret:
+        description: "Jeg har verificeret samme commit i DEV"
+        required: true
+        type: boolean
 
 concurrency:
   # To udrulninger på én gang efterlader app'en i en tilstand, ingen har valgt.
@@ -39,7 +40,9 @@ env:
 
 jobs:
   deploy:
+    if: inputs.dev_verificeret == true
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - uses: actions/checkout@v4
 

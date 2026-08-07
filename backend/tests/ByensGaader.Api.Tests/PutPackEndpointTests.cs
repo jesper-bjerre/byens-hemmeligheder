@@ -74,12 +74,10 @@ public sealed class PutPackEndpointTests : FastEndpoints.Testing.TestBase<PackAp
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    /// <summary>
-    /// FR-111. Kan klienten springe navnet over, mangler sporet netop de
-    /// gemninger, hvor nogen havde travlt — og det er dem, man spørger til.
-    /// </summary>
+    /// <summary>Den verificerede konto er revisionssporets afsender. Klienten
+    /// skal derfor hverken kunne eller behøve at sende et separat navn.</summary>
     [Fact]
-    public async Task Afviser_en_gemning_uden_quizmaster()
+    public async Task Gemning_bruger_den_verificerede_konto_uden_navneheader()
     {
         var current = await _app.Client.GetAsync(Pack, TestContext.Current.CancellationToken);
 
@@ -87,6 +85,6 @@ public sealed class PutPackEndpointTests : FastEndpoints.Testing.TestBase<PackAp
         request.Headers.IfMatch.Add(EntityTagHeaderValue.Parse(current.Headers.ETag!.ToString()));
         var response = await _app.Client.SendAsync(request, TestContext.Current.CancellationToken);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 }

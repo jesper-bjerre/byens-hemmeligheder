@@ -210,7 +210,7 @@ Optag 2–3 minutters rå positionsdata på fire punkter — standpunktet, klods
 facaden, tilstigningen og gå-forbi — og gem dem som regressionsdata.
 
 Disse målinger leverer de foreløbige koordinater, radius og standpunkter, som
-indholdspakken mangler, og som blokerer `publishReady` (V-10).
+indholdspakken mangler, og som blokerer `published` (V-10).
 
 ---
 

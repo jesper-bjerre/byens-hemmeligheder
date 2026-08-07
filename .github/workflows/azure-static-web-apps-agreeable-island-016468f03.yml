@@ -39,6 +39,10 @@ jobs:
         run: npm ci
         working-directory: webApps/byensgaaderweb
 
+      - name: Kontrollér produktionsafhængigheder
+        run: npm audit --omit=dev
+        working-directory: webApps/byensgaaderweb
+
       - name: Test og byg
         run: npm run check
         working-directory: webApps/byensgaaderweb

@@ -276,7 +276,7 @@ begge høje konstruktioner ved vand.
 ## Notes
 
 - **Alle koordinater er `null` i denne feature.** Datamodellens V-10 blokerer
-  bevidst `publishReady`, indtil felten er besøgt. Det er ikke en mangel, det er
+  bevidst `published`, indtil felten er besøgt. Det er ikke en mangel, det er
   en gate
 - **Ingen inventory nogen steder.** Opgavedokumenternes afsluttende linjer om
   Det femte signal og Fjordseglet omskrives til ren fortælling i T019 og T045
