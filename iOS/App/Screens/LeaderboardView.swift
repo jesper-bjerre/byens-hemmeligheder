@@ -1,3 +1,4 @@
+import BHAuthenticationKit
 import BHDesignSystem
 import SwiftUI
 
@@ -14,7 +15,10 @@ struct LeaderboardView: View {
     }
 
     @Environment(PlayerScoresStore.self) private var scores
+    @Environment(PlayerAuthentication.self) private var authentication
     @State private var scope: Scope = .week
+    @State private var nameToReport: String?
+    @State private var reportMessage: String?
 
     private var entries: [PlayerScoresStore.Entry] {
         scope == .week ? scores.weekly : scores.allTime
@@ -54,6 +58,27 @@ struct LeaderboardView: View {
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("leaderboard.screen")
         .task { await scores.refresh() }
+        .confirmationDialog(
+            "Hvorfor vil du rapportere navnet?",
+            isPresented: Binding(
+                get: { nameToReport != nil },
+                set: { if !$0 { nameToReport = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Krænkende eller upassende") { report(.offensive) }
+            Button("Indeholder personlige oplysninger") { report(.personalInfo) }
+            Button("Udgiver sig for at være en anden") { report(.impersonation) }
+            Button("Andet") { report(.other) }
+            Button("Annuller", role: .cancel) { nameToReport = nil }
+        }
+        .alert("Rapportering", isPresented: Binding(
+            get: { reportMessage != nil },
+            set: { if !$0 { reportMessage = nil } }
+        )) {
+            Button("OK") { reportMessage = nil }
+        } message: {
+            Text(reportMessage ?? "")
+        }
     }
 
     private var header: some View {
@@ -80,27 +105,45 @@ struct LeaderboardView: View {
         VStack(spacing: BHSpacing.tight) {
             ForEach(Array(entries.enumerated()), id: \.offset) { index, entry in
                 HStack(spacing: BHSpacing.snug) {
-                    rank(index + 1)
-                    Text(entry.name)
-                        .font(BHFont.body)
-                        .foregroundStyle(BHColor.ink)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Spacer(minLength: BHSpacing.tight)
-                    Text("\(entry.points)")
-                        .font(BHFont.heading)
-                        .foregroundStyle(BHColor.accent)
-                        .monospacedDigit()
-                    Text("point")
-                        .font(BHFont.caption)
+                    HStack(spacing: BHSpacing.snug) {
+                        rank(index + 1)
+                        Text(entry.name)
+                            .font(BHFont.body)
+                            .foregroundStyle(BHColor.ink)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: BHSpacing.tight)
+                        Text("\(entry.points)")
+                            .font(BHFont.heading)
+                            .foregroundStyle(BHColor.accent)
+                            .monospacedDigit()
+                        Text("point")
+                            .font(BHFont.caption)
+                            .foregroundStyle(BHColor.inkMuted)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Nummer \(index + 1): \(entry.name), \(entry.points) point")
+                    if entry.name != "Anonym spiller" {
+                        Button {
+                            if authentication.state == .signedIn {
+                                nameToReport = entry.name
+                            } else {
+                                reportMessage = "Log ind fra Profil for at rapportere et profilnavn."
+                            }
+                        } label: {
+                            Image(systemName: "exclamationmark.bubble")
+                                .frame(width: BHMetrics.minimumTapTarget,
+                                       height: BHMetrics.minimumTapTarget)
+                        }
+                        .buttonStyle(.plain)
                         .foregroundStyle(BHColor.inkMuted)
+                        .accessibilityLabel("Rapportér profilnavnet \(entry.name)")
+                    }
                 }
                 .padding(BHSpacing.regular)
                 .background(
                     RoundedRectangle(cornerRadius: BHRadius.control, style: .continuous)
                         .fill(BHColor.surface)
                 )
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Nummer \(index + 1): \(entry.name), \(entry.points) point")
             }
         }
         .accessibilityIdentifier("scoreboard.leaderboard")
@@ -115,5 +158,19 @@ struct LeaderboardView: View {
             .background(
                 Circle().fill(value <= 3 ? BHColor.accent : BHColor.accentSoft)
             )
+    }
+
+    private func report(_ category: PublicNameReportCategory) {
+        guard let name = nameToReport else { return }
+        nameToReport = nil
+        Task {
+            do {
+                try await authentication.reportPublicName(name, category: category)
+                reportMessage = "Tak. Rapporten er sendt til en administrator."
+            } catch {
+                authentication.handleAuthenticationFailure(error)
+                reportMessage = "Rapporten kunne ikke sendes. Prøv igen senere."
+            }
+        }
     }
 }

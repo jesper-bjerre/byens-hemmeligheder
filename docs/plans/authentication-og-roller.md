@@ -1,6 +1,6 @@
 # Authentication og roller — plan for version 1
 
-**Status:** Implementeret og godkendt i DEV; PROD-gate mangler
+**Status:** Authentication aktiv og smoke-testet i PROD; iOS-builds uploadet
 **Dato:** 6. august 2026
 **Senest verificeret:** 8. august 2026
 **Første administrator:** sættes som ikke-sporet Azure-konfiguration
@@ -339,8 +339,14 @@ DEV-gaten for web blev gennemført 8. august 2026: Apple-login oprettede den
 forventede bootstrap-konto som eneste Admin, webadmin kunne hente opgaver og
 brugerlisten viste den serverlagrede rolle. Samme konto kunne derefter logge
 ind i iOS-admin, hente alle opgaver og logge ind i spillerappen. Webadmin,
-iOS-admin og Vejles Koder er dermed verificeret mod DEV; PROD konfigureres og
-aktiveres kun gennem den menneskelige releasegate.
+iOS-admin og Vejles Koder er dermed verificeret mod DEV. Den menneskelige
+PROD-gate er også gennemført: HTTPS, Table-rolle, Key Vault og Apple-indstillinger
+er aktiveret, og smoke-testen gav `200` på health/offentlig pakke, `401` på
+anonym authoring og `/auth/me`, samt HTTPS-redirect. Begge iOS-apps er uploadet.
+
+Offentlige profilnavne, rapportering og Admin-moderation er efterfølgende
+implementeret og valideret lokalt. Denne udvidelse følger sin egen normale
+DEV- og manuelle PROD-gate og kræver en ny spillerbuild.
 
 ## Kilder til valideringen
 

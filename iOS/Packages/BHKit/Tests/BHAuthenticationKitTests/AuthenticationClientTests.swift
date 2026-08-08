@@ -106,6 +106,36 @@ struct AuthenticationClientTests {
         #expect(await client.account() != nil)
     }
 
+    @Test func profilnavn_opdateres_paa_serveren_og_i_keychain() async throws {
+        let store = MemorySessionStore()
+        await store.set(session(access: "access", refresh: "refresh", accessOffset: 300))
+        let transport = MockTransport()
+        transport.responses = [.json(200, accountJSON(publicName: "Åse Ørn"))]
+        let client = makeClient(store: store, transport: transport)
+        _ = try await client.restore()
+
+        let account = try await client.updatePublicName("Åse Ørn")
+
+        #expect(account.publicName == "Åse Ørn")
+        #expect(await store.value?.account.publicName == "Åse Ørn")
+        #expect(transport.requests.last?.httpMethod == "PUT")
+        #expect(transport.requests.last?.url?.path == "/auth/me/profile")
+    }
+
+    @Test func navnerapport_sendes_med_fast_kategori() async throws {
+        let store = MemorySessionStore()
+        await store.set(session(access: "access", refresh: "refresh", accessOffset: 300))
+        let transport = MockTransport()
+        transport.responses = [.json(204, "")]
+        let client = makeClient(store: store, transport: transport)
+        _ = try await client.restore()
+
+        try await client.reportPublicName("Uegnet navn", category: .offensive)
+
+        #expect(transport.requests.last?.httpMethod == "POST")
+        #expect(transport.requests.last?.url?.path == "/scores/name-reports")
+    }
+
     private func makeClient(
         store: MemorySessionStore,
         transport: MockTransport
@@ -203,6 +233,19 @@ private func sessionJSON(access: String, refresh: String) -> String {
         "role":"Designer",
         "state":"Active"
       }
+    }
+    """
+}
+
+private func accountJSON(publicName: String) -> String {
+    """
+    {
+      "accountId":"11111111-1111-1111-1111-111111111111",
+      "email":null,
+      "publicName":"\(publicName)",
+      "role":"Designer",
+      "state":"Active",
+      "nameModerationState":"Visible"
     }
     """
 }

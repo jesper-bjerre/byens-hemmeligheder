@@ -21,7 +21,13 @@ public sealed class AccountLifecycleTests(AccountLifecycleApp app)
         var now = DateTimeOffset.UtcNow;
         var account = new Account(
             Guid.NewGuid(), "slet@example.invalid", "Slet mig", AccountRole.User,
-            AccountState.Active, now, now);
+            AccountState.Active, now, now,
+            PublicNameChangedAt: now,
+            NameModerationState: NameModerationState.Hidden,
+            NameModerationReason: "Skjult efter rapport",
+            NameModeratedAt: now,
+            StateReason: "Tidligere blokering",
+            StateChangedAt: now);
         var first = OpaqueTokenService.Create();
         var second = OpaqueTokenService.Create();
         Assert.True(await repository.CreateAccountAsync(
@@ -67,6 +73,12 @@ public sealed class AccountLifecycleTests(AccountLifecycleApp app)
         Assert.Equal(AccountState.Deleted, deleted.State);
         Assert.Null(deleted.Email);
         Assert.Null(deleted.PublicName);
+        Assert.Null(deleted.PublicNameChangedAt);
+        Assert.Equal(NameModerationState.Visible, deleted.NameModerationState);
+        Assert.Null(deleted.NameModerationReason);
+        Assert.Null(deleted.NameModeratedAt);
+        Assert.Null(deleted.StateReason);
+        Assert.Null(deleted.StateChangedAt);
         Assert.Null(identity);
         Assert.Empty(await engagement.GetFavoritesAsync(
             account.AccountId, TestContext.Current.CancellationToken));

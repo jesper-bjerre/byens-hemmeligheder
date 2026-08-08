@@ -9,6 +9,8 @@ export interface AuthenticatedAccount {
   publicName: string | null;
   role: 'User' | 'Designer' | 'Admin';
   state: 'Active' | 'Blocked' | 'Deleted';
+  nameModerationState?: 'Visible' | 'Hidden';
+  nameModerationReason?: string | null;
 }
 
 interface WebSession {
@@ -125,7 +127,9 @@ interface AppleApi {
 }
 
 declare global {
-  interface Window { AppleID?: AppleApi; }
+  interface Window {
+    AppleID?: AppleApi;
+  }
 }
 
 async function waitForApple(): Promise<AppleApi> {
@@ -143,7 +147,5 @@ function randomValue(): string {
 
 async function sha256(value: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
-  return [...new Uint8Array(digest)]
-    .map((item) => item.toString(16).padStart(2, '0'))
-    .join('');
+  return [...new Uint8Array(digest)].map((item) => item.toString(16).padStart(2, '0')).join('');
 }

@@ -90,6 +90,17 @@ final class PlayerAuthentication {
         state = .guest
     }
 
+    func updatePublicName(_ publicName: String?) async throws {
+        account = try await client.updatePublicName(publicName)
+    }
+
+    func reportPublicName(
+        _ publicName: String,
+        category: PublicNameReportCategory
+    ) async throws {
+        try await client.reportPublicName(publicName, category: category)
+    }
+
     /// Holder UI'et i takt med klientens Keychain-session.
     ///
     /// ``AuthenticationClient`` rydder selv en afvist refresh-session. Uden

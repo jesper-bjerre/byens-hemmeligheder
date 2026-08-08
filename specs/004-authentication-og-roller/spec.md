@@ -127,6 +127,38 @@ direkte identifikatorer ikke længere udleveres.
 3. **Given** en Designer- eller Admin-konto, **When** selvbetjent sletning
    forsøges, **Then** afvises den med en forklaring om nødvendig degradering.
 
+---
+
+### User Story 6 - Vælg og moderér profilnavn (Priority: P1)
+
+En indlogget spiller kan aktivt vælge et offentligt profilnavn til highscore.
+Andre kan rapportere navnet uden at få adgang til konto-id eller e-mail, og en
+Admin kan skjule navnet eller blokere kontoen gennem den beskyttede brugerliste.
+
+**Why this priority**: Highscore er allerede i version 1, og målgruppen omfatter
+børn. Et frit offentligt tekstfelt må derfor ikke frigives uden validering,
+rapportering og en hurtig moderationsvej.
+
+**Independent Test**: Sæt et gyldigt navn, indsend point og se navnet på
+highscore; rapportér det fra en anden konto, skjul det som Admin og kontroller,
+at highscore straks viser det neutrale fallbacknavn.
+
+**Acceptance Scenarios**:
+
+1. **Given** en indlogget User uden profilnavn, **When** et gyldigt navn på
+   3–20 synlige tegn gemmes, **Then** normaliseres det og vises på highscore.
+2. **Given** et navn med kontroltegn, link, kontaktoplysning, reserveret eller
+   åbenlyst krænkende tekst, **When** det gemmes, **Then** afvises det uden at
+   ændre kontoen.
+3. **Given** et synligt navn på highscore, **When** en indlogget spiller
+   rapporterer det, **Then** gemmes kategori, navn og tidspunkt uden at et
+   internt konto-id udleveres offentligt.
+4. **Given** en rapporteret konto, **When** en Admin skjuler navnet, **Then**
+   viser highscore straks "Anonym spiller"; en Designer/User får `403` på samme
+   handling.
+5. **Given** en konto, der misbruger tjenesten, **When** en Admin blokerer den,
+   **Then** afvises dens eksisterende sessions ved næste request.
+
 ### Edge Cases
 
 - Apple udleverer kun navn og e-mail første gang, eller brugeren vælger Skjul
@@ -185,6 +217,22 @@ direkte identifikatorer ikke længere udleveres.
 - **FR-420**: Aktivering i DEV og PROD MUST være uafhængig af partner- eller
   quizmasterkommunikation og kræver alene teknisk konfiguration, test og
   menneskelig releasegodkendelse.
+- **FR-421**: En autentificeret spiller MUST kunne sætte eller fjerne et
+  valgfrit offentligt profilnavn; tomt navn er standarden.
+- **FR-422**: Profilnavnet MUST Unicode-normaliseres, indeholde 3–20 synlige
+  tegn og MUST afvise kontroltegn, links, kontaktoplysninger, reserverede navne
+  og en konservativ dansk blokliste.
+- **FR-423**: Ikke-tomme navneændringer MUST ratebegrænses server-side; klientens
+  skjul eller validering er ikke en sikkerhedsgrænse.
+- **FR-424**: Highscore MUST kun vise et godkendt profilnavn og ellers bruge
+  det neutrale navn "Anonym spiller". Internt konto-id og e-mail MUST NOT
+  udleveres med highscoredata.
+- **FR-425**: En autentificeret spiller MUST kunne rapportere et vist navn med
+  en fast kategori. Rapporten MUST kunne behandles af Admin uden at konto-id
+  udleveres på den offentlige highscore.
+- **FR-426**: Admin MUST kunne skjule/genåbne et profilnavn og blokere/aktivere
+  en ikke-Admin-konto. Ændringen MUST slå igennem ved næste request og være
+  utilgængelig for User og Designer.
 
 ### Key Entities
 
@@ -215,6 +263,8 @@ direkte identifikatorer ikke længere udleveres.
   optræder i highscore, revisionssvar, logs eller repositoryets sporede filer.
 - **SC-407**: DEV end-to-end-testen er grøn før en menneskelig godkendelse af
   PROD-release.
+- **SC-408**: Alle profilnavnsvalideringsvektorer og rollevariationer er dækket
+  af automatiske tests, og moderation ændrer highscore ved næste læsning.
 
 ## Assumptions
 

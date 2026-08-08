@@ -122,6 +122,52 @@ public actor AuthenticationClient {
         }
     }
 
+    /// Opdaterer det frivillige offentlige navn og erstatter kontokopien i
+    /// Keychain-sessionen med serverens normaliserede svar.
+    @discardableResult
+    public func updatePublicName(_ publicName: String?) async throws -> AuthenticatedAccount {
+        var request = URLRequest(url: baseURL.appending(path: "auth/me/profile"))
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(UpdateProfileBody(publicName: publicName))
+        let (data, response) = try await authorizedData(for: request)
+        guard response.statusCode == 200 else {
+            throw AuthenticationError.server(response.statusCode)
+        }
+        let account: AuthenticatedAccount
+        do {
+            account = try JSONDecoder.authentication.decode(AuthenticatedAccount.self, from: data)
+        } catch {
+            throw AuthenticationError.invalidResponse
+        }
+        guard let current = session else { throw AuthenticationError.notAuthenticated }
+        let updated = AuthenticationSession(
+            accessToken: current.accessToken,
+            accessExpiresAt: current.accessExpiresAt,
+            refreshToken: current.refreshToken,
+            refreshExpiresAt: current.refreshExpiresAt,
+            account: account)
+        session = updated
+        try await store.save(updated)
+        return account
+    }
+
+    public func reportPublicName(
+        _ publicName: String,
+        category: PublicNameReportCategory
+    ) async throws {
+        var request = URLRequest(url: baseURL.appending(path: "scores/name-reports"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(NameReportBody(
+            reportedName: publicName,
+            category: category.rawValue))
+        let (_, response) = try await authorizedData(for: request)
+        guard response.statusCode == 204 else {
+            throw AuthenticationError.server(response.statusCode)
+        }
+    }
+
     private func validAccessToken() async throws -> String {
         guard let session else { throw AuthenticationError.notAuthenticated }
         if session.accessExpiresAt > now().addingTimeInterval(30) {
@@ -184,4 +230,13 @@ private struct NativeExchangeBody: Encodable {
 
 private struct RefreshBody: Encodable {
     let refreshToken: String
+}
+
+private struct UpdateProfileBody: Encodable {
+    let publicName: String?
+}
+
+private struct NameReportBody: Encodable {
+    let reportedName: String
+    let category: String
 }

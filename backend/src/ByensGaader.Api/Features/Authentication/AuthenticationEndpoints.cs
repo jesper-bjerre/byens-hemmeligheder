@@ -103,7 +103,8 @@ internal sealed class NativeAppleExchangeEndpoint(
             session.Account.Email,
             session.Account.PublicName,
             session.Account.Role.ToString(),
-            session.Account.State.ToString()));
+            session.Account.State.ToString(),
+            session.Account.NameModerationState.ToString()));
 }
 
 /// Veksler Apples engangskode direkte fra web-popup'en. Browseren ejer

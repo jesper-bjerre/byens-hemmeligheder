@@ -21,7 +21,7 @@ spillerlæsning forbliver anonym.
 |---|---|---|
 | 1 | Intern test af opgavernes kvalitet | 🟡 I gang |
 | 2 | Research og design af et bedre lager til opgavedata | ✅ Afsluttet |
-| 3 | Login, adgangskontrol og produktionssikring | 🟡 Godkendt i DEV; PROD-gate mangler |
+| 3 | Login, adgangskontrol og produktionssikring | ✅ Aktiv og smoke-testet i PROD; iOS-builds uploadet |
 | 4 | Implementering af opgavevist Blob-lager | ✅ Afsluttet |
 
 ---
@@ -43,6 +43,18 @@ opgaver, men kan ikke like: vi opretter ikke et skjult device-id for et barn.
 
 Lagringsbeslutningen og dens pris står i
 [ADR 0011](../ADR/0011-favoritter-og-trending-i-table-storage.md).
+
+### Offentlige profilnavne og moderation
+
+Den næste releaseudvidelse er implementeret lokalt: en indlogget spiller kan
+vælge et offentligt profilnavn, og andre indloggede spillere kan rapportere et
+vist navn fra highscorelisten. Navnet valideres og ratebegrænses server-side.
+Admin kan i web-admin skjule navnet eller blokere en ikke-Admin-konto; highscore
+viser straks **Anonym spiller**, hvis navnet ikke længere må vises.
+
+Rapporter opbevares i højst 90 dage. Highscore udleverer fortsat hverken
+konto-id eller e-mail. Funktionen er lokalt releasevalideret og afventer nu den
+normale `main` → DEV → manuel PROD-gate og en ny spillerbuild.
 
 **Nye oplevelser** sorteres efter det serverstyrede `releasedAt`, altså hvornår
 opgaven skiftede til Frigivet — ikke hvornår kladden blev oprettet. Eksisterende
@@ -88,11 +100,11 @@ det interne konto-id og sessionsmetadata nu kan implementeres. Den konkrete
 privatlivstekst og interesseafvejning skal fortsat reviewes før offentlig
 release, men det blokerer ikke implementering eller test i DEV.
 
-### 3.1 Skrivning skal beskyttes
+### 3.1 Skrivning er beskyttet
 
-**Det er det eneste, der reelt spærrer.** `PUT` og `DELETE` står i dag med
-`AllowAnonymous()`. Enhver, der kender adressen, kan omskrive indholdspakken
-eller slette billederne.
+Authentication er aktiv og smoke-testet i PROD. Anonyme authoring-kald og
+`/auth/me` afvises med `401`, og HTTP omdirigeres til HTTPS. Rollepolicies
+beskytter skrive-, preview- og brugeradministrationsendpoints server-side.
 
 Den besluttede løsning:
 
@@ -124,26 +136,17 @@ Pakkegeneratoren oversætter i overgangsperioden `published` tilbage til
 se opgaverne. Broen fjernes først, når understøttelse af `published` er ude i
 alle spillerklienter; derefter migreres PROD-data, og legacy-værdien fjernes.
 
-### 3.3 To indstillinger i Azure, der mangler
+### 3.3 Resterende Azure-driftspunkt
 
-**HTTPS er ikke påkrævet.** `httpsOnly` står på `false`. En forespørgsel over
-almindelig HTTP bliver besvaret — og med 3.1 på plads ville nøglen dermed kunne
-sendes i klartekst. Skal rettes **før** nøglen tages i brug:
-
-```bash
-az webapp update -n byensgaader-api-p -g Gulvet --https-only true
-```
-
-**Blob-versionering er slået til på `byensgaaderp`.** Blob- og
-container-soft-delete er slået til med 7 dage. En lifecycle-regel for gamle
-versioner mangler fortsat:
+HTTPS-only er aktiveret og verificeret i PROD. Blob-versionering samt blob- og
+container-soft-delete er slået til med 7 dage på `byensgaaderp`. En
+lifecycle-regel for gamle versioner mangler fortsat:
 
 ```bash
 # Tilføj en godkendt lifecycle-regel på byensgaaderp.
 ```
 
-> HTTPS-kravet på App Service er ikke udført. Storage-versionering og soft
-> delete er udført 3. august 2026.
+> Storage-versionering og soft delete er udført 3. august 2026.
 
 ### 3.4 PROD- og D-lager er adskilt
 
@@ -165,8 +168,8 @@ Beslutningen og migrationsprisen står i
   Det gamle compile-flag `BH_DEV_TOOLS` er derfor fjernet som produktgrænse.
 - **Spillerappen** peger på drift gennem `BH_CONTENT_BASE_URL` i
   `Shared.xcconfig`. Klar.
-- **Admin-apps** peger på drift i begge konfigurationer. De skal have Apple-
-  login og bearer-session, før skrive-API'et lukkes.
+- **Admin-apps** peger på drift, bruger Apple-login og sender bearer-session på
+  de beskyttede kald.
 - Fremgangsmåden står i [testflight.md](../testflight.md). Den er skrevet til
   spillerappen; admin-appen følger den samme vej med sit eget bundle-id.
 

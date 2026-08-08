@@ -278,6 +278,12 @@ internal sealed class TableAuthenticationRepository(
         ["CreatedAt"] = value.CreatedAt,
         ["LastSignedInAt"] = value.LastSignedInAt,
         ["DeletedAt"] = value.DeletedAt,
+        ["PublicNameChangedAt"] = value.PublicNameChangedAt,
+        ["NameModerationState"] = value.NameModerationState.ToString(),
+        ["NameModerationReason"] = value.NameModerationReason,
+        ["NameModeratedAt"] = value.NameModeratedAt,
+        ["StateReason"] = value.StateReason,
+        ["StateChangedAt"] = value.StateChangedAt,
     };
 
     private static Account ToAccount(TableEntity value) => new(
@@ -289,7 +295,16 @@ internal sealed class TableAuthenticationRepository(
         value.GetDateTimeOffset("CreatedAt")!.Value,
         value.GetDateTimeOffset("LastSignedInAt")!.Value,
         value.GetDateTimeOffset("DeletedAt"),
-        value.ETag.ToString());
+        value.ETag.ToString(),
+        value.GetDateTimeOffset("PublicNameChangedAt"),
+        Enum.TryParse<NameModerationState>(
+            value.GetString("NameModerationState"), out var moderationState)
+            ? moderationState
+            : NameModerationState.Visible,
+        value.GetString("NameModerationReason"),
+        value.GetDateTimeOffset("NameModeratedAt"),
+        value.GetString("StateReason"),
+        value.GetDateTimeOffset("StateChangedAt"));
 
     private static TableEntity IdentityEntity(ExternalIdentity value) => new(
         value.Provider, value.ProviderSubjectHash)

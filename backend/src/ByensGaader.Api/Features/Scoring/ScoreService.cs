@@ -65,6 +65,7 @@ internal sealed class ScoreService(
             var account = await accounts.GetAccountAsync(item.AccountId, ct);
             if (account is null || account.State is not AccountState.Active) continue;
             var name = string.IsNullOrWhiteSpace(account.PublicName)
+                || account.NameModerationState is NameModerationState.Hidden
                 ? "Anonym spiller"
                 : account.PublicName.Trim();
             result.Add(new LeaderboardEntryDto(name, item.Points));

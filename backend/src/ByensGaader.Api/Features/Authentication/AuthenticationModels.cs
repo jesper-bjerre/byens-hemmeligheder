@@ -14,6 +14,12 @@ internal enum AccountState
     Deleted,
 }
 
+internal enum NameModerationState
+{
+    Visible,
+    Hidden,
+}
+
 internal enum AuthenticationClientKind
 {
     IOSPlayer,
@@ -31,7 +37,13 @@ internal sealed record Account(
     DateTimeOffset CreatedAt,
     DateTimeOffset LastSignedInAt,
     DateTimeOffset? DeletedAt = null,
-    string? ETag = null);
+    string? ETag = null,
+    DateTimeOffset? PublicNameChangedAt = null,
+    NameModerationState NameModerationState = NameModerationState.Visible,
+    string? NameModerationReason = null,
+    DateTimeOffset? NameModeratedAt = null,
+    string? StateReason = null,
+    DateTimeOffset? StateChangedAt = null);
 
 internal sealed record ExternalIdentity(
     string Provider,
@@ -79,7 +91,8 @@ internal sealed record AuthenticatedAccountDto(
     string? Email,
     string? PublicName,
     string Role,
-    string State);
+    string State,
+    string NameModerationState);
 
 internal sealed record IssuedSession(
     string AccessToken,

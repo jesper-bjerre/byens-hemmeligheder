@@ -66,6 +66,14 @@ builder.Services.AddSingleton<SessionService>();
 builder.Services.AddSingleton<AccountService>();
 builder.Services.AddSingleton<AccountAdministrationService>();
 builder.Services.AddSingleton<AccountLifecycleService>();
+builder.Services.AddSingleton<ProfileService>();
+builder.Services.AddSingleton<INameReportRepository>(services => authentication.Provider switch
+{
+    AuthenticationStoreProvider.Table => new TableNameReportRepository(
+        services.GetRequiredService<TableServiceClient>(), authentication),
+    _ => new InMemoryNameReportRepository(),
+});
+builder.Services.AddSingleton<NameReportService>();
 builder.Services.AddSingleton<IAccountAuditRepository>(services => authentication.Provider switch
 {
     AuthenticationStoreProvider.Table => new TableAccountAuditRepository(

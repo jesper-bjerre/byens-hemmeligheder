@@ -1,7 +1,7 @@
 # Navneskift til Vejles Koder
 
 **Besluttet:** 8. august 2026
-**Status:** Implementeret og godkendt i DEV; PROD og TestFlight mangler
+**Status:** Implementeret; PROD-authentication er aktiv, og begge iOS-builds er uploadet
 
 ## Beslutning
 
@@ -21,8 +21,8 @@ at forbedre produktet.
 ## Konsekvenser
 
 - Apple-login-gruppen, eksisterende konti og App Store Connect-posten bevares.
-- Den nuværende TestFlight-build beholder sit gamle navn; navnet skifter først
-  i en ny uploadet build.
+- De nye iOS-builds med navnene er uploadet. TestFlight-behandling,
+  testerdistribution og App Store-metadata håndteres fortsat i App Store Connect.
 - App Store-navnet rettes på den eksisterende appversion eller den nye versions
   redigerbare metadata. Der oprettes ikke en ny app.
 - Historiske analyser, arkivmateriale og eksisterende kildekrediteringer

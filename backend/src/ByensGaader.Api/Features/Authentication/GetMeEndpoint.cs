@@ -33,6 +33,7 @@ internal sealed class GetMeEndpoint(IAuthenticationRepository repository) : Endp
             account.Email,
             account.PublicName,
             account.Role.ToString(),
-            account.State.ToString()), cancellation: ct);
+            account.State.ToString(),
+            account.NameModerationState.ToString()), cancellation: ct);
     }
 }

@@ -52,6 +52,12 @@ internal sealed class AccountLifecycleService(
             {
                 Email = null,
                 PublicName = null,
+                PublicNameChangedAt = null,
+                NameModerationState = NameModerationState.Visible,
+                NameModerationReason = null,
+                NameModeratedAt = null,
+                StateReason = null,
+                StateChangedAt = null,
                 State = AccountState.Deleted,
                 DeletedAt = time.GetUtcNow(),
             };

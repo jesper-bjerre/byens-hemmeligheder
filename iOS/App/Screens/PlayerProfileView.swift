@@ -1,3 +1,4 @@
+import BHAuthenticationKit
 import BHDesignSystem
 import SwiftUI
 
@@ -10,6 +11,9 @@ struct PlayerProfileView: View {
     @State private var showsDeleteConfirmation = false
     @State private var isDeletingAccount = false
     @State private var accountError: String?
+    @State private var publicName = ""
+    @State private var isSavingPublicName = false
+    @State private var publicNameMessage: String?
 
     private var canUseLocationTools: Bool {
         guard authentication.state == .signedIn,
@@ -41,6 +45,9 @@ struct PlayerProfileView: View {
                     }
 
                     PlayerAccountCard()
+                    if authentication.state == .signedIn {
+                        publicProfile
+                    }
                     settings
                     if canUseLocationTools {
                         designerTools
@@ -64,6 +71,85 @@ struct PlayerProfileView: View {
             }
         } message: {
             Text("Din konto, dine servergemte favoritter og din placering på highscorelisterne fjernes. Handlingen kan ikke fortrydes.")
+        }
+        .task(id: authentication.account?.publicName) {
+            publicName = authentication.account?.publicName ?? ""
+        }
+    }
+
+    private var publicProfile: some View {
+        VStack(alignment: .leading, spacing: BHSpacing.snug) {
+            DiscoverySectionHeader(title: "Offentligt profilnavn")
+
+            BHCard {
+                VStack(alignment: .leading, spacing: BHSpacing.snug) {
+                    TextField("Fx Gådeholdet", text: $publicName)
+                        .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
+                        .textFieldStyle(.roundedBorder)
+                        .submitLabel(.done)
+                        .onSubmit { Task { await savePublicName() } }
+                        .accessibilityIdentifier("profile.public-name")
+
+                    Text("3–20 tegn. Kun dette navn kan ses på highscorelisten — aldrig din e-mail eller Apple-konto.")
+                        .font(BHFont.caption)
+                        .foregroundStyle(BHColor.inkMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if authentication.account?.nameModerationState == "Hidden" {
+                        Label("Navnet er skjult af en administrator og vises som Anonym spiller.",
+                              systemImage: "eye.slash.fill")
+                            .font(BHFont.caption)
+                            .foregroundStyle(BHColor.caution)
+                    }
+
+                    HStack(spacing: BHSpacing.snug) {
+                        Button("Gem navn") {
+                            Task { await savePublicName() }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(isSavingPublicName)
+
+                        if authentication.account?.publicName != nil {
+                            Button("Fjern navn", role: .destructive) {
+                                publicName = ""
+                                Task { await savePublicName() }
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(isSavingPublicName)
+                        }
+                    }
+
+                    if isSavingPublicName {
+                        ProgressView("Gemmer navn …")
+                    } else if let publicNameMessage {
+                        Text(publicNameMessage)
+                            .font(BHFont.caption)
+                            .foregroundStyle(publicNameMessage == "Profilnavnet er gemt."
+                                             ? BHColor.success
+                                             : Color.red)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        }
+    }
+
+    @MainActor
+    private func savePublicName() async {
+        isSavingPublicName = true
+        publicNameMessage = nil
+        defer { isSavingPublicName = false }
+        do {
+            let value = publicName.trimmingCharacters(in: .whitespacesAndNewlines)
+            try await authentication.updatePublicName(value.isEmpty ? nil : value)
+            publicName = authentication.account?.publicName ?? ""
+            publicNameMessage = "Profilnavnet er gemt."
+        } catch AuthenticationError.server(429) {
+            publicNameMessage = "Navnet kan ændres igen 24 timer efter den seneste ændring."
+        } catch {
+            authentication.handleAuthenticationFailure(error)
+            publicNameMessage = "Profilnavnet kunne ikke gemmes. Kontrollér navnet og prøv igen."
         }
     }
 

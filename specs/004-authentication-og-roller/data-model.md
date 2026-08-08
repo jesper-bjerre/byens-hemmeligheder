@@ -7,6 +7,10 @@
 | `accountId` | UUID | Permanent intern nøgle; tilfældig |
 | `email` | string? | Verificeret fra Apple; aldrig offentlig eller opslagsnøgle |
 | `publicName` | string? | 3–20 synlige tegn efter normalisering |
+| `publicNameChangedAt` | tidspunkt? | UTC; bruges til serverstyret rate limit |
+| `nameModerationState` | enum | `Visible` eller `Hidden`; tomt navn er aldrig offentligt |
+| `nameModerationReason` | string? | Kun Admin; udleveres ikke på highscore |
+| `stateReason`, `stateChangedAt` | string?/tidspunkt? | Beskyttet begrundelse og tidspunkt for blokering |
 | `role` | enum | `User`, `Designer`, `Admin` |
 | `state` | enum | `Active`, `Blocked`, `Deleted` |
 | `createdAt` | tidspunkt | UTC, uforanderlig |
@@ -25,6 +29,21 @@ User/Designer: Active|Blocked → Deleted
 
 Sidste Admin kan ikke degraderes, blokeres eller slettes. En Designer skal
 degraderes til User før selvbetjent sletning.
+
+## NameReport
+
+| Felt | Type | Regel |
+|---|---|---|
+| `reportId` | UUID | Tilfældig nøgle |
+| `reporterAccountId` | UUID | Kun beskyttet Admin-visning |
+| `reportedName` | string | Det viste normaliserede navn; intet mål-konto-id i klientrequest |
+| `category` | enum | `Offensive`, `PersonalInfo`, `Impersonation`, `Other` |
+| `createdAt` | tidspunkt | UTC |
+
+Rapporter slettes efter 90 dage. Rapportering matcher ikke automatisk en konto:
+Admin søger efter det rapporterede navn og vælger den konkrete konto. Dermed
+udleverer highscore hverken internt konto-id eller en ny stabil offentlig
+identifikator.
 
 ## ExternalIdentity
 
@@ -97,6 +116,9 @@ Rotated token genbrugt → hele sessionsfamilien Revoked
 - Sessions: partition efter de første to tegn i `sessionId`, row `sessionId`.
 - Grants: partition efter udløbsdato (`yyyyMMdd`), row `grantHash`.
 - Rolleaudit: partition efter mål-konto, row omvendt timestamp + tilfældig id.
+- Navnerapporter: partition efter måned, row er et hash af rapportør, dato og
+  navn. Det gør en gentaget rapport samme dag idempotent uden at udlevere
+  rapportørens konto-id i URL eller klientrespons.
 
 Kryds-partition-operationer gøres idempotente og genoptagelige; ingen request
 må stole på en ikke-atomisk fler-række-transaktion for at give adgang.

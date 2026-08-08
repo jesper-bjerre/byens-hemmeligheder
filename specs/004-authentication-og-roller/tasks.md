@@ -148,6 +148,24 @@ menneskelig releasegodkendelse.
 
 ---
 
+## Phase 9: Offentlige profilnavne og moderation
+
+**Goal**: Gør version 1-highscore egnet til børn uden at udlevere tekniske
+kontoidentifikatorer.
+
+- [x] T056 [P] [US6] Skriv backendtests for normalisering, afviste navne, rate limit, skjult fallback, rapportering og Admin-only moderation i `backend/tests/ByensGaader.Api.Tests/ProfileNameTests.cs`
+- [x] T057 [US6] Udvid Account og Table Storage-mapping med navnetidspunkt og moderationstilstand i `backend/src/ByensGaader.Api/Features/Authentication/`
+- [x] T058 [US6] Implementer profilnavnsvalidator, eget profilendpoint og serverstyret rate limit i `backend/src/ByensGaader.Api/Features/Accounts/`
+- [x] T059 [US6] Implementer navnerapporter med 90 dages retention og Admin-læsning i `backend/src/ByensGaader.Api/Features/Accounts/`
+- [x] T060 [US6] Implementer Admin-endpoints til navneskjul og kontoblokering samt neutral highscore-fallback i `backend/src/ByensGaader.Api/Features/Accounts/` og `backend/src/ByensGaader.Api/Features/Scoring/`
+- [x] T061 [P] [US6] Skriv Swift-tests for profilopdatering og rapportering i `iOS/Packages/BHKit/Tests/BHAuthenticationKitTests/`
+- [x] T062 [US6] Implementer profilnavnsredigering i spillerprofilen og rapporthandling på highscore i `iOS/App/`
+- [x] T063 [P] [US6] Udvid webadmin-tests for moderation og blokering i `webApps/webadmin/src/app/users/users-panel.spec.ts`
+- [x] T064 [US6] Implementer rapportoversigt, navnemoderation og kontoblokering i `webApps/webadmin/src/app/users/users-panel.ts`
+- [x] T065 [US6] Opdater OpenAPI, privacytekst, køreplan og release-status; kør samlet backend-, Swift-, Angular- og Release-buildvalidering
+
+---
+
 ## Dependencies & Execution Order
 
 ```text
@@ -180,5 +198,5 @@ US1 + US2 + US3 + US4 + US5 → Releasegate
 5. Gennemfør governance-/Apple-/Azure-gates, test i DEV og få menneskelig
    godkendelse før PROD.
 
-**Task count**: 55. Alle tasks følger checkbox + id + eventuel `[P]` +
+**Task count**: 65. Alle tasks følger checkbox + id + eventuel `[P]` +
 user-story-label + konkret filsti.

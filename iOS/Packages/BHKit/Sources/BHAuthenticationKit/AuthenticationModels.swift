@@ -11,20 +11,30 @@ public struct AuthenticatedAccount: Codable, Equatable, Sendable {
     public let publicName: String?
     public let role: String
     public let state: String
+    public let nameModerationState: String?
 
     public init(
         accountId: UUID,
         email: String?,
         publicName: String?,
         role: String,
-        state: String
+        state: String,
+        nameModerationState: String? = nil
     ) {
         self.accountId = accountId
         self.email = email
         self.publicName = publicName
         self.role = role
         self.state = state
+        self.nameModerationState = nameModerationState
     }
+}
+
+public enum PublicNameReportCategory: String, Codable, Sendable {
+    case offensive = "Offensive"
+    case personalInfo = "PersonalInfo"
+    case impersonation = "Impersonation"
+    case other = "Other"
 }
 
 public struct AuthenticationSession: Codable, Equatable, Sendable {
