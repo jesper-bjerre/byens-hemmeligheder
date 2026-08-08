@@ -17,7 +17,7 @@ featurekravene og ikke valgfri.
 - [x] T002 Tilføj disabled-by-default authenticationkonfiguration og validering i `backend/src/ByensGaader.Api/Features/Authentication/AuthenticationOptions.cs` og `backend/src/ByensGaader.Api/appsettings.json`
 - [x] T003 Tilføj authentication- og account-mapper til backendprojektet i `backend/src/ByensGaader.Api/Features/Authentication/` og `backend/src/ByensGaader.Api/Features/Accounts/`
 - [x] T004 [P] Tilføj fælles Swift-target `BHAuthenticationKit` i `iOS/Packages/BHKit/Package.swift`
-- [ ] T005 [P] Opret Angular auth-struktur i `webApps/webadmin/src/app/auth/` og `webApps/byensgaaderweb/src/app/auth/`
+- [ ] T005 [P] Opret Angular auth-struktur i `webApps/webadmin/src/app/auth/` og `webApps/byensgaaderweb/src/app/auth/` — web-admin er udført; spillerweb mangler
 
 ---
 
@@ -77,7 +77,7 @@ opretter én konto ved samtidighed og udsteder en roterbar native session.
 - [x] T028 [P] [US2] Implementer session- og Keychain-lag i `iOS/Packages/BHKit/Sources/BHAuthenticationKit/`
 - [x] T029 [P] [US2] Test Keychain, refresh og logout i `iOS/Packages/BHKit/Tests/BHAuthenticationKitTests/`
 - [x] T030 [US2] Tilføj valgfrit Log ind med Apple, profil og kontosletning i `iOS/App/Authentication/`
-- [ ] T031 [US2] Tilføj spillerweb-login uden permanent tokenlager i `webApps/byensgaaderweb/src/app/auth/`
+- [ ] T031 [US2] Tilføj spillerweb-login uden permanent tokenlager i `webApps/byensgaaderweb/src/app/auth/` — udskudt fra den aktuelle iPhone-release
 
 **Checkpoint**: Spilleren kan være gæst eller autentificeret User.
 
@@ -128,7 +128,7 @@ mens Designer/Admin afvises indtil administrativ håndtering.
 - [x] T044 [P] [US5] Skriv logout-, blokering-, revocation- og sletningstests i `backend/tests/ByensGaader.Api.Tests/AccountLifecycleTests.cs`
 - [x] T045 [US5] Implementer kontoanonymisering og global sessionrevocation i `backend/src/ByensGaader.Api/Features/Accounts/AccountLifecycleService.cs`
 - [x] T046 [US5] Implementer Apple server-to-server revocation endpoint i `backend/src/ByensGaader.Api/Features/Authentication/AppleNotificationEndpoint.cs`
-- [ ] T047 [US5] Tilføj sletteflow og forklaring i spillerklienterne i `iOS/App/Authentication/` og `webApps/byensgaaderweb/src/app/auth/`
+- [ ] T047 [US5] Tilføj sletteflow og forklaring i spillerklienterne i `iOS/App/Authentication/` og `webApps/byensgaaderweb/src/app/auth/` — iOS er udført; spillerweb mangler
 
 ---
 
@@ -139,12 +139,12 @@ menneskelig releasegodkendelse.
 
 - [x] T048 Få eksplicit godkendelse og gennemfør forfatningsændring for Apple-subject, sessioner, formål, behandlingsgrundlag og slettefrister i `.specify/memory/constitution.md`
 - [x] T049 Dokumenter arkitekturvalget og dets pris i `docs/ADR/0010-direkte-apple-login-og-egne-sessioner.md`
-- [ ] T050 [P] Tilføj sikre placeholder-indstillinger og managed-identity/Table-RBAC i `infra/` og `.github/workflows/` uden hemmeligheder eller konkrete persondata
-- [ ] T051 [P] Slå HTTPS-only til gennem godkendt Azure-konfiguration og dokumentér kontrollen i `docs/drift/udrulning.md`
+- [ ] T050 [P] Tilføj sikre placeholder-indstillinger og managed-identity/Table-RBAC i `infra/` og `.github/workflows/` uden hemmeligheder eller konkrete persondata — Azure-RBAC og secrets-baserede workflows er udført; formaliseret infra-definition mangler
+- [x] T051 [P] Slå HTTPS-only til gennem godkendt Azure-konfiguration og dokumentér kontrollen i `docs/drift/udrulning.md`
 - [x] T052 [P] Slå `BH_DEV_TOOLS` fra i Release i `iOS/ByensHemmeligheder.xcodeproj/project.pbxproj`
-- [ ] T053 Kør hele [quickstart.md](./quickstart.md), secret-scan, dependency-scan og DEV API-end-to-end-tests
-- [ ] T054 Konfigurer Apple App IDs, Services ID, grupper, return URLs og Key Vault/App Service-settings uden for repoet
-- [ ] T055 Indhent menneskelig review og releasegodkendelse; aktivér først DEV og derefter PROD efter grøn gate
+- [x] T053 Kør hele [quickstart.md](./quickstart.md), secret-scan, dependency-scan og DEV API-end-to-end-tests
+- [x] T054 Konfigurer Apple App IDs, Services ID, grupper, return URLs og Key Vault/App Service-settings uden for repoet
+- [x] T055 Indhent menneskelig review og releasegodkendelse; aktivér først DEV og derefter PROD efter grøn gate
 
 ---
 

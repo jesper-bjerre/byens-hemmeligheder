@@ -225,23 +225,20 @@ Workflowet bruger derfor `az webapp deploy`, som bruger den bearer-token,
 | 3 | Indholdet flytter fra repo til blob | ✅ — se [ADR 0005](../ADR/0005-blob-er-kilden-til-indholdet.md) |
 | 4 | Spillerappen henter fra tjenesten | ✅ — var allerede gjort i ADR 0004 |
 | 5a | PROD-storage | ✅ — `byensgaaderp`, cutover 3. august 2026 |
-| 5b | Adgangskontrol | 🟡 — alle klienter godkendt i DEV; PROD-gate mangler |
+| 5b | Adgangskontrol | ✅ — aktiv og smoke-testet i PROD |
 
 PROD peger kun på `byensgaaderp`; DEV peger kun på `byensgaaderd`. PROD-appens
 rolle på D-kontoen er fjernet. Lokal backend deler D-kontoen, men bruger de
 isolerede lokalcontainere.
 
-### Fase 5b — implementeret og aktiveret i DEV
+### Fase 5b — implementeret og aktiveret i DEV og PROD
 
 Authoring-endpoints kræver Designer/Admin, brugeradministration kræver Admin,
 og audit bruger den verificerede konto. Authentication er aktiv i DEV. Det
 roterede nøglemateriale, App IDs, Services ID, return URLs, webflowet og begge
-native loginflows er verificeret. PROD er fortsat slået fra og må først
-aktiveres gennem den manuelle menneskelige release-gate.
-
-**PRODs `httpsOnly` står på `false`.** En forespørgsel over almindelig HTTP bliver
-besvaret. Det skal rettes, *før* der indføres en nøgle — ellers kan nøglen
-sendes i klartekst.
+native loginflows er verificeret. Den manuelle PROD-gate er gennemført.
+Authentication er aktiv, anonyme authoring- og `/auth/me`-kald giver `401`, og
+almindelig HTTP omdirigeres til HTTPS. `httpsOnly` er dermed verificeret.
 
 **Blob-versionering er slået til på `byensgaaderp`.** Blob- og
 container-soft-delete dækker 7 dage. En lifecycle-regel for gamle versioner

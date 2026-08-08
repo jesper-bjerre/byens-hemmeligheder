@@ -2,20 +2,18 @@
 
 **Sidst opdateret:** 8. august 2026
 
-## Beslutning: authentication gennemføres nu
+## Aktuel status: authentication er i drift
 
-Begge iOS-apps er i TestFlight, og lagerresearchen er afsluttet. Authentication,
-authorization og produktionssikring er nu den aktive hovedopgave og skal
-frigives hurtigst muligt, så den interne test kan fokusere på opgavernes
-kvalitet.
+Begge iOS-apps er uploadet, lagerresearchen er afsluttet, og authentication,
+authorization og produktionssikring er aktiveret og smoke-testet i PROD. Den
+interne test kan derfor fokusere på spilleroplevelsen og opgavernes kvalitet.
 
 Partnerdialog, rekruttering og særskilt kommunikation med quizmastere er ikke
 en del af denne leverance og må ikke blokere den. Authentication implementeres
 som beskrevet i [feature 004](../../specs/004-authentication-og-roller/spec.md).
 
-Det åbne skrive-API er ikke længere en accepteret venteposition. Det lukkes som
-første releaseinkrement, når begge admin-klienter kan logge ind. Offentlig
-spillerlæsning forbliver anonym.
+Det tidligere åbne skrive-API er lukket. Begge admin-klienter kræver login, og
+offentlig spillerlæsning forbliver anonym.
 
 | | Mål | Status |
 |---|---|---|
@@ -53,8 +51,10 @@ Admin kan i web-admin skjule navnet eller blokere en ikke-Admin-konto; highscore
 viser straks **Anonym spiller**, hvis navnet ikke længere må vises.
 
 Rapporter opbevares i højst 90 dage. Highscore udleverer fortsat hverken
-konto-id eller e-mail. Funktionen er lokalt releasevalideret og afventer nu den
-normale `main` → DEV → manuel PROD-gate og en ny spillerbuild.
+konto-id eller e-mail. Funktionen ligger lokalt i commit `a2fc88c`; backend,
+Swift, Angular og begge iOS Release-builds er grønne. Spillerbuild 8 er
+forberedt. Committen er endnu ikke pushet, så funktionen afventer fortsat
+`main` → DEV → manuel PROD-gate og et nyt spillerarkiv.
 
 **Nye oplevelser** sorteres efter det serverstyrede `releasedAt`, altså hvornår
 opgaven skiftede til Frigivet — ikke hvornår kladden blev oprettet. Eksisterende
@@ -108,8 +108,10 @@ beskytter skrive-, preview- og brugeradministrationsendpoints server-side.
 
 Den besluttede løsning:
 
-- Spillerapps på iOS og web har gæstespil og valgfrit Log ind med Apple. Kun
+- iOS-spillerappen har gæstespil og valgfrit Log ind med Apple. Kun
   autentificerede konti kan optræde på highscore.
+- Spillerwebben er fortsat gæstebaseret. Dens login og kontosletning er
+  bevidst udskudt fra iPhone-releasen, men står fortsat som åbne featuretasks.
 - iOS-admin og web-admin kræver login.
 - `User` kan kun bruge frigivet indhold (`published`).
 - `Designer` kan desuden se `fieldTestReady` og vedligeholde opgaver.

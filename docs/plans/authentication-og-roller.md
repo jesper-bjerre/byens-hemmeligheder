@@ -5,6 +5,23 @@
 **Senest verificeret:** 8. august 2026
 **Første administrator:** sættes som ikke-sporet Azure-konfiguration
 
+## Implementeringsstatus
+
+| Del | Status pr. 8. august 2026 |
+|---|---|
+| Backendkonto, Apple-validering og egne sessions | ✅ Aktiv og smoke-testet i DEV og PROD |
+| Rollebeskyttet authoring og Designer-preview | ✅ Aktiv i PROD |
+| Vejles Koder til iOS | ✅ Apple-login, profil, logout og kontosletning; uploadet build 7 |
+| Koder Admin til iOS | ✅ Obligatorisk Apple-login og bearer-session; uploadet build 4 |
+| Web-admin | ✅ Apple-login, roller og brugeradministration i PROD |
+| Offentlige profilnavne og moderation | 🟡 Implementeret og releasebygget lokalt i commit `a2fc88c`; ikke pushet eller udrullet |
+| Vejles Koder på web | ⏸️ Fortsat gæstespil; login og kontosletning er åbne tasks T005, T031 og T047 |
+| Formaliseret infrastructure-as-code | ⬜ Azure-rollerne er sat; den resterende repo-definition står i T050 |
+
+Den aktuelle iPhone-release er ikke afhængig af spillerweb-login. Kravet
+bevares, før spillerwebben senere skal tilbyde konto, synkronisering eller
+highscoredeltagelse.
+
 ## Resultat af valideringen
 
 Version 1 kan bruge **Log ind med Apple direkte** uden Azure AD B2C, Microsoft
@@ -272,14 +289,18 @@ miljøsammenblanding. DEV og PROD har separate sessions- og bruger-tabeller.
 - kontrakt- og regressionstest, der beviser, at User/gæst aldrig får facit fra
   `draft` eller `fieldTestReady`
 
-### 3. Vejles Koder på iOS og web
+### 3. Vejles Koder på iOS
 
 - gæst som standard
-- Log ind med Apple; Keychain-session på iOS og kort hukommelsessession på web
+- Log ind med Apple og Keychain-session
 - profilnavn, logout og kontosletning
 - highscore kun for autentificerede konti
 - Designer/Admin får særskilt kortfilter og forskellige, ikke kun
   farvebaserede markører for `fieldTestReady` og `published`
+
+Dette er implementeret. Spillerweb-login med kort hukommelsessession og
+spillerweb-kontosletning er særskilt udskudt og står fortsat i T005, T031 og
+T047; webappen kan indtil da kun spille som gæst.
 
 ### 4. iOS-admin
 
@@ -345,8 +366,10 @@ er aktiveret, og smoke-testen gav `200` på health/offentlig pakke, `401` på
 anonym authoring og `/auth/me`, samt HTTPS-redirect. Begge iOS-apps er uploadet.
 
 Offentlige profilnavne, rapportering og Admin-moderation er efterfølgende
-implementeret og valideret lokalt. Denne udvidelse følger sin egen normale
-DEV- og manuelle PROD-gate og kræver en ny spillerbuild.
+implementeret og valideret lokalt i commit `a2fc88c`. Backendtests, Swift-tests,
+begge Angular-checks og begge iOS Release-builds er grønne. Spillerens næste
+arkiv er forberedt som build 8. Udvidelsen er endnu ikke pushet eller udrullet
+og følger sin egen normale DEV- og manuelle PROD-gate.
 
 ## Kilder til valideringen
 
