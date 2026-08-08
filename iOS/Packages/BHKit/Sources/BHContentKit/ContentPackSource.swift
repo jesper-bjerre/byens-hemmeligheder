@@ -36,9 +36,9 @@ public enum ContentPackError: Error, Hashable, Sendable {
         case .decodingFailed(let detail):
             "Indholdspakken kunne ikke afkodes: \(detail)"
         case .unreachable:
-            "Der er ingen forbindelse til Byens Gåder. Slå mobildata eller wi-fi til, og prøv igen."
+            "Der er ingen forbindelse til Vejles Koder. Slå mobildata eller wi-fi til, og prøv igen."
         case .serverError(let status):
-            "Byens Gåder svarer ikke lige nu (fejl \(status)). Prøv igen om lidt."
+            "Vejles Koder svarer ikke lige nu (fejl \(status)). Prøv igen om lidt."
         }
     }
 }

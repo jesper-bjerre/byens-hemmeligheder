@@ -7,7 +7,7 @@ import { LegalPage } from './legal-page';
   template: `
     <app-legal-page title="Vilkår for brug">
       <p>
-        Ved at bruge Vejles Gåder accepterer du disse enkle vilkår. Appen er en
+        Ved at bruge Vejles Koder accepterer du disse enkle vilkår. Appen er en
         stedsbaseret oplevelse og kan bruges som gæst uden login.
       </p>
 

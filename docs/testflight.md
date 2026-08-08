@@ -1,6 +1,6 @@
 # TestFlight — fra kode til quizmasterens telefon
 
-Vejledning til at få **Byens Gåder** ud til quizmasterne. Skrevet til intern
+Vejledning til at få **Vejles Koder** ud til testerne. Skrevet til intern
 test, hvor der ikke er nogen review hos Apple.
 
 **Bundle-id:** `dk.hyldenbrandt.byensgaader`
@@ -40,10 +40,14 @@ Xcode plejer at gøre det selv, men kontrollér det:
 Det er dette skridt, der mangler i dag. Uden det fejler eksporten med
 `No profiles for 'dk.hyldenbrandt.byensgaader' were found`.
 
+Appen findes allerede i App Store Connect. Genbrug den eksisterende post og
+ret navnet under **App Information**; opret ikke en ny app. Trinnene nedenfor
+gælder kun en frisk Apple-konto uden den eksisterende post.
+
 1. [appstoreconnect.apple.com](https://appstoreconnect.apple.com) → **Apps** → **+** → **New App**
 2. Udfyld:
    - **Platforms:** iOS
-   - **Name:** `Byens Gåder` — skal være unikt i hele App Store. Er navnet taget,
+   - **Name:** `Vejles Koder` — skal være unikt i hele App Store. Er navnet taget,
      vælg et andet her; det påvirker ikke `CFBundleDisplayName` i appen.
    - **Primary Language:** Dansk
    - **Bundle ID:** `dk.hyldenbrandt.byensgaader`
@@ -209,7 +213,7 @@ Derefter som testere:
 
 1. Installér **TestFlight** fra App Store (Apples egen app, gratis)
 2. Åbn invitationsmailen på telefonen og tryk **View in TestFlight**
-3. Installér **Byens Gåder** inde fra TestFlight
+3. Installér **Vejles Koder** inde fra TestFlight
 4. Ved første start spørger appen om **position** — vælg **Tillad, mens appen er i brug**.
    Uden den kan opgaverne ikke låses op; det er stedet, der er spillet.
 

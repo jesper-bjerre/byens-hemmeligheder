@@ -22,8 +22,11 @@ DEVELOPMENT_TEAM = <indsæt lokalt, commit aldrig>
 // Mangler denne linje, stopper appen ved opstart frem for at vise en tom
 // skærm, ingen ved hvorfor er tom.
 //
-// Den udrullede backend:
-BH_CONTENT_BASE_URL = https:/$()/byensgaader-api-p.azurewebsites.net
+// DEV i Debug (anbefalet under fælles test):
+BH_CONTENT_BASE_URL[config=Debug] = https:/$()/byensgaader-api-d.azurewebsites.net
 //
-// En lokal backend i stedet — kræver `./backend/run.sh`:
-// BH_CONTENT_BASE_URL = http:/$()/localhost:5199
+// En lokal backend i Debug i stedet — kræver `./backend/run.sh`:
+// BH_CONTENT_BASE_URL[config=Debug] = http:/$()/localhost:5199
+//
+// Sæt aldrig en ukvalificeret BH_CONTENT_BASE_URL her. Release og Archive
+// skal beholde PROD-adressen fra Shared.xcconfig.

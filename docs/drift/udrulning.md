@@ -49,11 +49,13 @@ ContentStore__AuthoringContainer = authoring
 ASPNETCORE_ENVIRONMENT          = Development
 ```
 
-DEV-vaulten indeholder den genererede `provider-token-encryption-key` og har en
-versionløs App Service-reference til `apple-sign-in-private-key`. Sidstnævnte
-oprettes først, når den tidligere eksponerede Apple-nøgle er tilbagekaldt og en
-ny `.p8` er hentet direkte fra Apple. Authentication forbliver slået fra indtil
-referencen er grøn, Key ID er sat, og loginflowet kan testes ende-til-ende.
+DEV-vaulten indeholder den genererede `provider-token-encryption-key` og den
+roterede `apple-sign-in-private-key`; App Service bruger versionløse Key Vault-
+referencer til begge. Authentication blev aktiveret 8. august 2026, og
+webadmin-login blev verificeret ende-til-ende med bootstrap-kontoen som eneste
+Admin. Samme konto er verificeret i både iOS-admin og Vejles Koder mod DEV.
+Den tidligere Apple-nøgle skal tilbagekaldes manuelt hos Apple, før PROD-gaten
+åbnes.
 
 `Authoring__ReconciliationEnabled` står på `false`, fordi migrationen til
 opgavevise blobs er afsluttet. En almindelig kodeudrulning må ikke forsøge at
@@ -149,7 +151,7 @@ Designer/Admin, når miljøets authentication-indstillinger aktiveres. API'et
 afviser redaktionelle kald uden en gyldig session også ved mangelfuld
 authentication-konfiguration.
 
-## Byens Gåder web på Azure Static Web Apps
+## Vejles Koder web på Azure Static Web Apps
 
 Spillerens Angular-app er udrullet som sin egen Static Web App:
 
@@ -223,18 +225,19 @@ Workflowet bruger derfor `az webapp deploy`, som bruger den bearer-token,
 | 3 | Indholdet flytter fra repo til blob | ✅ — se [ADR 0005](../ADR/0005-blob-er-kilden-til-indholdet.md) |
 | 4 | Spillerappen henter fra tjenesten | ✅ — var allerede gjort i ADR 0004 |
 | 5a | PROD-storage | ✅ — `byensgaaderp`, cutover 3. august 2026 |
-| 5b | Adgangskontrol | 🟡 — implementeret; Apple-konfiguration og miljøaktivering mangler |
+| 5b | Adgangskontrol | 🟡 — alle klienter godkendt i DEV; PROD-gate mangler |
 
 PROD peger kun på `byensgaaderp`; DEV peger kun på `byensgaaderd`. PROD-appens
 rolle på D-kontoen er fjernet. Lokal backend deler D-kontoen, men bruger de
 isolerede lokalcontainere.
 
-### Fase 5b — implementeret, afventer miljøaktivering
+### Fase 5b — implementeret og aktiveret i DEV
 
-Authoring-endpoints kræver nu Designer/Admin, brugeradministration kræver Admin,
-og audit bruger den verificerede konto. Authentication er fortsat slået fra i
-Azure, indtil de roterede Apple-hemmeligheder, App IDs, Services ID og return
-URLs er konfigureret og det fulde loginflow er bevist i DEV.
+Authoring-endpoints kræver Designer/Admin, brugeradministration kræver Admin,
+og audit bruger den verificerede konto. Authentication er aktiv i DEV. Det
+roterede nøglemateriale, App IDs, Services ID, return URLs, webflowet og begge
+native loginflows er verificeret. PROD er fortsat slået fra og må først
+aktiveres gennem den manuelle menneskelige release-gate.
 
 **PRODs `httpsOnly` står på `false`.** En forespørgsel over almindelig HTTP bliver
 besvaret. Det skal rettes, *før* der indføres en nøgle — ellers kan nøglen

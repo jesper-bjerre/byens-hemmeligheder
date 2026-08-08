@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>da</string>
 	<key>CFBundleDisplayName</key>
-	<string>Vejles Gåder</string>
+	<string>Vejles Koder</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -19,7 +19,7 @@
 		<string>da</string>
 	</array>
 	<key>CFBundleName</key>
-	<string>Vejles Gåder</string>
+	<string>Vejles Koder</string>
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
@@ -39,7 +39,7 @@
 		<string>Med præcis position kan appen se, at du står ved netop dette sted. Uden den kan opgaven ikke låses op.</string>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Vejles Gåder bruger din position til at se, at du står på det sted, opgaven handler om. Positionen forlader aldrig telefonen, og der gemmes hverken rute eller historik.</string>
+	<string>Vejles Koder bruger din position til at se, at du står på det sted, opgaven handler om. Positionen forlader aldrig telefonen, og der gemmes hverken rute eller historik.</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

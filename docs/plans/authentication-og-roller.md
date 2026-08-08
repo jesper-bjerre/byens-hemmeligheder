@@ -1,7 +1,8 @@
 # Authentication og roller — plan for version 1
 
-**Status:** Godkendt; implementering i gang
+**Status:** Implementeret og godkendt i DEV; PROD-gate mangler
 **Dato:** 6. august 2026
+**Senest verificeret:** 8. august 2026
 **Første administrator:** sættes som ikke-sporet Azure-konfiguration
 
 ## Resultat af valideringen
@@ -271,7 +272,7 @@ miljøsammenblanding. DEV og PROD har separate sessions- og bruger-tabeller.
 - kontrakt- og regressionstest, der beviser, at User/gæst aldrig får facit fra
   `draft` eller `fieldTestReady`
 
-### 3. Byens Gåder på iOS og web
+### 3. Vejles Koder på iOS og web
 
 - gæst som standard
 - Log ind med Apple; Keychain-session på iOS og kort hukommelsessession på web
@@ -333,6 +334,13 @@ miljøsammenblanding. DEV og PROD har separate sessions- og bruger-tabeller.
 6. Giv API'ets managed identity adgang til de nye Table Storage-tabeller.
 7. Sæt bootstrap-e-mail i D og PROD; gennemfør først login i D med
    **Del min e-mail**.
+
+DEV-gaten for web blev gennemført 8. august 2026: Apple-login oprettede den
+forventede bootstrap-konto som eneste Admin, webadmin kunne hente opgaver og
+brugerlisten viste den serverlagrede rolle. Samme konto kunne derefter logge
+ind i iOS-admin, hente alle opgaver og logge ind i spillerappen. Webadmin,
+iOS-admin og Vejles Koder er dermed verificeret mod DEV; PROD konfigureres og
+aktiveres kun gennem den menneskelige releasegate.
 
 ## Kilder til valideringen
 

@@ -7,13 +7,13 @@ import { LegalPage } from './legal-page';
   template: `
     <app-legal-page title="Privatlivspolitik">
       <p>
-        Vejles Gåder kan bruges uden en konto. Denne politik forklarer, hvilke data der
+        Vejles Koder kan bruges uden en konto. Denne politik forklarer, hvilke data der
         behandles, hvis du vælger at logge ind, og hvordan appens positionsfunktion virker.
       </p>
 
       <h2>Dataansvarlig</h2>
       <p>
-        Jesper Hyldenbrandt Bjerre er dataansvarlig for Vejles Gåder og hemmeligheder.
+        Jesper Hyldenbrandt Bjerre er dataansvarlig for Vejles Koder.
         Kontaktadressen står nederst på siden.
       </p>
 

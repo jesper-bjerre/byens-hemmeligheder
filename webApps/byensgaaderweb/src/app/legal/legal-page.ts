@@ -6,8 +6,8 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <article class="legal-shell">
-      <a routerLink="/" class="back">← Tilbage til Vejles Gåder</a>
-      <p class="eyebrow">Vejles Gåder og hemmeligheder</p>
+      <a routerLink="/" class="back">← Tilbage til Vejles Koder</a>
+      <p class="eyebrow">Vejles Koder</p>
       <h1>{{ title() }}</h1>
       <p class="updated">Senest opdateret 7. august 2026</p>
       <ng-content />

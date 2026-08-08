@@ -49,7 +49,7 @@ struct ContentView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Byens Gåder")
+            .navigationTitle("Koder Admin")
             .toolbar { toolbar }
             .overlay(alignment: .bottom) { banner }
             // Sletningen bekræftes. Den fjerner opgaven, dens sted og alt, der

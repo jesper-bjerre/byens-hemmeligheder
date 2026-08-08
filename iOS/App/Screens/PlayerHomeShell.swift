@@ -140,7 +140,7 @@ struct PlayerTopBar: View {
     }
 
     private var title: some View {
-        Text("Vejles Gåder")
+        Text("Vejles Koder")
             .font(BHFont.title)
             .foregroundStyle(BHColor.ink)
             .fixedSize(horizontal: false, vertical: true)

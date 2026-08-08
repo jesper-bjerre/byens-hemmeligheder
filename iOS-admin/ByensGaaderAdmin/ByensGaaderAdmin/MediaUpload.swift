@@ -213,9 +213,9 @@ struct MediaUploadSheet: View {
                     // kontrakten kræver dem, og forfatningens princip IV sætter
                     // rettigheder over spilværdi. Men det er ikke et spørgsmål,
                     // der skal stilles fem gange pr. opgave.
-                    "owner": "Byens Gåder",
-                    "licence": "Eget materiale — Byens Gåder ejer rettighederne",
-                    "credit": "Byens Gåder",
+                    "owner": "Vejles Koder",
+                    "licence": "Eget materiale — Vejles Koder ejer rettighederne",
+                    "credit": "Vejles Koder",
                     "creditLine": NSNull(),
                     // Et nutidigt foto. Hverken historisk, bearbejdet eller
                     // AI-genereret — og derfor er der intet at spørge om.

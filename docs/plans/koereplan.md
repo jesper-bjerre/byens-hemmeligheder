@@ -1,6 +1,6 @@
 # Køreplan
 
-**Sidst opdateret:** 7. august 2026
+**Sidst opdateret:** 8. august 2026
 
 ## Beslutning: authentication gennemføres nu
 
@@ -21,7 +21,7 @@ spillerlæsning forbliver anonym.
 |---|---|---|
 | 1 | Intern test af opgavernes kvalitet | 🟡 I gang |
 | 2 | Research og design af et bedre lager til opgavedata | ✅ Afsluttet |
-| 3 | Login, adgangskontrol og produktionssikring | 🟡 Implementering startet — feature 004 |
+| 3 | Login, adgangskontrol og produktionssikring | 🟡 Godkendt i DEV; PROD-gate mangler |
 | 4 | Implementering af opgavevist Blob-lager | ✅ Afsluttet |
 
 ---

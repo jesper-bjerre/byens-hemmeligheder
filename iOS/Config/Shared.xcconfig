@@ -28,7 +28,9 @@ CODE_SIGN_STYLE = Automatic
 // Skråstregerne brydes med $(), fordi // ellers læses som en kommentar.
 BH_CONTENT_BASE_URL = https:/$()/byensgaader-api-p.azurewebsites.net
 
-// Vil du køre mod din egen maskine, så sæt den i Local.xcconfig:
-//   BH_CONTENT_BASE_URL = http:/$()/localhost:5199
+// Vil du køre Debug mod din egen maskine eller DEV, så sæt kun Debug-
+// varianten i Local.xcconfig:
+//   BH_CONTENT_BASE_URL[config=Debug] = http:/$()/localhost:5199
+// En ukvalificeret lokal værdi ville også ramme Archive og sende et
+// TestFlight-build mod localhost.
 #include? "Local.xcconfig"
-

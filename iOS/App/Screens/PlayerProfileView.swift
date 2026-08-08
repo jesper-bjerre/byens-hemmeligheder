@@ -35,7 +35,7 @@ struct PlayerProfileView: View {
                             .font(BHFont.title)
                             .foregroundStyle(BHColor.ink)
                             .accessibilityAddTraits(.isHeader)
-                        Text("Din konto, appens indstillinger og information om Vejles Gåder.")
+                        Text("Din konto, appens indstillinger og information om Vejles Koder.")
                             .font(BHFont.body)
                             .foregroundStyle(BHColor.inkMuted)
                     }
@@ -208,9 +208,9 @@ struct PlayerProfileView: View {
                     )
                     Divider().padding(.leading, 36)
                     informationLink(
-                        "Om Vejles Gåder",
+                        "Om Vejles Koder",
                         symbol: "info.circle.fill",
-                        body: "Vejles Gåder og hemmeligheder er en stedsbaseret oplevelse for familier. Gå hen til et sted i Vejle, undersøg omgivelserne, og løs gåden sammen."
+                        body: "Vejles Koder er en stedsbaseret oplevelse for familier. Gå hen til et sted i Vejle, undersøg omgivelserne, og løs koden sammen."
                     )
                     Divider().padding(.leading, 36)
                     HStack {

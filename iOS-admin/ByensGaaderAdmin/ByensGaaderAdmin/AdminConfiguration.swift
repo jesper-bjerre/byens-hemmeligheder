@@ -22,17 +22,23 @@ import Foundation
 /// Det er stadig en konfiguration og ikke et skærmbillede, og linjen findes
 /// ikke i Release.
 ///
-/// `BH_BACKEND_URL` peger på drift i **begge** konfigurationer. Debug starter
-/// altså også mod drift; skal den et andet sted hen, vælges det i appen eller
-/// med argumentet ovenfor. `AssetTests` holder værdien op mod ``Backend``, så en
-/// adresse, der kun står i bygningen, får testene til at fejle.
+/// Debug peger som standard på DEV, mens Release altid peger på drift. Lokal
+/// backend vælges bevidst i appen eller med argumentet ovenfor. `AssetTests`
+/// holder værdien op mod ``Backend``, så en adresse, der kun står i bygningen,
+/// får testene til at fejle.
 enum AdminConfiguration {
 
     private static let backendKey = "BHBackendURL"
 
-    /// Bruges kun, hvis `Info.plist` mangler nøglen — altså aldrig i en
-    /// bygning, der er sat rigtigt op.
-    private static let fallback = URL(string: "http://localhost:5199")!
+    /// Bruges kun, hvis `Info.plist` mangler nøglen. En manglende indstilling
+    /// må ikke lydløst sende appen mod localhost, hvor fejlen ligner nedetid.
+    private static var fallback: URL {
+        #if DEBUG
+        Backend.udvikling.url
+        #else
+        Backend.drift.url
+        #endif
+    }
 
     static var backendURL: URL {
         #if DEBUG
@@ -63,6 +69,7 @@ enum AdminConfiguration {
     /// En vælger mellem to navngivne servere bryder ikke det: der er ikke noget
     /// at stave forkert, og der er stadig kun ét sted, adresserne står.
     enum Backend: String, CaseIterable, Identifiable {
+        case udvikling
         case drift
         case lokal
 
@@ -70,6 +77,7 @@ enum AdminConfiguration {
 
         var name: String {
             switch self {
+            case .udvikling: "Udvikling (DEV)"
             case .drift: "Drift"
             case .lokal: "Lokal maskine"
             }
@@ -77,6 +85,7 @@ enum AdminConfiguration {
 
         var url: URL {
             switch self {
+            case .udvikling: URL(string: "https://byensgaader-api-d.azurewebsites.net")!
             case .drift: URL(string: "https://byensgaader-api-p.azurewebsites.net")!
             case .lokal: URL(string: "http://localhost:5199")!
             }
@@ -87,6 +96,7 @@ enum AdminConfiguration {
         /// der svarer.
         var note: String {
             switch self {
+            case .udvikling: "Testmiljøet med adskilte opgaver og brugere."
             case .drift: "Det indhold, quizmasterne arbejder i."
             case .lokal: "Kræver ./backend/run.sh. Virker kun i simulatoren."
             }
@@ -95,7 +105,7 @@ enum AdminConfiguration {
 
     /// Serveren, appen taler med lige nu.
     static var backend: Backend {
-        Backend.allCases.first { $0.url == backendURL } ?? .drift
+        Backend.allCases.first { $0.url == backendURL } ?? .udvikling
     }
 
     /// Skifter server. Kun i Debug — en udsendt bygning peger på drift og

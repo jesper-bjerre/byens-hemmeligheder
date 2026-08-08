@@ -102,7 +102,7 @@ struct AdminLoginView: View {
                 .foregroundStyle(.tint)
                 .accessibilityHidden(true)
             VStack(spacing: 8) {
-                Text("Byens Gåder Admin")
+                Text("Koder Admin")
                     .font(.largeTitle.bold())
                 Text(message)
                     .foregroundStyle(.secondary)

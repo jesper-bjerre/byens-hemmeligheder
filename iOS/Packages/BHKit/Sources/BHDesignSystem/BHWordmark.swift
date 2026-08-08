@@ -18,7 +18,7 @@ public struct BHWordmark: View {
         .font(.system(.title, design: .serif, weight: .regular))
         .fixedSize(horizontal: false, vertical: true)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Vejles Gåder")
+        .accessibilityLabel("Vejles Koder")
         .accessibilityAddTraits(.isHeader)
     }
 }
